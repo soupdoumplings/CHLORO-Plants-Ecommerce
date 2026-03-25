@@ -1,7 +1,7 @@
 import { Search, User, ShoppingCart, ChevronDown, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
-export function DetailHeader({ onBack }) {
+export function DetailHeader({ onBack, onNavigate }) {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const navItems = [
@@ -38,9 +38,9 @@ export function DetailHeader({ onBack }) {
               >
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               </button>
-              <a href="/" onClick={(e) => { e.preventDefault(); onBack(); }} className="flex items-center">
+              <button onClick={(e) => { e.preventDefault(); if (onNavigate) onNavigate('home'); else onBack(); }} className="flex flex-col items-center hover:opacity-80 transition-opacity">
                 <h1 className="text-4xl tracking-tight text-[#2D7A4E]" style={{ fontFamily: '"Ingrid Darling", cursive', fontWeight: 300 }}>Petals and Pots</h1>
-              </a>
+              </button>
             </div>
 
             {/* Navigation — same as homepage */}
@@ -54,8 +54,13 @@ export function DetailHeader({ onBack }) {
                 >
                   <button
                     className="flex items-center gap-1 text-sm hover:text-gray-600 transition-colors"
-                    onClick={() => {
-                      if (!item.items) onBack();
+                    onClick={(e) => {
+                      if (item.label === 'ABOUT US') {
+                        e.preventDefault();
+                        if (onNavigate) onNavigate('about');
+                      } else if (!item.items) {
+                        onBack();
+                      }
                     }}
                   >
                     {item.label}

@@ -8,6 +8,7 @@ import { FindPerfectPlant } from "./components/FindPerfectPlant";
 import { HelpPlantsThrive } from "./components/HelpPlantsThrive";
 import { Footer } from "./components/Footer";
 import { ProductDetailPage } from "./components/ProductDetailPage";
+import { AboutUsPage } from "./components/AboutUsPage";
 import { samplePlant } from "./lib/plant-data";
 
 function App() {
@@ -33,20 +34,31 @@ function App() {
   const handleBack = () => {
     setCurrentPage("home");
     setSelectedProduct(null);
+    window.scrollTo(0, 0);
+  };
+
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
   if (currentPage === "product") {
     return (
       <ProductDetailPage
         onBack={handleBack}
+        onNavigate={handleNavigate}
         product={selectedProduct}
       />
     );
   }
 
+  if (currentPage === "about") {
+    return <AboutUsPage onNavigate={handleNavigate} />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <Header onNavigate={handleNavigate} />
       <Hero />
       <PlantCategories onProductClick={handleProductClick} />
       <BestSellers onProductClick={handleProductClick} />

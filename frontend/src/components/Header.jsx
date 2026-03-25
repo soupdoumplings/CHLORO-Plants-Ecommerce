@@ -1,7 +1,7 @@
 import { Search, User, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-export function Header() {
+export function Header({ onNavigate }) {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const navItems = [
@@ -31,7 +31,9 @@ export function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-4xl tracking-tight text-[#2D7A4E]" style={{ fontFamily: '"Ingrid Darling", cursive', fontWeight: 300 }}>Petals and Pots</h1>
+              <button onClick={() => onNavigate && onNavigate('home')} className="hover:opacity-80 transition-opacity">
+                <h1 className="text-4xl tracking-tight text-[#2D7A4E]" style={{ fontFamily: '"Ingrid Darling", cursive', fontWeight: 300 }}>Petals and Pots</h1>
+              </button>
             </div>
 
             {/* Navigation */}
@@ -43,7 +45,15 @@ export function Header() {
                   onMouseEnter={() => item.items && setOpenDropdown(item.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  <button className="flex items-center gap-1 text-sm hover:text-gray-600 transition-colors">
+                  <button 
+                    className="flex items-center gap-1 text-sm hover:text-gray-600 transition-colors"
+                    onClick={(e) => {
+                      if (item.label === 'ABOUT US') {
+                        e.preventDefault();
+                        if (onNavigate) onNavigate('about');
+                      }
+                    }}
+                  >
                     {item.label}
                     {item.items && <ChevronDown className="w-4 h-4" />}
                   </button>
