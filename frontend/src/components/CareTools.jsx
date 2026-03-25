@@ -62,18 +62,18 @@ export function CareTools({ onProductClick }) {
 
           {/* Text Content */}
           <div>
-            <p className="text-sm text-[#2D7A4E] uppercase tracking-wider mb-4">
+            <p className="text-xs font-bold text-[#2D5A3D]/70 uppercase tracking-[0.2em] mb-4">
               CARE, POTS & DECOR 🪴
             </p>
-            <h2 className="text-5xl text-[#2D5A3D] mb-6 leading-tight" style={{ fontFamily: 'Lora, serif' }}>
+            <h2 className="text-5xl lg:text-6xl text-[#2D5A3D] mb-6 leading-tight drop-shadow-sm" style={{ fontFamily: 'Lora, serif' }}>
               Everything to help them thrive
             </h2>
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+            <p className="text-lg text-gray-600 font-light mb-10 leading-relaxed max-w-lg">
               From our exclusive EcoPots collection to essential care tools and handcrafted Ayurveda decor, we have everything you need to nurture your plants and show off your style.
             </p>
-            <button className="text-[#2D7A4E] hover:text-[#235F3D] flex items-center gap-2 group">
-              <span className="uppercase tracking-wider text-sm">Shop Care Tools</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <button className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center gap-3 group">
+              Shop Care Tools
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
@@ -89,20 +89,20 @@ export function CareTools({ onProductClick }) {
               image: tool.image,
               category: tool.badge
             })}>
-              <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-white relative">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-white relative shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-50/50">
                 <img
                   src={tool.image}
                   alt={tool.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover transform transition-transform duration-[2000ms] ease-out group-hover:scale-110"
                 />
                 {tool.badge && (
-                  <span className="absolute top-2 left-2 bg-[#2D7A4E] text-white text-xs px-2 py-1 rounded">
+                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[9px] font-bold tracking-[0.15em] uppercase text-[#2D5A3D] px-3 py-1.5 rounded-full shadow-sm">
                     {tool.badge}
                   </span>
                 )}
               </div>
-              <h3 className="text-sm text-gray-900 mb-1">{tool.name}</h3>
-              <p className="text-sm text-gray-700">${tool.price}</p>
+              <h3 className="text-base font-normal text-gray-900 leading-tight mb-1" style={{ fontFamily: 'Lora, serif' }}>{tool.name}</h3>
+              <p className="text-[15px] font-medium text-[#2D5A3D]">₹{tool.price.toFixed(2)}</p>
             </div>
           ))}
         </div>

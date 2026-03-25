@@ -31,14 +31,14 @@ export function PlantCategories({ onProductClick }) {
   return (
     <section className="py-20 bg-[#F5F1ED]">
       <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
-        <div className="text-center mb-12">
-          <p className="text-sm text-[#2D7A4E] uppercase tracking-wider mb-4">
+        <div className="text-center mb-16">
+          <p className="text-xs font-bold text-[#2D5A3D]/70 uppercase tracking-[0.2em] mb-4">
             FIND YOUR PERFECT PLANT
           </p>
-          <h2 className="text-6xl text-[#2D5A3D] mb-4" style={{ fontFamily: 'Lora, serif' }}>
+          <h2 className="text-5xl lg:text-6xl text-[#2D5A3D] mb-6 leading-tight" style={{ fontFamily: 'Lora, serif' }}>
             What kind of plant parent are you?
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 font-light max-w-2xl mx-auto">
             Tell us about your space and we'll match you with plants that will thrive.
           </p>
         </div>
@@ -49,7 +49,7 @@ export function PlantCategories({ onProductClick }) {
             return (
               <div
                 key={category.title}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+                className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 cursor-pointer group hover:-translate-y-1"
                 onClick={() => onProductClick && onProductClick({
                   name: category.title,
                   price: 39,
@@ -63,7 +63,7 @@ export function PlantCategories({ onProductClick }) {
                   <img
                     src={category.image}
                     alt={category.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover transform transition-transform duration-[1500ms] ease-out group-hover:scale-110"
                   />
                 </div>
                 <div className="p-4 flex items-center justify-between">
@@ -83,10 +83,10 @@ export function PlantCategories({ onProductClick }) {
           })}
         </div>
 
-        <div className="text-center">
-          <button className="text-gray-900 font-bold hover:text-gray-700 flex items-center gap-2 mx-auto">
+        <div className="text-center mt-12">
+          <button className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center justify-center gap-3 mx-auto">
             Or browse all plants
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

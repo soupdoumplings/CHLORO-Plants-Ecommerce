@@ -21,8 +21,8 @@ export function ProductHero({ product }) {
         <div className="flex-1 w-full flex items-center justify-center relative my-6 md:my-0">
           <div className="relative w-[90%] sm:w-[80%] lg:w-[75%] max-w-lg aspect-[4/5]">
             {/* Tagline Box - Anchored to Image Edge */}
-            <div className="absolute -left-8 md:-left-16 lg:-left-24 top-1/2 -translate-y-1/2 z-10 hidden md:block bg-white/70 backdrop-blur-xl p-5 lg:p-7 rounded-[2rem] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
-              <h2 className="text-xl lg:text-3xl text-[#2D5A3D] italic leading-tight font-medium" style={{ fontFamily: 'Lora, serif' }}>
+            <div className="absolute -left-8 md:-left-16 lg:-left-24 top-1/2 -translate-y-1/2 z-10 hidden md:block bg-white/40 backdrop-blur-2xl p-6 lg:p-8 rounded-3xl border border-white/60 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4),0_8px_40px_rgba(0,0,0,0.03)] duration-700 hover:scale-[1.02] cursor-default">
+              <h2 className="text-2xl lg:text-4xl text-[#2D5A3D] italic leading-tight font-medium opacity-90" style={{ fontFamily: 'Lora, serif' }}>
                 {product.tagline.map((word, i) => (
                   <span key={i} className="block">
                     {word}
@@ -31,11 +31,13 @@ export function ProductHero({ product }) {
               </h2>
             </div>
 
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover shadow-sm bg-white"
-            />
+            <div className="w-full h-full overflow-hidden rounded-[2rem] shadow-sm bg-white">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105 ease-out"
+              />
+            </div>
           </div>
         </div>
 
@@ -55,31 +57,34 @@ export function ProductHero({ product }) {
           </h3>
 
           {/* Description */}
-          <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-8 text-center lg:text-left">
+          <p className="text-gray-500 font-light text-base lg:text-lg leading-[1.8] mb-10 text-center lg:text-left">
             {product.promoDescription}
           </p>
 
           {/* Feature Cards */}
-          <div className="space-y-3">
+          <div className="space-y-6 mb-12">
             {product.features.map((feature) => (
               <FeatureCard key={feature.id} feature={feature} />
             ))}
           </div>
 
           {/* Price & CTA */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                ₹{product.price.toFixed(2)}
-              </span>
-              {product.originalPrice && (
-                <span className="text-gray-400 line-through text-lg">
-                  ₹{product.originalPrice.toFixed(2)}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-gray-100">
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-[10px] tracking-widest uppercase text-gray-400 font-medium mb-1">Total Price</span>
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl md:text-3xl font-normal text-gray-900" style={{ fontFamily: 'Lora, serif' }}>
+                  ₹{product.price.toFixed(2)}
                 </span>
-              )}
+                {product.originalPrice && (
+                  <span className="text-gray-400 line-through text-sm font-light">
+                    ₹{product.originalPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
             </div>
-            <button className="w-full sm:w-auto px-8 py-4 bg-[#2D7A4E] text-white text-base font-medium rounded-full hover:bg-[#235F3D] shadow-lg shadow-[#2D7A4E]/20 transition-all hover:-translate-y-0.5 active:scale-95">
-              Buy Now
+            <button className="w-full sm:w-auto px-10 py-4 bg-[#2D7A4E] text-white text-xs tracking-[0.2em] font-medium uppercase rounded-full hover:bg-[#235F3D] shadow-lg shadow-[#2D7A4E]/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-[#2D7A4E]/30 active:scale-95">
+              Add to Cart
             </button>
           </div>
         </div>

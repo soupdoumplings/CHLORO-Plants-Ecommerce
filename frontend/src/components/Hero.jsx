@@ -19,18 +19,18 @@ export function Hero() {
       {/* Content */}
       <div className="relative h-full w-full mx-auto px-6 md:px-12 xl:px-20 flex items-center">
         <div className="text-white max-w-2xl">
-          <p className="text-sm uppercase tracking-wider mb-4">HOME-READY PLANTS</p>
-          <h2 className="text-6xl mb-6 leading-tight" style={{ fontFamily: 'Lora, serif' }}>It's our birthday! </h2>
-          <p className="text-xl mb-8 text-white/90">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] mb-4 text-white/80">HOME-READY PLANTS</p>
+          <h2 className="text-5xl md:text-7xl mb-6 leading-[1.1] font-medium drop-shadow-sm" style={{ fontFamily: 'Lora, serif' }}>It's our birthday! </h2>
+          <p className="text-lg md:text-xl mb-10 text-white/90 font-light max-w-lg leading-relaxed">
             Celebrate all weekend long with up to 30% off All plants
           </p>
 
-          <div className="flex gap-4">
-            <button className="bg-[#2D7A4E] text-white px-8 py-3 rounded-full hover:bg-[#235F3D] transition-colors flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-5">
+            <button className="bg-[#2D7A4E] text-white px-10 py-4 rounded-full text-xs font-medium tracking-[0.15em] hover:bg-[#235F3D] transition-all duration-500 flex items-center justify-center gap-3 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
               SHOP SELF-WATERING PLANTS
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </button>
-            <button className="border-2 border-white text-white px-8 py-3 rounded-full hover:bg-white/10 transition-colors">
+            <button className="border border-white/80 backdrop-blur-sm text-white px-10 py-4 rounded-full text-xs font-medium tracking-[0.15em] hover:bg-white hover:text-[#2D5A3D] transition-all duration-500 flex items-center justify-center">
               SHOP THE SALE
             </button>
           </div>
