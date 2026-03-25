@@ -18,8 +18,8 @@ export function ProductHero({ product }) {
         </div>
 
         {/* Plant Image & Desktop Tagline */}
-        <div className="flex-1 w-full flex items-center justify-center relative mt-4 md:mt-0">
-          <div className="relative w-[90%] sm:w-[80%] max-w-2xl aspect-square">
+        <div className="flex-1 w-full flex items-center justify-center relative my-6 md:my-0">
+          <div className="relative w-[90%] sm:w-[80%] lg:w-[75%] max-w-lg aspect-[4/5]">
             {/* Tagline Box - Anchored to Image Edge */}
             <div className="absolute -left-8 md:-left-16 lg:-left-24 top-1/2 -translate-y-1/2 z-10 hidden md:block bg-white/70 backdrop-blur-xl p-5 lg:p-7 rounded-[2rem] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
               <h2 className="text-xl lg:text-3xl text-[#2D5A3D] italic leading-tight font-medium" style={{ fontFamily: 'Lora, serif' }}>
@@ -34,7 +34,7 @@ export function ProductHero({ product }) {
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-contain drop-shadow-2xl"
+              className="w-full h-full object-cover shadow-sm bg-white"
             />
           </div>
         </div>

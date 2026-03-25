@@ -25,14 +25,6 @@ export function Header() {
 
   return (
     <>
-      {/* Top Banner */}
-      <div className="bg-[#C8E6C9] text-center py-2 px-4">
-        <p className="text-sm text-[#2D5A3D]">
-          It's Our Birthday! 🎉{' '}
-          <span className="underline cursor-pointer">Save up to 67% on All Plants</span>
-        </p>
-      </div>
-
       {/* Main Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="w-full mx-auto px-6 md:px-12 xl:px-20 py-4">
