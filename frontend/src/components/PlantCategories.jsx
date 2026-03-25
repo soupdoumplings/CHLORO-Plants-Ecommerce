@@ -1,6 +1,6 @@
 import { Sun, Heart, Sparkles, Leaf, ArrowRight } from 'lucide-react';
 
-export function PlantCategories({ onProductClick }) {
+export function PlantCategories({ onProductClick, onNavigate }) {
   const categories = [
     {
       title: 'Low Light',
@@ -50,14 +50,7 @@ export function PlantCategories({ onProductClick }) {
               <div
                 key={category.title}
                 className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 cursor-pointer group hover:-translate-y-1"
-                onClick={() => onProductClick && onProductClick({
-                  name: category.title,
-                  price: 39,
-                  originalPrice: 55,
-                  rating: 4.8,
-                  image: category.image,
-                  category: category.description
-                })}
+                onClick={() => onNavigate && onNavigate('catalog')}
               >
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
@@ -84,7 +77,10 @@ export function PlantCategories({ onProductClick }) {
         </div>
 
         <div className="text-center mt-12">
-          <button className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center justify-center gap-3 mx-auto">
+          <button 
+            onClick={() => onNavigate && onNavigate('catalog')}
+            className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center justify-center gap-3 mx-auto"
+          >
             Or browse all plants
             <ArrowRight className="w-4 h-4" />
           </button>

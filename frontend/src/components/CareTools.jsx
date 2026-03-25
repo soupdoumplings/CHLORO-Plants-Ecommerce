@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 
-export function CareTools({ onProductClick }) {
+export function CareTools({ onProductClick, onNavigate }) {
   const tools = [
     {
       name: 'EcoRain',
@@ -71,7 +71,10 @@ export function CareTools({ onProductClick }) {
             <p className="text-lg text-gray-600 font-light mb-10 leading-relaxed max-w-lg">
               From our exclusive EcoPots collection to essential care tools and handcrafted Ayurveda decor, we have everything you need to nurture your plants and show off your style.
             </p>
-            <button className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center gap-3 group">
+            <button 
+              onClick={() => onNavigate && onNavigate('catalog')}
+              className="text-xs font-bold tracking-[0.2em] uppercase text-gray-900 hover:text-[#2D7A4E] transition-colors flex items-center gap-3 group"
+            >
               Shop Care Tools
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>

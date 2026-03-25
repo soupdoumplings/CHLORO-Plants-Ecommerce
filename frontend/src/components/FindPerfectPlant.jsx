@@ -1,4 +1,4 @@
-export function FindPerfectPlant() {
+export function FindPerfectPlant({ onNavigate }) {
   const categories = [
     {
       title: 'New Arrivals',
@@ -34,6 +34,7 @@ export function FindPerfectPlant() {
           {categories.map((category) => (
             <div
               key={category.title}
+              onClick={() => onNavigate && onNavigate('catalog')}
               className="group cursor-pointer relative overflow-hidden rounded-2xl"
             >
               <div className="aspect-[3/4] relative">

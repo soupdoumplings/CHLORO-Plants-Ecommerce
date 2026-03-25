@@ -9,6 +9,7 @@ import { HelpPlantsThrive } from "./components/HelpPlantsThrive";
 import { Footer } from "./components/Footer";
 import { ProductDetailPage } from "./components/ProductDetailPage";
 import { AboutUsPage } from "./components/AboutUsPage";
+import { PlantsPage } from "./components/discover/PlantsPage";
 import { samplePlant } from "./lib/plant-data";
 
 function App() {
@@ -56,14 +57,18 @@ function App() {
     return <AboutUsPage onNavigate={handleNavigate} />;
   }
 
+  if (currentPage === "catalog") {
+    return <PlantsPage onNavigate={handleNavigate} />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Header onNavigate={handleNavigate} />
       <Hero />
-      <PlantCategories onProductClick={handleProductClick} />
+      <PlantCategories onProductClick={handleProductClick} onNavigate={handleNavigate} />
       <BestSellers onProductClick={handleProductClick} />
-      <CareTools onProductClick={handleProductClick} />
-      <FindPerfectPlant />
+      <CareTools onProductClick={handleProductClick} onNavigate={handleNavigate} />
+      <FindPerfectPlant  onNavigate={handleNavigate}/>
       <HelpPlantsThrive />
       <Footer />
     </div>

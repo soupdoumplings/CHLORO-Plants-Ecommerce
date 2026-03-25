@@ -51,6 +51,9 @@ export function Header({ onNavigate }) {
                       if (item.label === 'ABOUT US') {
                         e.preventDefault();
                         if (onNavigate) onNavigate('about');
+                      } else if (item.label === 'PLANTS' || item.label === 'CARE TOOLS') {
+                        e.preventDefault();
+                        if (onNavigate) onNavigate('catalog');
                       }
                     }}
                   >
@@ -62,13 +65,15 @@ export function Header({ onNavigate }) {
                   {item.items && openDropdown === item.label && (
                     <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 shadow-lg rounded-md py-2 z-50">
                       {item.items.map((subItem) => (
-                        <a
+                        <button
                           key={subItem}
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                          onClick={() => {
+                            if ((item.label === 'PLANTS' || item.label === 'CARE TOOLS') && onNavigate) onNavigate('catalog');
+                          }}
+                          className="w-full text-left lock px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                         >
                           {subItem}
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}

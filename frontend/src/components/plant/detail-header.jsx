@@ -58,6 +58,9 @@ export function DetailHeader({ onBack, onNavigate }) {
                       if (item.label === 'ABOUT US') {
                         e.preventDefault();
                         if (onNavigate) onNavigate('about');
+                      } else if (item.label === 'PLANTS') {
+                        e.preventDefault();
+                        if (onNavigate) onNavigate('catalog');
                       } else if (!item.items) {
                         onBack();
                       }
@@ -71,13 +74,15 @@ export function DetailHeader({ onBack, onNavigate }) {
                   {item.items && openDropdown === item.label && (
                     <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 shadow-lg rounded-md py-2 z-50">
                       {item.items.map((subItem) => (
-                        <a
+                        <button
                           key={subItem}
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                          onClick={() => {
+                            if (item.label === 'PLANTS' && onNavigate) onNavigate('catalog');
+                          }}
+                          className="w-full text-left block px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                         >
                           {subItem}
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}
