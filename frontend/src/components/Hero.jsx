@@ -17,7 +17,7 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative h-full max-w-7xl mx-auto px-6 flex items-center">
+      <div className="relative h-full w-full mx-auto px-6 md:px-12 xl:px-20 flex items-center">
         <div className="text-white max-w-2xl">
           <p className="text-sm uppercase tracking-wider mb-4">HOME-READY PLANTS</p>
           <h2 className="text-6xl mb-6 leading-tight" style={{ fontFamily: 'Lora, serif' }}>It's our birthday! </h2>

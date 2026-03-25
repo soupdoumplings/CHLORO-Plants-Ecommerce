@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 
-export function CareTools() {
+export function CareTools({ onProductClick }) {
   const tools = [
     {
       name: 'EcoRain',
@@ -48,7 +48,7 @@ export function CareTools() {
 
   return (
     <section className="py-20 bg-[#F5F1ED]">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         {/* Featured Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 items-center">
           {/* Image */}
@@ -81,7 +81,14 @@ export function CareTools() {
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-6">
           {tools.map((tool) => (
-            <div key={tool.name} className="group cursor-pointer">
+            <div key={tool.name} className="group cursor-pointer" onClick={() => onProductClick && onProductClick({
+              name: tool.name,
+              price: tool.price,
+              originalPrice: null,
+              rating: 4.8,
+              image: tool.image,
+              category: tool.badge
+            })}>
               <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-white relative">
                 <img
                   src={tool.image}

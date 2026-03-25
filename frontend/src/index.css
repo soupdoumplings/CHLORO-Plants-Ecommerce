@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Ingrid+Darling&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Kite+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 @import "tailwindcss";
 
@@ -8,6 +9,7 @@
   --font-cursive: "Ingrid Darling", cursive;
   --font-sans-clean: "Kite One", sans-serif;
   --font-serif: "Lora", serif;
+  --font-serif-display: "Playfair Display", serif;
 }
 
 body {

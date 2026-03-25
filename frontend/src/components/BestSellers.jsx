@@ -1,7 +1,7 @@
 import { ProductCard } from './ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export function BestSellers() {
+export function BestSellers({ onProductClick }) {
   const products = [
     {
       name: 'Money Tree',
@@ -43,7 +43,7 @@ export function BestSellers() {
 
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-4xl text-[#2D5A3D]" style={{ fontFamily: 'Lora, serif' }}>Best Sellers</h2>
           <a href="#" className="text-sm text-[#2D7A4E] hover:underline uppercase tracking-wider">
@@ -54,7 +54,7 @@ export function BestSellers() {
         <div className="relative">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) => (
-              <ProductCard key={product.name} {...product} />
+              <ProductCard key={product.name} {...product} onClick={onProductClick} />
             ))}
           </div>
 

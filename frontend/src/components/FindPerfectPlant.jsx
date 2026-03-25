@@ -20,7 +20,7 @@ export function FindPerfectPlant() {
 
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         <div className="mb-12">
           <p className="text-sm text-[#2D7A4E] uppercase tracking-wider mb-3">
             SHOP BY CATEGORY

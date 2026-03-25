@@ -1,7 +1,13 @@
 
-export function ProductCard({ name, category, price, originalPrice, rating, image, colors }) {
+export function ProductCard({ name, category, price, originalPrice, rating, image, colors, onClick }) {
+  const handleClick = () => {
+    if (onClick) {
+      onClick({ name, category, price, originalPrice, rating, image, colors });
+    }
+  };
+
   return (
-    <div className="group cursor-pointer">
+    <div className="group cursor-pointer" onClick={handleClick}>
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4">
         <img 
           src={image} 

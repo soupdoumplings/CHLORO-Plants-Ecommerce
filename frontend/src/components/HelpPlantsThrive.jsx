@@ -27,7 +27,7 @@ export function HelpPlantsThrive() {
 
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         {/* Main Feature */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 items-center">
           {/* Image */}

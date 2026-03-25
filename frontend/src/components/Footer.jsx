@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 export function Footer() {
   return (
     <footer className="bg-[#2D5A3D] text-white pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-white/20 pb-12">
           {/* Column 1 - Newsletter */}
           <div>

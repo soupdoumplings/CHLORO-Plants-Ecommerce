@@ -1,6 +1,6 @@
 import { Sun, Heart, Sparkles, Leaf, ArrowRight } from 'lucide-react';
 
-export function PlantCategories() {
+export function PlantCategories({ onProductClick }) {
   const categories = [
     {
       title: 'Low Light',
@@ -30,7 +30,7 @@ export function PlantCategories() {
 
   return (
     <section className="py-20 bg-[#F5F1ED]">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="w-full mx-auto px-6 md:px-12 xl:px-20">
         <div className="text-center mb-12">
           <p className="text-sm text-[#2D7A4E] uppercase tracking-wider mb-4">
             FIND YOUR PERFECT PLANT
@@ -50,6 +50,14 @@ export function PlantCategories() {
               <div
                 key={category.title}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+                onClick={() => onProductClick && onProductClick({
+                  name: category.title,
+                  price: 39,
+                  originalPrice: 55,
+                  rating: 4.8,
+                  image: category.image,
+                  category: category.description
+                })}
               >
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
