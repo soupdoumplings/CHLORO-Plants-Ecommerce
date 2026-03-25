@@ -20,9 +20,9 @@ export function Hero() {
       <div className="relative h-full w-full mx-auto px-6 md:px-12 xl:px-20 flex items-center">
         <div className="text-white max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] mb-4 text-white/80">HOME-READY PLANTS</p>
-          <h2 className="text-5xl md:text-7xl mb-6 leading-[1.1] font-medium drop-shadow-sm" style={{ fontFamily: 'Lora, serif' }}>It's our birthday! </h2>
+          <h2 className="text-5xl md:text-7xl mb-6 leading-[1.1] font-medium drop-shadow-sm" style={{ fontFamily: 'Lora, serif' }}>Bring nature indoors.</h2>
           <p className="text-lg md:text-xl mb-10 text-white/90 font-light max-w-lg leading-relaxed">
-            Celebrate all weekend long with up to 30% off All plants
+            Discover our curated collection of vibrant, easy-care plants designed to elevate your everyday space.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5">
