@@ -1,7 +1,7 @@
-import { DetailHeader } from "./plant/detail-header";
-import { ProductHero } from "./plant/product-hero";
-import { Footer } from "./Footer";
-import { samplePlant } from "../lib/plant-data";
+import { DetailHeader } from "./DetailHeader";
+import { ProductHero } from "./ProductHero";
+import { Footer } from "../layout/Footer";
+import { samplePlant } from "../../lib/plant-data";
 
 export function ProductDetailPage({ onBack, onNavigate, product }) {
   const displayProduct = product || samplePlant;

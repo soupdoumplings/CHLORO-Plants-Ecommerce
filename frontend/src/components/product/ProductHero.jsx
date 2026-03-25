@@ -1,6 +1,6 @@
-import { RatingStars } from "./rating-stars";
-import { SocialLinks } from "./social-links";
-import { FeatureCard } from "./feature-card";
+import { RatingStars } from "./RatingStars";
+import { SocialLinks } from "./SocialLinks";
+import { FeatureCard } from "./FeatureCard";
 
 export function ProductHero({ product }) {
   return (

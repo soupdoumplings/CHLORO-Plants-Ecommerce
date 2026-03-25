@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
-import { Header } from '../Header';
-import { Footer } from '../Footer';
+import { Header } from '../layout/Header';
+import { Footer } from '../layout/Footer';
 
 const plants = [
   { id: 1, name: 'Money Tree', category: 'EASY CARE', price: 48, image: 'https://images.pexels.com/photos/6915358/pexels-photo-6915358.jpeg' },

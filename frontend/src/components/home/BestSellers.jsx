@@ -1,4 +1,4 @@
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '../product/ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function BestSellers({ onProductClick }) {

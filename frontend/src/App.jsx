@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
-import { PlantCategories } from "./components/PlantCategories";
-import { BestSellers } from "./components/BestSellers";
-import { CareTools } from "./components/CareTools";
-import { FindPerfectPlant } from "./components/FindPerfectPlant";
-import { HelpPlantsThrive } from "./components/HelpPlantsThrive";
-import { Footer } from "./components/Footer";
-import { ProductDetailPage } from "./components/ProductDetailPage";
-import { AboutUsPage } from "./components/AboutUsPage";
-import { PlantsPage } from "./components/discover/PlantsPage";
+import { Header } from "./components/layout/Header";
+import { Hero } from "./components/home/Hero";
+import { PlantCategories } from "./components/home/PlantCategories";
+import { BestSellers } from "./components/home/BestSellers";
+import { CareTools } from "./components/home/CareTools";
+import { FindPerfectPlant } from "./components/home/FindPerfectPlant";
+import { HelpPlantsThrive } from "./components/home/HelpPlantsThrive";
+import { Footer } from "./components/layout/Footer";
+import { ProductDetailPage } from "./components/product/ProductDetailPage";
+import { AboutUsPage } from "./components/about/AboutUsPage";
+import { PlantsPage } from "./components/catalog/PlantsPage";
 import { samplePlant } from "./lib/plant-data";
 
 function App() {
