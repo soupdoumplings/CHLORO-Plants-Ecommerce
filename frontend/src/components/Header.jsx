@@ -29,10 +29,9 @@ export function Header({ onNavigate }) {
       <header className="bg-white border-b border-gray-200">
         <div className="w-full mx-auto px-6 md:px-12 xl:px-20 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center">
-              <button onClick={() => onNavigate && onNavigate('home')} className="hover:opacity-80 transition-opacity">
-                <h1 className="text-4xl tracking-tight text-[#2D7A4E]" style={{ fontFamily: '"Ingrid Darling", cursive', fontWeight: 300 }}>Petals and Pots</h1>
+              <button onClick={() => onNavigate && onNavigate('home')} className="hover:opacity-80 transition-opacity flex items-center">
+                <img src="/logo.png" alt="Petals & Pots Logo" className="h-[72px] w-auto object-contain" />
               </button>
             </div>
 

@@ -39,7 +39,7 @@ export function DetailHeader({ onBack, onNavigate }) {
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               </button>
               <button onClick={(e) => { e.preventDefault(); if (onNavigate) onNavigate('home'); else onBack(); }} className="flex flex-col items-center hover:opacity-80 transition-opacity">
-                <h1 className="text-4xl tracking-tight text-[#2D7A4E]" style={{ fontFamily: '"Ingrid Darling", cursive', fontWeight: 300 }}>Petals and Pots</h1>
+                <img src="/logo.png" alt="Petals & Pots Logo" className="h-[72px] w-auto object-contain" />
               </button>
             </div>
 
