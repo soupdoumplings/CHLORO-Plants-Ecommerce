@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const aspectMap = {
   square: 'aspect-square',
@@ -10,7 +11,7 @@ const DiscoveryProductCard = ({ product }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
 
   return (
-    <div className="group cursor-pointer">
+    <Link to={`/catalogue/${product.id}`} className="group cursor-pointer block">
       {/* Image Container */}
       <div className={`${aspect} overflow-hidden bg-[#EFEEE6] relative mb-5`}>
         <img
@@ -46,7 +47,7 @@ const DiscoveryProductCard = ({ product }) => {
           {product.price}
         </span>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -55,7 +56,7 @@ const ProductGrid = ({ products }) => {
     <div className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-24">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
         {products.map((product) => (
-          <DiscoveryProductCard key={product.id} product={product} />
+          <DiscoveryProductCard key={product.id} product={product} />  
         ))}
       </div>
     </div>
