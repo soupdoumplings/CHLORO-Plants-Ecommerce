@@ -1,13 +1,13 @@
 import React from 'react';
 
-const ArchiveHeader = () => {
+const AdminHeader = () => {
   return (
     <div className="flex flex-col lg:flex-row justify-between items-end gap-12 w-full max-w-[1440px] mx-auto px-12 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Primary Context */}
       <div className="flex flex-col gap-4 max-w-2xl">
         <div className="flex flex-col gap-0 items-start">
-           <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A]">Botanical Asset Management</span>
-           <h1 className="font-headline text-6xl leading-tight text-[#31332C] tracking-tight -ml-1">Active Portfolio</h1>
+           <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A]">System Administration</span>
+           <h1 className="font-headline text-6xl leading-tight text-[#31332C] tracking-tight -ml-1">Admin Dashboard</h1>
         </div>
         <p className="font-body text-lg leading-relaxed text-[#5E6058] opacity-90">
              Real-time monitoring of Himalayan species inventory, curation health, and global distribution logistics.
@@ -28,4 +28,4 @@ const ArchiveHeader = () => {
   );
 };
 
-export default ArchiveHeader;
+export default AdminHeader;

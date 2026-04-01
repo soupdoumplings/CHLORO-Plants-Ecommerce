@@ -23,10 +23,10 @@ const Navbar = () => {
           <a href="#" className="text-[#31332c]/70 hover:text-[#31332c]">The Journal</a>
           <a href="#" className="text-[#31332c]/70 hover:text-[#31332c]">Care Guides</a>
           <Link 
-            to="/archive" 
-            className={`transition-all duration-300 ${location.pathname === '/archive' ? 'text-[#785a1a] border-b border-[#785a1a]' : 'text-[#785a1a]/70 hover:text-[#785a1a]'}`}
+            to="/admin" 
+            className={`transition-all duration-300 ${location.pathname === '/admin' ? 'text-[#785a1a] border-b border-[#785a1a]' : 'text-[#785a1a]/70 hover:text-[#785a1a]'}`}
           >
-            Archive
+            Admin Dashboard
           </Link>
         </div>
       </div>
