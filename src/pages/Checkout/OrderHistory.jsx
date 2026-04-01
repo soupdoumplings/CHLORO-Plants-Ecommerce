@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import wateringCanImg from '../../assets/products/watering_can.png';
+import wateringCanImg from '../../assets/products/watering-can.png';
 import scissorsImg from '../../assets/products/scissors.png';
 import monsteraImg from '../../assets/products/monstera.png';
 
