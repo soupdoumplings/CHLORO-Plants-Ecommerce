@@ -11,7 +11,7 @@ const DiscoveryProductCard = ({ product }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
 
   return (
-    <Link to={`/catalogue/${product.id}`} className="group cursor-pointer block">
+    <Link to="/catalogue" className="group cursor-pointer block">
       {/* Image Container */}
       <div className={`${aspect} overflow-hidden bg-[#EFEEE6] relative mb-5`}>
         <img
