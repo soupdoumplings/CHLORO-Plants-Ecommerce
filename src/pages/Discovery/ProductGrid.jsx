@@ -21,20 +21,39 @@ const DiscoveryProductCard = ({ product, index }) => {
         delay: (index % 4) * 0.1,
         ease: [0.22, 1, 0.36, 1],
       }}
+      whileHover="hover"
+      className="group"
     >
-      <Link to="/catalogue" className="group cursor-pointer block">
+      <Link to="/catalogue" className="cursor-pointer block">
         {/* Image Container */}
         <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
           <motion.img
             src={product.image}
             alt={product.name}
             className="w-full h-full object-cover"
-            whileHover={{ scale: 1.04 }}
+            variants={{ hover: { scale: 1.05 } }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           />
 
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500" />
+          {/* Hover overlay tinted glass */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            variants={{ hover: { opacity: 1 } }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 bg-black/[0.04]"
+          />
+
+          {/* View Product CTA - slides up from below the frame */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            variants={{ hover: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm"
+          >
+            <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
+              View Details
+            </span>
+          </motion.div>
 
           {/* Badge */}
           {product.badge && (
