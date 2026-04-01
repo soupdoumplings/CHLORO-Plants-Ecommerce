@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const OrderSummary = ({ subtotal, shipping, tax, total }) => {
   return (
@@ -41,9 +42,12 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
         </div>
 
         {/* Checkout CTA */}
-        <button className="w-full bg-[#1A1A1A] text-white py-5 px-6 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#2F4F4F] transition-all duration-300 active:scale-[0.98] mb-5">
+        <Link 
+          to="/checkout"
+          className="w-full block text-center bg-[#1A1A1A] text-white py-5 px-6 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#2F4F4F] transition-all duration-300 active:scale-[0.98] mb-5"
+        >
           Proceed to Checkout
-        </button>
+        </Link>
 
         <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] text-center w-full mb-14">
           SECURE CHECKOUT POWERED BY PETALS & POTS

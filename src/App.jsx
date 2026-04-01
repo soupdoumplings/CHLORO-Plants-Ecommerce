@@ -2,9 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
-import ArchivePage from './pages/Archive';
 import DiscoveryPage from './pages/Discovery';
 import CartPage from './pages/Cart';
+import CheckoutPage from './pages/Checkout';
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
           <Route path="/catalogue" element={<CataloguePage />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           {/* Add more routes here as we build them */}
           {/* <Route path="/login" element={<Login />} /> */}
           {/* <Route path="/signup" element={<Signup />} /> */}
