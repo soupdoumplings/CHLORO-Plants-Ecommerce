@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import profileImg from '../../assets/profile-photo.png';
+import RecentOrders from './RecentOrders';
 
 const ProfileDetails = () => {
   return (
@@ -14,7 +15,7 @@ const ProfileDetails = () => {
       {/* ── Left Column: Photo + Curator Status ── */}
       <div className="lg:col-span-4 xl:col-span-3 flex flex-col gap-8">
         {/* Profile Photo */}
-        <div className="relative w-full aspect-[3/4] max-w-[260px] overflow-hidden bg-[#EDEBE4] group">
+        <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#EDEBE4] group">
           <img
             src={profileImg}
             alt="Member profile"
@@ -34,7 +35,7 @@ const ProfileDetails = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="bg-[#EDEBE4] p-7 lg:p-8 max-w-[260px]"
+          className="bg-[#EDEBE4] p-7 lg:p-8 w-full"
         >
           <h3 className="font-headline text-[20px] text-[#1A1A1A] mb-4 leading-snug">
             Curator Status
@@ -139,6 +140,9 @@ const ProfileDetails = () => {
             Save Profile Changes
           </motion.button>
         </motion.div>
+
+        {/* Tabbed Orders Section underneath Personal Details */}
+        <RecentOrders />
       </div>
     </motion.section>
   );
