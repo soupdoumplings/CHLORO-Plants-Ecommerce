@@ -5,10 +5,11 @@ import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
 import ManageInventory from './pages/ManageInventory';
 import DiscoveryPage from './pages/Discovery';
-import ArchivePage from './pages/Archive';
 import CartPage from './pages/Cart';
 import CheckoutPage from './pages/Checkout';
 import DashboardPage from './pages/Dashboard';
+import AuthPage from './pages/Auth/AuthPage';
+import ProductDetailPage from './pages/Product';
 
 function App() {
   return (
@@ -23,9 +24,10 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
           {/* Add more routes here as we build them */}
-          {/* <Route path="/login" element={<Login />} /> */}
-          {/* <Route path="/signup" element={<Signup />} /> */}
         </Routes>
       </div>
     </Router>
