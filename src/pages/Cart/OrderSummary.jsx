@@ -16,7 +16,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
         <div className="space-y-6 mb-12 border-b border-[#B0B0A8]/20 pb-10">
           <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
             <span>Subtotal</span>
-            <span className="text-[#1A1A1A]">Rs. {subtotal.toFixed(2)}</span>
+            <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
           </div>
           
           <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
@@ -26,7 +26,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
 
           <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
             <span>Tax Estimation</span>
-            <span className="text-[#1A1A1A]">Rs. {tax.toFixed(2)}</span>
+            <span className="text-[#1A1A1A]">रू {tax.toFixed(2)}</span>
           </div>
         </div>
 
@@ -36,7 +36,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
             Total Amount
           </span>
           <span className="font-headline text-[32px] lg:text-[40px] leading-[0.8] text-[#1A1A1A]">
-            Rs. {total.toFixed(2)}
+            रू {total.toFixed(2)}
           </span>
         </div>
 
@@ -56,7 +56,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
               local_shipping
             </span>
             <p className="font-body text-[12px] leading-relaxed text-[#4A4A4A]">
-              Complimentary climate-neutral shipping on orders over Rs. 150.
+              Complimentary climate-neutral shipping on orders over रू 150.
             </p>
           </div>
           <div className="flex items-start gap-4">
