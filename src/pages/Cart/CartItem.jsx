@@ -54,7 +54,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         {/* Price & Remove */}
         <div className="flex flex-row sm:flex-col justify-between items-center sm:items-end mt-4 sm:mt-0">
           <p className="font-headline text-[18px] text-[#1A1A1A] tracking-tight">
-            ${item.price.toFixed(2)}
+            Rs. {item.price.toFixed(2)}
           </p>
           <button
             onClick={() => onRemove(item.id)}

@@ -35,7 +35,7 @@ const CartCrossSell = ({ onAdd }) => {
           onClick={() => onAdd(crossSellProduct)}
           className="flex items-center gap-2 font-label text-[10px] tracking-[0.15em] uppercase text-[#C5A059] hover:text-[#1A1A1A] font-semibold transition-colors w-fit group"
         >
-          Add to Bag — ${crossSellProduct.price.toFixed(2)}
+          Add to Bag — Rs. {crossSellProduct.price.toFixed(2)}
           <span className="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-1.5 inline-block">
             arrow_right_alt
           </span>
