@@ -46,10 +46,10 @@ const Navbar = () => {
            <Link to="/catalogue" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors">
               person
            </Link>
-           <button className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors relative">
+           <Link to="/cart" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors relative">
               shopping_bag
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#785a1a] rounded-full"></span>
-           </button>
+           </Link>
         </div>
       </div>
     </nav>
