@@ -4,7 +4,7 @@ import DiscoveryHero from './DiscoveryHero';
 import CategoryFilter from './CategoryFilter';
 import ProductGrid from './ProductGrid';
 import Newsletter from './Newsletter';
-import DiscoveryFooter from './DiscoveryFooter';
+import Footer from '../../components/Footer';
 import discoveryProducts from './discoveryProducts';
 
 const categoryMap = {
@@ -62,7 +62,7 @@ const DiscoveryPage = () => {
         <Newsletter />
       </main>
 
-      <DiscoveryFooter />
+      <Footer />
     </div>
   );
 };
