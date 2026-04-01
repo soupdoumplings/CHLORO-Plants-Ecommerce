@@ -11,7 +11,7 @@ const discoveryProducts = [
   {
     id: 'lycaste-granata',
     name: 'Lycaste Granata',
-    price: '$240.00',
+    price: 'रू 240.00',
     category: 'Rare Foliage',
     image: lycasteImg,
     badge: 'Limited Edition',
@@ -20,7 +20,7 @@ const discoveryProducts = [
   {
     id: 'etone-vessel',
     name: 'Etone Vessel',
-    price: '$185.00',
+    price: 'रू 185.00',
     category: 'Studio Ceramics',
     image: vesselImg,
     badge: null,
@@ -29,7 +29,7 @@ const discoveryProducts = [
   {
     id: 'wild-king-protea',
     name: 'Wild King Protea',
-    price: '$45.00',
+    price: 'रू 45.00',
     category: 'Fresh Cut',
     image: proteaImg,
     badge: null,
@@ -38,7 +38,7 @@ const discoveryProducts = [
   {
     id: 'obtusa-trio',
     name: 'Obtusa Trio',
-    price: '$72.00',
+    price: 'रू 72.00',
     category: 'Succulents',
     image: succulentsImg,
     badge: null,
@@ -47,7 +47,7 @@ const discoveryProducts = [
   {
     id: 'brass-secateurs',
     name: 'Brass Secateurs',
-    price: '$120.00',
+    price: 'रू 120.00',
     category: 'Heirloom Tools',
     image: scissorsImg,
     badge: null,
@@ -56,7 +56,7 @@ const discoveryProducts = [
   {
     id: 'deliciosa-shadow',
     name: "Deliciosa 'Shadow'",
-    price: '$145.00',
+    price: 'रू 145.00',
     category: 'Large Scale',
     image: monsteraImg,
     badge: null,
@@ -65,7 +65,7 @@ const discoveryProducts = [
   {
     id: 'mineral-can',
     name: 'Mineral Can',
-    price: '$130.00',
+    price: 'रू 130.00',
     category: 'Copperware',
     image: wateringCanImg,
     badge: null,
@@ -74,7 +74,7 @@ const discoveryProducts = [
   {
     id: 'orb-biosphere',
     name: 'Orb Biosphere',
-    price: '$320.00',
+    price: 'रू 320.00',
     category: 'Living Ecosystem',
     image: terrariumImg,
     badge: null,
