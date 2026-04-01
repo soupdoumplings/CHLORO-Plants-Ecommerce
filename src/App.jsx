@@ -4,6 +4,7 @@ import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
 import ManageInventory from './pages/ManageInventory';
+import DiscoveryPage from './pages/Discovery';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/catalogue" element={<CataloguePage />} />
           <Route path="/admin/add-plant" element={<ManageInventory />} />
+          <Route path="/discovery" element={<DiscoveryPage />} />
           {/* Add more routes here as we build them */}
           {/* <Route path="/login" element={<Login />} /> */}
           {/* <Route path="/signup" element={<Signup />} /> */}
