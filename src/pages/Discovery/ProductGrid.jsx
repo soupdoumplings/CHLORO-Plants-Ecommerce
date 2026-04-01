@@ -13,7 +13,7 @@ const DiscoveryProductCard = ({ product }) => {
   return (
     <Link to="/catalogue" className="group cursor-pointer block">
       {/* Image Container */}
-      <div className={`${aspect} overflow-hidden bg-[#EFEEE6] relative mb-5`}>
+      <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
         <img
           src={product.image}
           alt={product.name}
@@ -26,7 +26,7 @@ const DiscoveryProductCard = ({ product }) => {
         {/* Badge */}
         {product.badge && (
           <div className="absolute top-4 left-4">
-            <span className="inline-block bg-[#456565] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
+            <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
               {product.badge}
             </span>
           </div>
@@ -36,14 +36,14 @@ const DiscoveryProductCard = ({ product }) => {
       {/* Product Info */}
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1">
-          <h3 className="font-headline text-[18px] text-[#31332C] leading-snug group-hover:text-[#785A1A] transition-colors duration-300">
+          <h3 className="font-headline text-[18px] text-[#1A1A1A] leading-snug group-hover:text-[#C5A059] transition-colors duration-300">
             {product.name}
           </h3>
-          <p className="font-label text-[9px] tracking-[0.12em] uppercase text-[#797C73] font-medium">
+          <p className="font-label text-[9px] tracking-[0.12em] uppercase text-[#6B6B6B] font-medium">
             {product.category}
           </p>
         </div>
-        <span className="font-headline text-[16px] text-[#31332C] whitespace-nowrap pt-0.5">
+        <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap pt-0.5">
           {product.price}
         </span>
       </div>

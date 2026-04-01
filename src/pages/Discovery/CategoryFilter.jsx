@@ -24,8 +24,8 @@ const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortCh
               onClick={() => onCategoryChange(cat)}
               className={`px-5 py-2 text-[11px] tracking-[0.06em] uppercase font-medium border transition-all duration-300 ${
                 activeCategory === cat
-                  ? 'bg-[#31332C] text-white border-[#31332C]'
-                  : 'bg-transparent text-[#5E6058] border-[#B1B3A9]/40 hover:border-[#31332C]/30 hover:text-[#31332C]'
+                  ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]'
+                  : 'bg-transparent text-[#4A4A4A] border-[#B0B0A8]/40 hover:border-[#1A1A1A]/30 hover:text-[#1A1A1A]'
               }`}
             >
               {cat}
@@ -37,10 +37,10 @@ const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortCh
         <div className="relative">
           <button
             onClick={() => setSortOpen(!sortOpen)}
-            className="flex items-center gap-2 font-label text-[11px] tracking-[0.06em] uppercase text-[#5E6058] hover:text-[#31332C] transition-colors"
+            className="flex items-center gap-2 font-label text-[11px] tracking-[0.06em] uppercase text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors"
           >
-            <span className="text-[#B1B3A9]">Showing 24 results</span>
-            <span className="mx-2 text-[#B1B3A9]">·</span>
+            <span className="text-[#B0B0A8]">Showing 24 results</span>
+            <span className="mx-2 text-[#B0B0A8]">·</span>
             <span className="font-semibold">Sort by {activeSort}</span>
             <span className="material-symbols-outlined text-[16px]">
               {sortOpen ? 'expand_less' : 'expand_more'}
@@ -58,8 +58,8 @@ const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortCh
                   }}
                   className={`block w-full text-left px-5 py-3 font-label text-[11px] tracking-[0.04em] uppercase transition-colors ${
                     activeSort === opt
-                      ? 'text-[#31332C] bg-[#F5F4ED] font-semibold'
-                      : 'text-[#5E6058] hover:bg-[#F5F4ED]/50 hover:text-[#31332C]'
+                      ? 'text-[#1A1A1A] bg-[#F3F1EA] font-semibold'
+                      : 'text-[#4A4A4A] hover:bg-[#F3F1EA]/50 hover:text-[#1A1A1A]'
                   }`}
                 >
                   {opt}

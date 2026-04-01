@@ -47,7 +47,7 @@ const DiscoveryPage = () => {
   }, [activeCategory, activeSort]);
 
   return (
-    <div className="min-h-screen bg-[#FBF9F4] flex flex-col">
+    <div className="min-h-screen bg-[#F9F7F2] flex flex-col">
       <Navbar />
 
       <main className="flex-grow">
