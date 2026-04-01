@@ -3,7 +3,7 @@ import heroImage from '../../assets/discovery-hero.png';
 
 const DiscoveryHero = () => {
   return (
-    <section className="w-full pt-[72px]">
+    <section className="w-full pt-[82px]">
       <div className="max-w-[1440px] mx-auto px-10 lg:px-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[75vh] items-center">
           {/* Left — Editorial Copy */}

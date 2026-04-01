@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import DiscoveryNavbar from './DiscoveryNavbar';
+import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
 import CategoryFilter from './CategoryFilter';
 import ProductGrid from './ProductGrid';
@@ -48,7 +48,7 @@ const DiscoveryPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF9F4] flex flex-col">
-      <DiscoveryNavbar />
+      <Navbar />
 
       <main className="flex-grow">
         <DiscoveryHero />
