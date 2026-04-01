@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
@@ -17,20 +18,51 @@ const Newsletter = () => {
     <section className="w-full bg-[#F3F1EA] py-28 lg:py-36">
       <div className="max-w-[600px] mx-auto px-10 text-center">
         {/* Decorative divider */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          <span className="w-8 h-[1px] bg-[#B1B3A9]/40" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center justify-center gap-4 mb-10"
+        >
+          <motion.span
+            initial={{ width: 0 }}
+            whileInView={{ width: 32 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="h-[1px] bg-[#B0B0A8]/40"
+          />
           <span className="material-symbols-outlined text-[#2F4F4F] text-[20px]">
             local_florist
           </span>
-          <span className="w-8 h-[1px] bg-[#B1B3A9]/40" />
-        </div>
+          <motion.span
+            initial={{ width: 0 }}
+            whileInView={{ width: 32 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="h-[1px] bg-[#B0B0A8]/40"
+          />
+        </motion.div>
 
-        <h2 className="font-headline text-[clamp(1.8rem,4vw,2.8rem)] text-[#1A1A1A] leading-[1.15] tracking-tight mb-14">
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="font-headline text-[clamp(1.8rem,4vw,2.8rem)] text-[#1A1A1A] leading-[1.15] tracking-tight mb-14"
+        >
           Receive the quarterly Journal on{' '}
           <span className="italic font-light">botanical preservation.</span>
-        </h2>
+        </motion.h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col items-center gap-5">
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          onSubmit={handleSubmit}
+          className="flex flex-col items-center gap-5"
+        >
           <div className="w-full max-w-[380px]">
             <label className="block font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A]/60 font-medium mb-2 text-left">
               Email Address
@@ -45,13 +77,15 @@ const Newsletter = () => {
             />
           </div>
 
-          <button
+          <motion.button
             type="submit"
+            whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(47, 79, 79, 0.2)' }}
+            whileTap={{ scale: 0.97 }}
             className="mt-4 bg-[#2F4F4F] text-white px-10 py-3.5 font-label text-[10px] tracking-[0.15em] uppercase font-semibold hover:bg-[#243F3F] active:scale-[0.98] transition-all duration-300"
           >
             {submitted ? 'Subscribed ✓' : 'Subscribe'}
-          </button>
-        </form>
+          </motion.button>
+        </motion.form>
       </div>
     </section>
   );

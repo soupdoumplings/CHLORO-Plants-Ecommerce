@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const aspectMap = {
   square: 'aspect-square',
@@ -7,47 +8,66 @@ const aspectMap = {
   tall: 'aspect-[3/5]',
 };
 
-const DiscoveryProductCard = ({ product }) => {
+const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
 
   return (
-    <Link to="/catalogue" className="group cursor-pointer block">
-      {/* Image Container */}
-      <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.04]"
-        />
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{
+        duration: 0.7,
+        delay: (index % 4) * 0.1,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <Link to="/catalogue" className="group cursor-pointer block">
+        {/* Image Container */}
+        <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
+          <motion.img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.04 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          />
 
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500" />
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500" />
 
-        {/* Badge */}
-        {product.badge && (
-          <div className="absolute top-4 left-4">
-            <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
-              {product.badge}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Product Info */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="space-y-1">
-          <h3 className="font-headline text-[18px] text-[#1A1A1A] leading-snug group-hover:text-[#C5A059] transition-colors duration-300">
-            {product.name}
-          </h3>
-          <p className="font-label text-[9px] tracking-[0.12em] uppercase text-[#6B6B6B] font-medium">
-            {product.category}
-          </p>
+          {/* Badge */}
+          {product.badge && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="absolute top-4 left-4"
+            >
+              <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
+                {product.badge}
+              </span>
+            </motion.div>
+          )}
         </div>
-        <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap pt-0.5">
-          {product.price}
-        </span>
-      </div>
-    </Link>
+
+        {/* Product Info */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-1">
+            <h3 className="font-headline text-[18px] text-[#1A1A1A] leading-snug group-hover:text-[#C5A059] transition-colors duration-300">
+              {product.name}
+            </h3>
+            <p className="font-label text-[9px] tracking-[0.12em] uppercase text-[#6B6B6B] font-medium">
+              {product.category}
+            </p>
+          </div>
+          <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap pt-0.5">
+            {product.price}
+          </span>
+        </div>
+      </Link>
+    </motion.div>
   );
 };
 
@@ -55,8 +75,8 @@ const ProductGrid = ({ products }) => {
   return (
     <div className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-24">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
-        {products.map((product) => (
-          <DiscoveryProductCard key={product.id} product={product} />  
+        {products.map((product, i) => (
+          <DiscoveryProductCard key={product.id} product={product} index={i} />
         ))}
       </div>
     </div>
