@@ -6,6 +6,7 @@ import ArchivePage from './pages/Archive';
 import ManageInventory from './pages/ManageInventory';
 import DiscoveryPage from './pages/Discovery';
 import CartPage from './pages/Cart';
+import CheckoutPage from './pages/Checkout';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/admin/add-plant" element={<ManageInventory />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           {/* Add more routes here as we build them */}
           {/* <Route path="/login" element={<Login />} /> */}
           {/* <Route path="/signup" element={<Signup />} /> */}
