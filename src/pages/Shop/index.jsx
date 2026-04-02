@@ -90,17 +90,10 @@ const ShopPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
           {ALL_PLANTS.map((p, i) => (
-             <motion.div 
-               key={p.id} 
-               initial={{ opacity: 0, y: 40 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true, margin: '-40px' }}
-               transition={{ duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-               className="group relative"
-             >
-                <ProductCard product={p} />
+             <div key={p.id} className="group relative">
+                <ProductCard product={p} delay={i * 0.12} />
                 <button className="absolute inset-0 opacity-0 bg-transparent" onClick={() => window.location.href = `/catalogue/${p.id}`}></button>
-             </motion.div>
+             </div>
           ))}
         </div>
       </main>

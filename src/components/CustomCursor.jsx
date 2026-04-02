@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
 
 const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isHidden, setIsHidden] = useState(true);
+  const isHiddenRef = useRef(isHidden);
+
   const cursorSize = isHovered ? 40 : 12;
 
   // Use motion values for position to avoid React re-renders on every mouse move
@@ -11,73 +13,70 @@ const CustomCursor = () => {
   const mouseY = useMotionValue(-100);
 
   // Smooth springs for trailing effect
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
+  const springConfig = { damping: 25, stiffness: 450, mass: 0.3 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+    // Keep ref in sync without triggering hook dependencies
+    isHiddenRef.current = isHidden;
+  }, [isHidden]);
+
+  useEffect(() => {
+    // Highly optimized passive event handler
     const handleMouseMove = (e) => {
-      mouseX.set(e.clientX - cursorSize / 2);
-      mouseY.set(e.clientY - cursorSize / 2);
-      if (isHidden) setIsHidden(false);
+      // By using translateX/Y -50% in the styles, we don't need to calculate offsets here
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      
+      if (isHiddenRef.current) {
+        setIsHidden(false);
+      }
     };
 
     const handleMouseLeave = () => setIsHidden(true);
     const handleMouseEnterWindow = () => setIsHidden(false);
 
-    // Setup interactive hovers for cursor expansion
-    const setupInteractions = () => {
-      const interactables = document.querySelectorAll('button, a, input, select, .cursor-pointer');
-      
-      const onEnter = () => setIsHovered(true);
-      const onLeave = () => setIsHovered(false);
-
-      interactables.forEach((el) => {
-        el.addEventListener('mouseenter', onEnter);
-        el.addEventListener('mouseleave', onLeave);
-      });
-
-      return () => {
-        interactables.forEach((el) => {
-          el.removeEventListener('mouseenter', onEnter);
-          el.removeEventListener('mouseleave', onLeave);
-        });
-      };
+    // Event delegation is much cheaper than binding to 100+ elements
+    const handleMouseOver = (e) => {
+      const isInteractable = e.target.closest('button, a, input, select, .cursor-pointer, [role="button"]');
+      setIsHovered(!!isInteractable);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    document.body.addEventListener('mouseleave', handleMouseLeave);
-    document.body.addEventListener('mouseenter', handleMouseEnterWindow);
-    
-    // Slight delay to allow DOM to render dynamically
-    const cleanupInteractions = setTimeout(setupInteractions, 1000);
+    // Use passive listeners to prevent scrolling/input thread blocking
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.body.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    document.body.addEventListener('mouseenter', handleMouseEnterWindow, { passive: true });
+    document.body.addEventListener('mouseover', handleMouseOver, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       document.body.removeEventListener('mouseleave', handleMouseLeave);
       document.body.removeEventListener('mouseenter', handleMouseEnterWindow);
-      clearTimeout(cleanupInteractions);
+      document.body.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [cursorSize, isHidden, mouseX, mouseY]);
+  }, [mouseX, mouseY]); // Empty dependencies mean event listeners are attached exactly once
 
   if (typeof window === 'undefined') return null;
 
   return (
     <motion.div
-      className="fixed top-0 left-0 rounded-full border pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+      className="fixed top-0 left-0 rounded-full border pointer-events-none z-[9999] hidden md:block"
       style={{
         width: cursorSize,
         height: cursorSize,
         x: cursorX,
         y: cursorY,
-        backgroundColor: isHovered ? 'white' : 'transparent',
-        borderColor: 'white',
-        borderWidth: isHovered ? '0px' : '1px',
+        translateX: '-50%',
+        translateY: '-50%',
+        backgroundColor: isHovered ? 'rgba(49, 51, 44, 0.1)' : 'transparent',
+        borderColor: isHovered ? 'transparent' : 'rgba(49, 51, 44, 0.6)',
+        borderWidth: '1px',
         opacity: isHidden ? 0 : 1,
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: isHidden ? 0 : 1 }}
-      transition={{ duration: 0.2 }}
+      transition={{ opacity: { duration: 0.2 }, width: { duration: 0.2 }, height: { duration: 0.2 } }}
     />
   );
 };
