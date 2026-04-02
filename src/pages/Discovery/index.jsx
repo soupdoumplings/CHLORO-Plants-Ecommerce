@@ -39,7 +39,7 @@ const DiscoveryPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="min-h-screen bg-[#F9F7F2] flex flex-col"
     >
       <Navbar />
