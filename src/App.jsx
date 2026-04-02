@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
@@ -12,23 +12,33 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}>
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/archive" element={<ArchivePage />} />
-        <Route path="/catalogue" element={<CataloguePage />} />
-        <Route path="/admin/add-plant" element={<ManageInventory />} />
-        <Route path="/discovery" element={<DiscoveryPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/register" element={<AuthPage />} />
+        
+        {/* Protected Routes */}
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/archive" element={<ProtectedRoute><ArchivePage /></ProtectedRoute>} />
+        <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
+        <Route path="/admin/add-plant" element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
+        <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
       </Routes>
     </AnimatePresence>
   );

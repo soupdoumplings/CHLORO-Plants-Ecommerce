@@ -37,6 +37,22 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* AI Diagnosis Center */}
+      <div className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 cursor-pointer group">
+        <motion.div 
+          whileHover={{ scale: 1.05, backgroundColor: '#31332C' }}
+          className="w-10 h-10 border border-[#31332c]/20 flex items-center justify-center transition-all duration-500 rounded-sm bg-transparent group-hover:bg-[#31332C]"
+        >
+          <span className="material-symbols-outlined text-[#31332c] group-hover:text-[#FBF9F4] transition-colors text-[18px]">
+            camera
+          </span>
+        </motion.div>
+        <div className="flex flex-col justify-center">
+          <span className="font-label text-[8px] uppercase tracking-[0.2em] text-[#31332c]/50 font-bold leading-none mb-1">AI Powered</span>
+          <span className="font-headline italic text-[15px] text-[#31332c] leading-none">AI Diagnosis</span>
+        </div>
+      </div>
+
       {/* Utilities */}
       <div className="flex items-center gap-6">
         <div className="hidden lg:flex items-center border border-[#797c73]/40 px-3 py-1 bg-transparent group focus-within:border-[#785a1a] transition-all">
@@ -49,7 +65,7 @@ const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
-           <Link to="/catalogue" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors">
+           <Link to="/dashboard" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors">
               person
            </Link>
            <Link to="/cart" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors relative">
