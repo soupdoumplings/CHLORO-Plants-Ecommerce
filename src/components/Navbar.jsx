@@ -38,7 +38,7 @@ const Navbar = () => {
       </div>
 
       {/* AI Diagnosis Center */}
-      <div className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 cursor-pointer group">
+      <Link to="/ai-diagnosis" className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 cursor-pointer group">
         <motion.div 
           whileHover={{ scale: 1.05, backgroundColor: '#31332C' }}
           className="w-10 h-10 border border-[#31332c]/20 flex items-center justify-center transition-all duration-500 rounded-sm bg-transparent group-hover:bg-[#31332C]"
@@ -51,7 +51,7 @@ const Navbar = () => {
           <span className="font-label text-[8px] uppercase tracking-[0.2em] text-[#31332c]/50 font-bold leading-none mb-1">AI Powered</span>
           <span className="font-headline italic text-[15px] text-[#31332c] leading-none">AI Diagnosis</span>
         </div>
-      </div>
+      </Link>
 
       {/* Utilities */}
       <div className="flex items-center gap-6">
