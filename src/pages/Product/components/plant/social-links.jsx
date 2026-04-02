@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram } from "lucide-react";
+import { FaFacebook as Facebook, FaTwitter as Twitter, FaInstagram as Instagram } from "react-icons/fa";
 
 const socials = [
   { icon: Facebook, href: "#", label: "Facebook" },
