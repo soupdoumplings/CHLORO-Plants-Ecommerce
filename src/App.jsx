@@ -34,10 +34,13 @@ const AnimatedRoutes = () => {
   );
 };
 
+import CustomCursor from './components/CustomCursor';
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden">
+      <CustomCursor />
+      <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
         <AnimatedRoutes />
       </div>
     </Router>

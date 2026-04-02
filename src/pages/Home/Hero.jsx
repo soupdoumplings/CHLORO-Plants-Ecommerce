@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Magnetic from '../../components/Magnetic';
 
 const Hero = () => {
   return (
@@ -42,23 +43,27 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col md:flex-row gap-10 items-start md:items-center"
         >
-          <motion.button 
-            whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
-            whileTap={{ scale: 0.97 }}
-            className="bg-white text-[#31332c] px-12 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all shadow-xl shadow-black/10"
-          >
-            Explore the Archive
-          </motion.button>
+          <Magnetic magnetism={15}>
+            <motion.button 
+              whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+              whileTap={{ scale: 0.97 }}
+              className="bg-white text-[#31332c] px-12 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all shadow-xl shadow-black/10"
+            >
+              Explore the Archive
+            </motion.button>
+          </Magnetic>
           
           <div className="flex items-center gap-5 group cursor-pointer text-white">
-            <motion.div 
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,1)' }}
-              className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm"
-            >
-              <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-2xl">
-                camera
-              </span>
-            </motion.div>
+            <Magnetic magnetism={20}>
+              <motion.div 
+                whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,1)' }}
+                className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm"
+              >
+                <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-2xl">
+                  camera
+                </span>
+              </motion.div>
+            </Magnetic>
             <div>
               <p className="font-label text-[9px] uppercase tracking-[0.2em] text-white/60 font-bold">AI Powered</p>
               <p className="font-headline italic text-lg text-white">AI Diagnosis</p>
