@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import CartHeader from './CartHeader';
@@ -6,7 +7,6 @@ import CartItem from './CartItem';
 import CartCrossSell from './CartCrossSell';
 import OrderSummary from './OrderSummary';
 import { initialCartItems } from './cartData';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const CartPage = () => {
@@ -32,11 +32,17 @@ const CartPage = () => {
   };
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const tax = subtotal * 0.08; // 8% tax estimation to match visually $21.52
+  const tax = subtotal * 0.08;
   const total = subtotal + tax;
 
   return (
-    <div className="min-h-screen bg-[#F9F7F2] flex flex-col">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen bg-[#F9F7F2] flex flex-col"
+    >
       <Navbar />
 
       <main className="flex-grow w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-32">
@@ -80,19 +86,24 @@ const CartPage = () => {
           </div>
 
           {/* Right Column: Order Summary Sidebar */}
-          <div className="lg:col-span-5 xl:col-span-4 w-full lg:sticky lg:top-[120px]">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 xl:col-span-4 w-full lg:sticky lg:top-[120px]"
+          >
              <OrderSummary 
                subtotal={subtotal} 
                shipping={0} 
                tax={tax} 
                total={total} 
              />
-          </div>
+          </motion.div>
         </div>
       </main>
 
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

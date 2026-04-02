@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const InventoryTable = () => {
   const holdings = [
@@ -29,8 +30,20 @@ const InventoryTable = () => {
   ];
 
   return (
-    <section className="mb-24 px-12 max-w-[1440px] mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-      <div className="flex justify-between items-center mb-12 border-b border-[#B1B3A9]/10 pb-10">
+    <motion.section 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="mb-24 px-12 max-w-[1440px] mx-auto w-full"
+    >
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="flex justify-between items-center mb-12 border-b border-[#B1B3A9]/10 pb-10"
+      >
         <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Holdings</h2>
         <div className="flex gap-8 items-center font-label text-[12px] uppercase tracking-widest">
            <button className="text-[#785A1A] border-b border-[#785A1A] pb-1 font-bold">All Species</button>
@@ -38,7 +51,7 @@ const InventoryTable = () => {
            <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Lowland</button>
            <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Equipment</button>
         </div>
-      </div>
+      </motion.div>
 
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left">
@@ -54,7 +67,14 @@ const InventoryTable = () => {
            </thead>
            <tbody className="divide-y divide-[#B1B3A9]/10">
              {holdings.map((item, i) => (
-               <tr key={i} className="group hover:bg-white transition-all duration-300">
+               <motion.tr 
+                 key={i} 
+                 initial={{ opacity: 0, x: -20 }}
+                 whileInView={{ opacity: 1, x: 0 }}
+                 viewport={{ once: true, margin: '-20px' }}
+                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                 className="group hover:bg-white transition-all duration-300"
+               >
                   <td className="py-8 px-4 flex items-center gap-6">
                      <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -82,10 +102,13 @@ const InventoryTable = () => {
                            <span className={item.progress < 20 ? 'text-[#9F403D]' : 'text-[#785A1A]'}>{item.progress}%</span>
                         </div>
                         <div className="w-full h-[3px] bg-[#E2E3D9] overflow-hidden relative">
-                           <div 
-                              className={`absolute inset-y-0 left-0 transition-all duration-1000 group-hover:opacity-90 ${item.progress < 20 ? 'bg-[#9F403D]' : 'bg-[#785A1A]'}`} 
-                              style={{ width: `${item.progress}%` }}
-                           ></div>
+                           <motion.div 
+                              initial={{ width: 0 }}
+                              whileInView={{ width: `${item.progress}%` }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                              className={`absolute inset-y-0 left-0 group-hover:opacity-90 ${item.progress < 20 ? 'bg-[#9F403D]' : 'bg-[#785A1A]'}`} 
+                           />
                         </div>
                      </div>
                   </td>
@@ -98,12 +121,12 @@ const InventoryTable = () => {
                         <button className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">archive</button>
                      </div>
                   </td>
-               </tr>
+               </motion.tr>
              ))}
            </tbody>
         </table>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

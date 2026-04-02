@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
@@ -11,24 +12,33 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/archive" element={<ArchivePage />} />
+        <Route path="/catalogue" element={<CataloguePage />} />
+        <Route path="/admin/add-plant" element={<ManageInventory />} />
+        <Route path="/discovery" element={<DiscoveryPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/register" element={<AuthPage />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/archive" element={<ArchivePage />} />
-          <Route path="/catalogue" element={<CataloguePage />} />
-          <Route path="/admin/add-plant" element={<ManageInventory />} />
-          <Route path="/discovery" element={<DiscoveryPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/login" element={<AuthPage />} />
-          <Route path="/register" element={<AuthPage />} />
-          {/* Add more routes here as we build them */}
-        </Routes>
+        <AnimatedRoutes />
       </div>
     </Router>
   );

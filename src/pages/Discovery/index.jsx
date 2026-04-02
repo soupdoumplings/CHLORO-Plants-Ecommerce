@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
 import CategoryFilter from './CategoryFilter';
@@ -21,35 +22,27 @@ const DiscoveryPage = () => {
 
   const filteredProducts = useMemo(() => {
     let items = [...discoveryProducts];
-
-    // Filter by category
     const allowed = categoryMap[activeCategory];
     if (allowed) {
       items = items.filter((p) => allowed.includes(p.category));
     }
-
-    // Sort
     if (activeSort === 'Price: Low to High') {
-      items.sort(
-        (a, b) =>
-          parseFloat(a.price.replace(/[$,]/g, '')) -
-          parseFloat(b.price.replace(/[$,]/g, ''))
-      );
+      items.sort((a, b) => parseFloat(a.price.replace(/[$,]/g, '')) - parseFloat(b.price.replace(/[$,]/g, '')));
     } else if (activeSort === 'Price: High to Low') {
-      items.sort(
-        (a, b) =>
-          parseFloat(b.price.replace(/[$,]/g, '')) -
-          parseFloat(a.price.replace(/[$,]/g, ''))
-      );
+      items.sort((a, b) => parseFloat(b.price.replace(/[$,]/g, '')) - parseFloat(a.price.replace(/[$,]/g, '')));
     }
-
     return items;
   }, [activeCategory, activeSort]);
 
   return (
-    <div className="min-h-screen bg-[#F9F7F2] flex flex-col">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen bg-[#F9F7F2] flex flex-col"
+    >
       <Navbar />
-
       <main className="flex-grow">
         <DiscoveryHero />
         <CategoryFilter
@@ -61,9 +54,8 @@ const DiscoveryPage = () => {
         <ProductGrid products={filteredProducts} />
         <Newsletter />
       </main>
-
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

@@ -14,7 +14,13 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#fbf9f4] overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="flex h-screen bg-[#fbf9f4] overflow-hidden"
+    >
 
       {/* ── Left Panel: Cinematic Flower Image ── */}
       <motion.div
@@ -74,7 +80,7 @@ const AuthPage = () => {
             <div className="flex items-center gap-8 mb-12">
               <button
                 onClick={() => setIsLogin(true)}
-                className="relative pb-3"
+                className="relative pb-3 outline-none"
               >
                 <span className={`font-label text-[10px] uppercase tracking-[0.2em] font-semibold transition-colors duration-300 ${isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Sign In
@@ -89,7 +95,7 @@ const AuthPage = () => {
               </button>
               <button
                 onClick={() => setIsLogin(false)}
-                className="relative pb-3"
+                className="relative pb-3 outline-none"
               >
                 <span className={`font-label text-[10px] uppercase tracking-[0.2em] font-semibold transition-colors duration-300 ${!isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Create Account
@@ -150,12 +156,14 @@ const AuthPage = () => {
                     </div>
                   </div>
 
-                  <button
+                  <motion.button
+                    whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
+                    whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 active:scale-[0.99]"
+                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20"
                   >
                     Enter Portfolio
-                  </button>
+                  </motion.button>
 
                   <div className="flex items-center gap-4 my-8">
                     <div className="flex-1 h-px bg-[#2F4F4F]/8" />
@@ -235,12 +243,14 @@ const AuthPage = () => {
                     </div>
                   </div>
 
-                  <button
+                  <motion.button
+                    whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
+                    whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 active:scale-[0.99]"
+                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20"
                   >
                     Create Account
-                  </button>
+                  </motion.button>
 
                   <p className="mt-6 text-center font-body text-[11px] text-[#456565]/50 leading-relaxed">
                     By joining, you agree to our{' '}
@@ -261,7 +271,7 @@ const AuthPage = () => {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

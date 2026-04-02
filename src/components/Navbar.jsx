@@ -1,11 +1,17 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-[82px] bg-[#FBF9F4] border-b border-[#31332c]/10 z-50 flex items-center justify-between px-12 transition-all duration-500">
+    <motion.nav 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 h-[82px] bg-[#FBF9F4] border-b border-[#31332c]/10 z-50 flex items-center justify-between px-12 transition-all duration-500"
+    >
       <div className="flex items-center gap-12">
         {/* Branding */}
         <Link to="/" className="font-headline text-2xl text-[#31332C] hover:opacity-70 transition-opacity">
@@ -20,8 +26,8 @@ const Navbar = () => {
           >
             Shop
           </Link>
-          <a href="#" className="text-[#31332c]/70 hover:text-[#31332c]">The Journal</a>
-          <a href="#" className="text-[#31332c]/70 hover:text-[#31332c]">Care Guides</a>
+          <a href="#" className="text-[#31332c]/70 hover:text-[#31332c] transition-colors">The Journal</a>
+          <a href="#" className="text-[#31332c]/70 hover:text-[#31332c] transition-colors">Care Guides</a>
           <Link 
             to="/archive" 
             className={`transition-all duration-300 ${location.pathname === '/archive' ? 'text-[#785a1a] border-b border-[#785a1a]' : 'text-[#785a1a]/70 hover:text-[#785a1a]'}`}
@@ -48,11 +54,16 @@ const Navbar = () => {
            </Link>
            <Link to="/cart" className="material-symbols-outlined text-[#31332c] hover:text-[#785a1a] transition-colors relative">
               shopping_bag
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#785a1a] rounded-full"></span>
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.8, type: 'spring', stiffness: 500 }}
+                className="absolute -top-1 -right-1 w-2 h-2 bg-[#785a1a] rounded-full"
+              />
            </Link>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

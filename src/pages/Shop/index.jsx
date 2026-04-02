@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProductCard from '../../components/ProductCard';
@@ -36,39 +37,76 @@ const ALL_PLANTS = [
 
 const ShopPage = () => {
   return (
-    <div className="min-h-screen bg-[#FBF9F4] flex flex-col items-center">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen bg-[#FBF9F4] flex flex-col items-center"
+    >
       <Navbar />
       
       <main className="w-full max-w-[1440px] px-12 pt-32 pb-48">
         <header className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
            <div className="text-left space-y-6 max-w-2xl">
-              <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#785A1A] font-bold">Botanical Archive</span>
-              <h1 className="font-headline text-8xl md:text-9xl tracking-tighter text-[#31332C] leading-none">The <span className="italic font-light">Specimens.</span></h1>
-              <p className="font-body text-[#5E6058] text-lg max-w-md leading-relaxed">
+              <motion.span 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#785A1A] font-bold inline-block"
+              >
+                Botanical Archive
+              </motion.span>
+              <motion.h1 
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="font-headline text-8xl md:text-9xl tracking-tighter text-[#31332C] leading-none"
+              >
+                The <span className="italic font-light">Specimens.</span>
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="font-body text-[#5E6058] text-lg max-w-md leading-relaxed"
+              >
                  A curated selection of the finest flora from the Himalayan foothills and beyond. Each specimen is selected for its architectural presence and botanical soul.
-              </p>
+              </motion.p>
            </div>
            
-           <div className="flex gap-12 font-sans text-[11px] tracking-[0.1em] uppercase font-bold text-[#31332C]/40 border-b border-[#31332C]/5 pb-2">
+           <motion.div 
+             initial={{ opacity: 0, y: 15 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+             className="flex gap-12 font-sans text-[11px] tracking-[0.1em] uppercase font-bold text-[#31332C]/40 border-b border-[#31332C]/5 pb-2"
+           >
               <button className="text-[#31332C] border-b border-[#31332C]">All</button>
-              <button className="hover:text-[#31332C]">High Altitude</button>
-              <button className="hover:text-[#31332C]">Indoor</button>
-              <button className="hover:text-[#31332C]">Rare</button>
-           </div>
+              <button className="hover:text-[#31332C] transition-colors">High Altitude</button>
+              <button className="hover:text-[#31332C] transition-colors">Indoor</button>
+              <button className="hover:text-[#31332C] transition-colors">Rare</button>
+           </motion.div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
-          {ALL_PLANTS.map((p) => (
-             <div key={p.id} className="group relative">
+          {ALL_PLANTS.map((p, i) => (
+             <motion.div 
+               key={p.id} 
+               initial={{ opacity: 0, y: 40 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true, margin: '-40px' }}
+               transition={{ duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+               className="group relative"
+             >
                 <ProductCard product={p} />
                 <button className="absolute inset-0 opacity-0 bg-transparent" onClick={() => window.location.href = `/catalogue/${p.id}`}></button>
-             </div>
+             </motion.div>
           ))}
         </div>
       </main>
 
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import ProductCard from '../../components/ProductCard';
 
 const FEATURED_PRODUCTS = [
@@ -30,20 +31,50 @@ const Archive = () => {
     <section className="py-32 px-12 bg-[#fbf9f4]">
         <div className="flex justify-between items-end mb-20">
           <div className="max-w-2xl text-left">
-            <h2 className="font-headline text-5xl md:text-6xl mb-8 leading-tight text-[#31332c] animate-in slide-in-from-bottom-5 duration-700">Personalized Archive Recommendations</h2>
-            <p className="font-body text-[#5e6058] leading-relaxed text-lg tracking-wide opacity-90 mb-4 animate-in slide-in-from-bottom-3 duration-500">
+            <motion.h2 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="font-headline text-5xl md:text-6xl mb-8 leading-tight text-[#31332c]"
+            >
+              Personalized Archive Recommendations
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="font-body text-[#5e6058] leading-relaxed text-lg tracking-wide opacity-90 mb-4"
+            >
               Curated by our proprietary growth algorithms, these specimens are selected based on your local micro-climate in the Kathmandu Valley.
-            </p>
+            </motion.p>
           </div>
-          <a class="font-label text-[10px] uppercase font-bold tracking-[0.25em] border-b border-[#31332c] pb-1.5 mb-2 hover:opacity-50 transition-all text-[#31332c] flex items-center gap-3 shrink-0" href="#">
+          <motion.a 
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ x: 4 }}
+            className="font-label text-[10px] uppercase font-bold tracking-[0.25em] border-b border-[#31332c] pb-1.5 mb-2 hover:opacity-50 transition-all text-[#31332c] flex items-center gap-3 shrink-0" 
+            href="#"
+          >
              View Full Collection 
              <span className="material-symbols-outlined text-xs">arrow_forward</span>
-          </a>
+          </motion.a>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          {FEATURED_PRODUCTS.map((p) => (
-            <ProductCard key={p.id} product={p} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
+          {FEATURED_PRODUCTS.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ProductCard product={p} />
+            </motion.div>
           ))}
         </div>
       </section>
