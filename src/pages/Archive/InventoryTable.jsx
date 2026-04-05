@@ -1,33 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../supabase';
 
 const InventoryTable = () => {
-  const holdings = [
-    { 
-      name: "Monstera Deliciosa", 
-      id: "SPEC-001-KTM", 
-      status: "Optimal", 
-      progress: 75, 
-      value: "4,500", 
-      image: "https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg" 
-    },
-    { 
-      name: "Sansevieria 'Laurentii'", 
-      id: "SPEC-002-KTM", 
-      status: "Optimal", 
-      progress: 90, 
-      value: "2,200", 
-      image: "https://images.pexels.com/photos/3699416/pexels-photo-3699416.jpeg" 
-    },
-    { 
-      name: "Ficus Lyrata", 
-      id: "SPEC-842-HIM", 
-      status: "Critical", 
-      progress: 12, 
-      value: "8,900", 
-      image: "https://images.pexels.com/photos/8175394/pexels-photo-8175394.jpeg" 
+  const [holdings, setHoldings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchHoldings();
+  }, []);
+
+  const fetchHoldings = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, category(name)')
+      .order('created_at', { ascending: false });
+    
+    if (!error) {
+      setHoldings(data);
+    } else {
+      console.error('Error fetching holdings:', error);
     }
-  ];
+    setLoading(false);
+  };
+
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      
+      if (!error) {
+        setHoldings(prev => prev.filter(item => item.id !== id));
+        alert('Specimen removed from archive.');
+      } else {
+        alert('Error deleting specimen: ' + error.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="py-24 px-12 text-center font-label text-[10px] uppercase tracking-widest text-[#5E6058]">Loading Archive Data...</div>;
+  }
 
   return (
     <motion.section 
@@ -46,85 +64,76 @@ const InventoryTable = () => {
       >
         <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Holdings</h2>
         <div className="flex gap-8 items-center font-label text-[12px] uppercase tracking-widest">
-           <button className="text-[#785A1A] border-b border-[#785A1A] pb-1 font-bold">All Species</button>
-           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">High Altitude</button>
-           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Lowland</button>
-           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Equipment</button>
+           <Link to="/admin/add-plant" className="bg-[#785A1A] text-white px-6 py-2 rounded-full font-bold hover:bg-[#31332C] transition-all">Add New Specimen</Link>
         </div>
       </motion.div>
 
       <div className="overflow-x-auto w-full">
-        <table className="w-full text-left">
-           <thead>
-              <tr className="border-b border-[#B1B3A9]/20 font-label text-[10px] uppercase tracking-widest text-[#5E6058]/80 font-black">
-                <th className="py-6 px-4">Specimen Profile</th>
-                <th className="py-6 px-4">Inventory ID</th>
-                <th className="py-6 px-4">Curation Health</th>
-                <th className="py-6 px-4">Market Position</th>
-                <th className="py-6 px-4 text-right">Valuation</th>
-                <th className="py-6 px-4 text-right">Actions</th>
-              </tr>
-           </thead>
-           <tbody className="divide-y divide-[#B1B3A9]/10">
-             {holdings.map((item, i) => (
-               <motion.tr 
-                 key={i} 
-                 initial={{ opacity: 0, x: -20 }}
-                 whileInView={{ opacity: 1, x: 0 }}
-                 viewport={{ once: true, margin: '-20px' }}
-                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                 className="group hover:bg-white transition-all duration-300"
-               >
-                  <td className="py-8 px-4 flex items-center gap-6">
-                     <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                     </div>
-                     <div>
-                        <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
-                        <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70">Kathmandu Indoor Selection</p>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4">
-                     <span className="bg-[#E8E9E0] px-4 py-2 font-label text-[10px] tracking-wide uppercase text-[#31332C] font-bold border border-[#797c73]/5">
-                        {item.id}
-                     </span>
-                  </td>
-                  <td className="py-8 px-4">
-                     <div className="flex items-center gap-3">
-                        <span className={`w-2 h-2 rounded-full ${item.status === 'Optimal' ? 'bg-[#456565]' : 'bg-[#9F403D]'}`}></span>
-                        <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.status}</p>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4 w-[200px]">
-                     <div className="space-y-3">
-                        <div className="flex justify-between font-label text-[9px] uppercase tracking-widest text-[#31332C]">
-                           <span className="font-black">Maturity</span>
-                           <span className={item.progress < 20 ? 'text-[#9F403D]' : 'text-[#785A1A]'}>{item.progress}%</span>
-                        </div>
-                        <div className="w-full h-[3px] bg-[#E2E3D9] overflow-hidden relative">
-                           <motion.div 
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${item.progress}%` }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                              className={`absolute inset-y-0 left-0 group-hover:opacity-90 ${item.progress < 20 ? 'bg-[#9F403D]' : 'bg-[#785A1A]'}`} 
-                           />
-                        </div>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4 text-right">
-                     <p className="font-headline text-xl text-[#31332C]">रू {item.value}</p>
-                  </td>
-                  <td className="py-8 px-4">
-                     <div className="flex justify-end gap-6 items-center">
-                        <button className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</button>
-                        <button className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">archive</button>
-                     </div>
-                  </td>
-               </motion.tr>
-             ))}
-           </tbody>
-        </table>
+        {holdings.length === 0 ? (
+          <div className="py-20 text-center border-2 border-dashed border-[#B1B3A9]/20 rounded-2xl">
+             <p className="font-headline text-2xl text-[#31332C]/40 italic">No specimens in the current archive.</p>
+             <p className="font-label text-[10px] uppercase tracking-widest text-[#5E6058] mt-4 opacity-60">Add your first plant to begin tracking.</p>
+          </div>
+        ) : (
+          <table className="w-full text-left">
+            <thead>
+                <tr className="border-b border-[#B1B3A9]/20 font-label text-[10px] uppercase tracking-widest text-[#5E6058]/80 font-black">
+                  <th className="py-6 px-4">Specimen Profile</th>
+                  <th className="py-6 px-4">Slug / ID</th>
+                  <th className="py-6 px-4">Category</th>
+                  <th className="py-6 px-4 text-right">Valuation</th>
+                  <th className="py-6 px-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody className="divide-y divide-[#B1B3A9]/10">
+              {holdings.map((item, i) => (
+                <motion.tr 
+                  key={item.id} 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-20px' }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  className="group hover:bg-white transition-all duration-300"
+                >
+                    <td className="py-8 px-4 flex items-center gap-6">
+                      <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+                          <img src={item.image_url || 'https://via.placeholder.com/400?text=No+Image'} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                          <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
+                          <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70">Specimen Archive Entry</p>
+                      </div>
+                    </td>
+                    <td className="py-8 px-4 font-label text-[10px] tracking-wide uppercase text-[#31332C] font-bold">
+                       {item.slug}
+                    </td>
+                    <td className="py-8 px-4">
+                       <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.category?.name || 'Uncategorized'}</p>
+                    </td>
+                    <td className="py-8 px-4 text-right">
+                       <p className="font-headline text-xl text-[#31332C]">रू {item.price}</p>
+                    </td>
+                    <td className="py-8 px-4">
+                       <div className="flex justify-end gap-6 items-center">
+                          <button 
+                            onClick={() => navigate(`/admin/edit-plant/${item.id}`)}
+                            className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]"
+                          >
+                            edit_calendar
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(item.id, item.name)}
+                            className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]"
+                          >
+                            delete
+                          </button>
+                       </div>
+                    </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </motion.section>
   );
