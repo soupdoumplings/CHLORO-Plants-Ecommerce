@@ -10,7 +10,6 @@ const AuthPage = () => {
     e.preventDefault();
     localStorage.setItem('isAuthenticated', 'true');
     navigate('/');
-    window.location.reload();
   };
 
   return (

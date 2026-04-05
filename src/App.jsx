@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
+import AuthPage from './pages/Auth/AuthPage';
 
 function App() {
   return (
@@ -13,8 +14,8 @@ function App() {
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/catalogue" element={<CataloguePage />} />
           {/* Add more routes here as we build them */}
-          {/* <Route path="/login" element={<Login />} /> */}
-          {/* <Route path="/signup" element={<Signup />} /> */}
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage />} />
         </Routes>
       </div>
     </Router>
