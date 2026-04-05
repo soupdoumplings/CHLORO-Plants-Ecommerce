@@ -13,9 +13,21 @@ import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 
+import { AuthProvider, useAuth } from './lib/AuthContext';
+
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (!isAuthenticated) {
+  const { session, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
+        {/* Minimal loading state while checking session */}
+        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -51,10 +63,12 @@ import CustomCursor from './components/CustomCursor';
 function App() {
   return (
     <Router>
-      <CustomCursor />
-      <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-        <AnimatedRoutes />
-      </div>
+      <AuthProvider>
+        <CustomCursor />
+        <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+          <AnimatedRoutes />
+        </div>
+      </AuthProvider>
     </Router>
   );
 }

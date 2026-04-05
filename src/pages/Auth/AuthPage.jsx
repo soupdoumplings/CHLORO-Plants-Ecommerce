@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../lib/AuthContext';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
-  const handleAuth = (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
-    localStorage.setItem('isAuthenticated', 'true');
-    navigate('/');
-    window.location.reload();
+    setErrorMsg('');
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        await signIn(email, password);
+        navigate('/');
+      } else {
+        if (password !== confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
+        await signUp(email, password, fullName);
+        navigate('/');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'An error occurred during authentication.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -129,12 +154,20 @@ const AuthPage = () => {
                   </p>
 
                   <div className="space-y-7 mb-10">
+                    {errorMsg && (
+                      <div className="bg-red-50 text-red-500 font-body text-[12px] p-3 rounded border border-red-100">
+                        {errorMsg}
+                      </div>
+                    )}
                     <div>
                       <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-3">
                         Email Address
                       </label>
                       <input
                         type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-3 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -150,6 +183,9 @@ const AuthPage = () => {
                       </div>
                       <input
                         type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-3 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -159,10 +195,11 @@ const AuthPage = () => {
                   <motion.button
                     whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
                     whileTap={{ scale: 0.98 }}
+                    disabled={isLoading}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20"
+                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Enter Portfolio
+                    {isLoading ? 'Processing...' : 'Enter Portfolio'}
                   </motion.button>
 
                   <div className="flex items-center gap-4 my-8">
@@ -201,12 +238,20 @@ const AuthPage = () => {
                   </p>
 
                   <div className="space-y-5 mb-8">
+                    {errorMsg && (
+                      <div className="bg-red-50 text-red-500 font-body text-[12px] p-3 rounded border border-red-100">
+                        {errorMsg}
+                      </div>
+                    )}
                     <div>
                       <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-2.5">
                         Full Name
                       </label>
                       <input
                         type="text"
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         placeholder="Your Name"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -217,6 +262,9 @@ const AuthPage = () => {
                       </label>
                       <input
                         type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -227,6 +275,9 @@ const AuthPage = () => {
                       </label>
                       <input
                         type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -237,6 +288,9 @@ const AuthPage = () => {
                       </label>
                       <input
                         type="password"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••"
                         className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
                       />
@@ -246,10 +300,11 @@ const AuthPage = () => {
                   <motion.button
                     whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
                     whileTap={{ scale: 0.98 }}
+                    disabled={isLoading}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20"
+                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Create Account
+                    {isLoading ? 'Processing...' : 'Create Account'}
                   </motion.button>
 
                   <p className="mt-6 text-center font-body text-[11px] text-[#456565]/50 leading-relaxed">
