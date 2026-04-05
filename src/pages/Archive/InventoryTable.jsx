@@ -1,33 +1,43 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../supabase';
 
 const InventoryTable = () => {
-  const holdings = [
-    { 
-      name: "Monstera Deliciosa", 
-      id: "SPEC-001-KTM", 
-      status: "Optimal", 
-      progress: 75, 
-      value: "4,500", 
-      image: "https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg" 
-    },
-    { 
-      name: "Sansevieria 'Laurentii'", 
-      id: "SPEC-002-KTM", 
-      status: "Optimal", 
-      progress: 90, 
-      value: "2,200", 
-      image: "https://images.pexels.com/photos/3699416/pexels-photo-3699416.jpeg" 
-    },
-    { 
-      name: "Ficus Lyrata", 
-      id: "SPEC-842-HIM", 
-      status: "Critical", 
-      progress: 12, 
-      value: "8,900", 
-      image: "https://images.pexels.com/photos/8175394/pexels-photo-8175394.jpeg" 
+  const [holdings, setHoldings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setHoldings(data || []);
+    } catch (err) {
+      console.error('Error fetching inventory:', err.message);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to permanently delete this listing?")) return;
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
+      setHoldings(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      console.error("Error deleting product:", err.message);
+      alert("Failed to delete product.");
+    }
+  };
 
   return (
     <motion.section 
@@ -59,70 +69,75 @@ const InventoryTable = () => {
               <tr className="border-b border-[#B1B3A9]/20 font-label text-[10px] uppercase tracking-widest text-[#5E6058]/80 font-black">
                 <th className="py-6 px-4">Specimen Profile</th>
                 <th className="py-6 px-4">Inventory ID</th>
-                <th className="py-6 px-4">Curation Health</th>
-                <th className="py-6 px-4">Market Position</th>
+                <th className="py-6 px-4">Status</th>
+                <th className="py-6 px-4">Stock</th>
                 <th className="py-6 px-4 text-right">Valuation</th>
                 <th className="py-6 px-4 text-right">Actions</th>
               </tr>
            </thead>
            <tbody className="divide-y divide-[#B1B3A9]/10">
-             {holdings.map((item, i) => (
-               <motion.tr 
-                 key={i} 
-                 initial={{ opacity: 0, x: -20 }}
-                 whileInView={{ opacity: 1, x: 0 }}
-                 viewport={{ once: true, margin: '-20px' }}
-                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                 className="group hover:bg-white transition-all duration-300"
-               >
-                  <td className="py-8 px-4 flex items-center gap-6">
-                     <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                     </div>
-                     <div>
-                        <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
-                        <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70">Kathmandu Indoor Selection</p>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4">
-                     <span className="bg-[#E8E9E0] px-4 py-2 font-label text-[10px] tracking-wide uppercase text-[#31332C] font-bold border border-[#797c73]/5">
-                        {item.id}
-                     </span>
-                  </td>
-                  <td className="py-8 px-4">
-                     <div className="flex items-center gap-3">
-                        <span className={`w-2 h-2 rounded-full ${item.status === 'Optimal' ? 'bg-[#456565]' : 'bg-[#9F403D]'}`}></span>
-                        <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.status}</p>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4 w-[200px]">
-                     <div className="space-y-3">
-                        <div className="flex justify-between font-label text-[9px] uppercase tracking-widest text-[#31332C]">
-                           <span className="font-black">Maturity</span>
-                           <span className={item.progress < 20 ? 'text-[#9F403D]' : 'text-[#785A1A]'}>{item.progress}%</span>
+             {loading ? (
+               <tr>
+                 <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
+                   Syncing Inventory...
+                 </td>
+               </tr>
+             ) : holdings.length === 0 ? (
+               <tr>
+                 <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
+                   Database empty. Add plants to begin.
+                 </td>
+               </tr>
+             ) : (
+               <AnimatePresence>
+                 {holdings.map((item, i) => (
+                   <motion.tr 
+                     key={item.id} 
+                     initial={{ opacity: 0, x: -20 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
+                     transition={{ duration: 0.5, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                     className="group hover:bg-white transition-all duration-300"
+                   >
+                     <td className="py-8 px-4 flex items-center gap-6">
+                        <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+                           <img src={item.images?.[0] || "https://images.unsplash.com/photo-1616046229478-9901c5536a45"} alt={item.name} className="w-full h-full object-cover" />
                         </div>
-                        <div className="w-full h-[3px] bg-[#E2E3D9] overflow-hidden relative">
-                           <motion.div 
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${item.progress}%` }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                              className={`absolute inset-y-0 left-0 group-hover:opacity-90 ${item.progress < 20 ? 'bg-[#9F403D]' : 'bg-[#785A1A]'}`} 
-                           />
+                        <div>
+                           <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
+                           <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70 truncate max-w-[200px]">{item.description || "Indoor Selection"}</p>
                         </div>
-                     </div>
-                  </td>
-                  <td className="py-8 px-4 text-right">
-                     <p className="font-headline text-xl text-[#31332C]">रू {item.value}</p>
-                  </td>
-                  <td className="py-8 px-4">
-                     <div className="flex justify-end gap-6 items-center">
-                        <button className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</button>
-                        <button className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">archive</button>
-                     </div>
-                  </td>
-               </motion.tr>
-             ))}
+                     </td>
+                     <td className="py-8 px-4">
+                        <span className="bg-[#E8E9E0] px-4 py-2 font-label text-[8px] tracking-wide uppercase text-[#31332C] font-bold border border-[#797c73]/5 truncate w-24 inline-block">
+                           {item.id.split('-')[0]}
+                        </span>
+                     </td>
+                     <td className="py-8 px-4">
+                        <div className="flex items-center gap-3">
+                           <span className={`w-2 h-2 rounded-full ${item.is_active ? 'bg-[#456565]' : 'bg-[#9F403D]'}`}></span>
+                           <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.is_active ? 'Active' : 'Archived'}</p>
+                        </div>
+                     </td>
+                     <td className="py-8 px-4">
+                        <div className="flex items-center gap-2">
+                           <span className="font-headline text-xl text-[#31332C]">{item.stock}</span>
+                           <span className="font-label text-[9px] uppercase tracking-widest text-[#5E6058] font-bold">Units</span>
+                        </div>
+                     </td>
+                     <td className="py-8 px-4 text-right">
+                        <p className="font-headline text-xl text-[#31332C]">रू {parseFloat(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                     </td>
+                     <td className="py-8 px-4">
+                        <div className="flex justify-end gap-6 items-center">
+                           <button className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</button>
+                           <button onClick={() => handleDelete(item.id)} className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">delete</button>
+                        </div>
+                     </td>
+                   </motion.tr>
+                 ))}
+               </AnimatePresence>
+             )}
            </tbody>
         </table>
       </div>

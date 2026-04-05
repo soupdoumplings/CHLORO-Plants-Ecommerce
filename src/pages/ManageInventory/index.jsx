@@ -1,12 +1,51 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
 
 const ManageInventory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [stock, setStock] = useState(1);
+  const [waterFrequency, setWaterFrequency] = useState('Every 7 Days');
+  const [optimalPlace, setOptimalPlace] = useState('Bright Indirect Light');
+  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
+
+  const handleAcquire = async () => {
+    if (!name || !price) {
+      setErrorMsg("Name and Market Valuation are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMsg('');
+
+    try {
+      const { error } = await supabase.from('products').insert({
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock, 10) || 0,
+        water_frequency: waterFrequency,
+        optimal_place: optimalPlace,
+        images: ["https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80"] // Default placeholder image
+      });
+
+      if (error) throw error;
+      
+      // Success, route to Discovery
+      navigate('/discovery');
+    } catch (err) {
+      setErrorMsg(err.message || 'Error occurred while saving product.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <motion.div 
@@ -58,14 +97,20 @@ const ManageInventory = () => {
                
                {/* Left Column Data */}
                <div className="lg:col-span-8 bg-white p-10 md:p-14 border border-[#B1B3A9]/20 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-10">
+                  {errorMsg && (
+                     <div className="bg-red-50 text-red-500 font-body text-[12px] p-4 rounded border border-red-100">
+                     {errorMsg}
+                     </div>
+                  )}
+
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Specimen Common Name</label>
-                     <input type="text" placeholder="e.g. Monstera Deliciosa" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Monstera Deliciosa" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                   </div>
 
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Botanical/Scientific Name</label>
-                     <input type="text" placeholder="e.g. Araceae Monstera" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-xl italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Araceae Monstera" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-xl italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -75,27 +120,30 @@ const ManageInventory = () => {
                       </div>
                       <div className="flex flex-col gap-3 group">
                          <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Market Valuation (रू)</label>
-                         <input type="number" placeholder="0.00" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                         <input type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                       </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       <div className="flex flex-col gap-3 group">
-                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Curation Health</label>
-                         <select className="bg-transparent border-b border-[#31332C]/20 py-3 outline-none font-body text-sm uppercase tracking-wide text-[#31332C] font-bold focus:border-[#785A1A] cursor-pointer">
-                            <option>Optimal</option>
-                            <option>Stable</option>
-                            <option>Critical</option>
-                            <option>Quarantine</option>
-                         </select>
+                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Optimal Placement</label>
+                         <input type="text" value={optimalPlace} onChange={e => setOptimalPlace(e.target.value)} placeholder="e.g. Bright Indirect Light" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                       </div>
                       <div className="flex flex-col gap-3 group">
-                         <div className="flex justify-between items-center">
-                            <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Maturity Progress %</label>
-                            <span className="font-label text-[10px] tracking-widest font-black text-[#785A1A]">50%</span>
-                         </div>
-                         <input type="range" min="0" max="100" defaultValue="50" className="mt-4 accent-[#785A1A] cursor-pointer" />
+                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Watering Frequency</label>
+                         <select value={waterFrequency} onChange={e => setWaterFrequency(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
+                            <option value="Every 3 Days">Every 3 Days</option>
+                            <option value="Every 7 Days">Every 7 Days</option>
+                            <option value="Every 14 Days">Every 14 Days</option>
+                            <option value="When Soil is Dry">When Soil is Dry</option>
+                            <option value="Misting Only">Misting Only</option>
+                         </select>
                       </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Stock Quantity</label>
+                     <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="1" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full md:w-1/3" />
                   </div>
                </div>
 
@@ -148,9 +196,11 @@ const ManageInventory = () => {
               <motion.button 
                 whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10"
+                onClick={handleAcquire}
+                disabled={isSubmitting}
+                className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                 Commence Acquisition
+                 {isSubmitting ? 'Acquiring...' : 'Commence Acquisition'}
                  <div className="w-[1px] h-4 bg-white/20"></div>
                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </motion.button>
