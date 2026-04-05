@@ -35,6 +35,7 @@ const AnimatedRoutes = () => {
         <Route path="/archive" element={<ProtectedRoute><ArchivePage /></ProtectedRoute>} />
         <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
         <Route path="/admin/add-plant" element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
+        <Route path="/admin/edit-plant/:id" element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
         <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
