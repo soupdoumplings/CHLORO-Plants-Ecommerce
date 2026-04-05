@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../lib/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
+  const { isAdmin } = useAuth();
 
   return (
     <motion.nav 
@@ -28,12 +30,14 @@ const Navbar = () => {
           </Link>
           <a href="#" className="text-[#31332c]/70 hover:text-[#31332c] transition-colors">The Journal</a>
           <a href="#" className="text-[#31332c]/70 hover:text-[#31332c] transition-colors">Care Guides</a>
-          <Link 
-            to="/archive" 
-            className={`transition-all duration-300 ${location.pathname === '/archive' ? 'text-[#785a1a] border-b border-[#785a1a]' : 'text-[#785a1a]/70 hover:text-[#785a1a]'}`}
-          >
-            ADMIN
-          </Link>
+          {isAdmin && (
+            <Link 
+              to="/archive" 
+              className={`transition-all duration-300 ${location.pathname === '/archive' ? 'text-[#785a1a] border-b border-[#785a1a]' : 'text-[#785a1a]/70 hover:text-[#785a1a]'}`}
+            >
+              ADMIN
+            </Link>
+          )}
         </div>
       </div>
 

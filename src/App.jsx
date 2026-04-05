@@ -33,6 +33,28 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const { session, isAdmin, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
+        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/discovery" replace />;
+  }
+  
+  return children;
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
 
@@ -44,9 +66,9 @@ const AnimatedRoutes = () => {
         
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path="/archive" element={<ProtectedRoute><ArchivePage /></ProtectedRoute>} />
+        <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
         <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
-        <Route path="/admin/add-plant" element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
+        <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
