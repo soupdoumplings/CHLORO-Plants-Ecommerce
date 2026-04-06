@@ -24,8 +24,11 @@ CREATE TABLE public.products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     description TEXT,
+    info TEXT,
     price DECIMAL(10, 2) NOT NULL,
     stock INTEGER NOT NULL DEFAULT 0,
+    water_frequency TEXT,
+    optimal_place TEXT,
     images TEXT[], -- Array of URLs
     category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
     is_active BOOLEAN DEFAULT true,

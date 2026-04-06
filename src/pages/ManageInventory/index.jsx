@@ -9,6 +9,7 @@ const ManageInventory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [info, setInfo] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState(1);
   const [waterFrequency, setWaterFrequency] = useState('Every 7 Days');
@@ -32,6 +33,7 @@ const ManageInventory = () => {
           if (data) {
             setName(data.name || '');
             setDescription(data.description || '');
+            setInfo(data.info || '');
             setPrice(data.price || '');
             setStock(data.stock || 1);
             setWaterFrequency(data.water_frequency || 'Every 7 Days');
@@ -61,6 +63,7 @@ const ManageInventory = () => {
         const { error: updateError } = await supabase.from('products').update({
           name,
           description,
+          info,
           price: parseFloat(price),
           stock: parseInt(stock, 10) || 0,
           water_frequency: waterFrequency,
@@ -71,6 +74,7 @@ const ManageInventory = () => {
         const { error: insertError } = await supabase.from('products').insert({
           name,
           description,
+          info,
           price: parseFloat(price),
           stock: parseInt(stock, 10) || 0,
           water_frequency: waterFrequency,
@@ -155,6 +159,11 @@ const ManageInventory = () => {
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Botanical/Scientific Name</label>
                      <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Araceae Monstera" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-xl italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Additional Info / Care Details</label>
+                     <textarea value={info} onChange={e => setInfo(e.target.value)} placeholder="e.g. Originates from the tropical rainforests..." rows="2" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[16px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full resize-none"></textarea>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
