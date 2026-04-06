@@ -1,6 +1,8 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const TOOLS = [
+  // ... (keeping same tools)
   { 
     name: "Heritage Shears", 
     price: "3,200", 
@@ -11,7 +13,7 @@ const TOOLS = [
     name: "Copper Mist Vessel", 
     price: "5,800", 
     desc: "Polished Finish", 
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAlvbpVIN_VUxTcamiWMHhSDDlbE4iMDm4bi9KRGRL2KHlVHWX8NKBOIfqnocmn50zO_5sFIU60N-CSij9jFyZ9gjm2Ak06ygo_VwY7Ucfe0PMBBdiHa1kHSyDEnBIqSBFFuENIFtJl3v-96hGKYtvg-wLvrwQ5V4WiRetLrWgjTFhOEHS27Pp1Tn37R_B00-9J36ZGa8axkGsX4cIAcyLfp75kQioSyNVDHaJQLCFJiXIGq0qAYe0FpmOOy4OofEa1__CJNiq-kVh7" 
+    image: "/copper_mist_vessel_1775451032552.png" 
   },
   { 
     name: "Organic Hemp Bind", 
@@ -28,16 +30,52 @@ const TOOLS = [
 ];
 
 const Toolkit = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 0.8, ease: "easeOut" }
+    }
+  };
+
   return (
     <section className="py-32 px-12 bg-[#fbf9f4]">
-        <div className="text-center mb-24 animate-in fade-in slide-in-from-bottom-5 duration-700">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="text-center mb-24"
+        >
           <p className="font-label text-[11px] tracking-[0.3em] uppercase mb-5 text-[#31332c] font-bold">Precision Instruments</p>
           <h2 className="font-headline text-5xl md:text-6xl text-[#31332c] tracking-tight">The Archivist's Toolkit</h2>
-        </div>
+        </motion.div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12"
+        >
           {TOOLS.map((tool, i) => (
-            <div key={i} className="group border border-[#31332c]/5 p-10 hover:bg-[#efeee6] hover:-translate-y-2 transition-all duration-700 text-center relative overflow-hidden bg-white/50 backdrop-blur-sm">
+            <motion.div 
+              key={i} 
+              variants={itemVariants}
+              whileHover={{ y: -10, transition: { duration: 0.4 } }}
+              className="group border border-[#31332c]/5 p-10 hover:bg-[#efeee6] transition-all duration-700 text-center relative overflow-hidden bg-white/50 backdrop-blur-sm"
+            >
                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                  <div className="relative h-56 flex items-center justify-center mb-10 transform group-hover:scale-110 transition-transform duration-700">
                     <img 
@@ -52,9 +90,9 @@ const Toolkit = () => {
                     <span className="font-serif text-lg text-[#31332c]">रू {tool.price}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-[#785a1a] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                  </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
   );
 };
