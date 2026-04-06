@@ -310,6 +310,4 @@ const ManageInventory = () => {
   );
 };
 
-export default ManageInventory;
-\ / /   c h e c k   s l u g   a v a i l a b i l i t y \  
- 
+export default ManageInventory;

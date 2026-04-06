@@ -8,10 +8,6 @@ const InventoryTable = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchHoldings();
-  }, []);
-
   const fetchHoldings = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -26,6 +22,10 @@ const InventoryTable = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchHoldings();
+  }, []);
 
   const handleDelete = async (id, name) => {
     if (window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
