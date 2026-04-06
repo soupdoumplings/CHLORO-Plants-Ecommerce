@@ -1,23 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Magnetic from '../../components/Magnetic';
+import { Aperture } from 'lucide-react';
 
 const Hero = () => {
   return (
     <header className="relative w-full h-screen flex flex-col justify-center px-12 pt-20 overflow-hidden">
       <motion.div 
         className="absolute inset-0 z-0"
-        initial={{ scale: 1.15, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
       >
-        <img 
-          src="https://images.pexels.com/photos/28449944/pexels-photo-28449944.jpeg" 
-          alt="Himalayan Flora" 
-          className="w-full h-full object-cover grayscale-[0.2] brightness-[0.9] transition-transform duration-[10s] hover:scale-105"
-        />
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="w-full h-full object-cover grayscale-[0.05] brightness-[0.85] transition-opacity duration-1000"
+        >
+          <source src="/flo.mp4" type="video/mp4" />
+        </video>
       </motion.div>
-      
       <div className="relative z-10 max-w-4xl text-left">
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -57,11 +61,9 @@ const Hero = () => {
             <Magnetic magnetism={20}>
               <motion.div 
                 whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,1)' }}
-                className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm"
+                className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm group-hover:bg-white group-hover:border-white"
               >
-                <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-2xl">
-                  camera
-                </span>
+                <Aperture className="w-6 h-6 text-white group-hover:text-[#31332c] transition-colors" strokeWidth={1.5} />
               </motion.div>
             </Magnetic>
             <div>

@@ -63,6 +63,7 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<AuthPage />} />
         <Route path="/register" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} />
         
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />

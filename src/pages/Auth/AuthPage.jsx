@@ -17,6 +17,7 @@ const AuthPage = () => {
 
   const handleAuth = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     setErrorMsg('');
     setIsLoading(true);
 
@@ -36,6 +37,10 @@ const AuthPage = () => {
     } finally {
       setIsLoading(false);
     }
+=======
+    localStorage.setItem('isAuthenticated', 'true');
+    navigate('/');
+>>>>>>> origin/UI-refinement
   };
 
   return (
