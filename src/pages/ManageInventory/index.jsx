@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
@@ -15,6 +15,36 @@ const ManageInventory = () => {
   const [optimalPlace, setOptimalPlace] = useState('Bright Indirect Light');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = !!id;
+
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchPlant = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setName(data.name || '');
+            setDescription(data.description || '');
+            setPrice(data.price || '');
+            setStock(data.stock || 1);
+            setWaterFrequency(data.water_frequency || 'Every 7 Days');
+            setOptimalPlace(data.optimal_place || 'Bright Indirect Light');
+          }
+        } catch (err) {
+          setErrorMsg('Failed to load plant details.');
+        }
+      };
+      
+      fetchPlant();
+    }
+  }, [id, isEditMode]);
 
   const handleAcquire = async () => {
     if (!name || !price) {
@@ -26,15 +56,29 @@ const ManageInventory = () => {
     setErrorMsg('');
 
     try {
-      const { error } = await supabase.from('products').insert({
-        name,
-        description,
-        price: parseFloat(price),
-        stock: parseInt(stock, 10) || 0,
-        water_frequency: waterFrequency,
-        optimal_place: optimalPlace,
-        images: ["https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80"] // Default placeholder image
-      });
+      let error;
+      if (isEditMode) {
+        const { error: updateError } = await supabase.from('products').update({
+          name,
+          description,
+          price: parseFloat(price),
+          stock: parseInt(stock, 10) || 0,
+          water_frequency: waterFrequency,
+          optimal_place: optimalPlace
+        }).eq('id', id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase.from('products').insert({
+          name,
+          description,
+          price: parseFloat(price),
+          stock: parseInt(stock, 10) || 0,
+          water_frequency: waterFrequency,
+          optimal_place: optimalPlace,
+          images: ["https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80"] // Default placeholder image
+        });
+        error = insertError;
+      }
 
       if (error) throw error;
       
@@ -68,7 +112,7 @@ const ManageInventory = () => {
              className="flex items-center gap-4 mb-6"
            >
                <Link to="/archive" className="material-symbols-outlined text-[#31332C]/60 hover:text-[#31332C] transition-colors bg-[#EFEEE6] p-2 rounded-full cursor-pointer hover:bg-[#E2E3D9]">arrow_back</Link>
-               <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">New Plant Listing</span>
+               <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">{isEditMode ? 'Edit Plant Listing' : 'New Plant Listing'}</span>
            </motion.div>
            
            <motion.h1 
@@ -77,7 +121,7 @@ const ManageInventory = () => {
              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
              className="font-headline text-5xl md:text-6xl leading-tight text-[#31332C] tracking-tight mb-12"
            >
-             Add Plant for Sale
+             {isEditMode ? 'Update Plant Details' : 'Add Plant for Sale'}
            </motion.h1>
            
            <motion.div 
@@ -200,7 +244,7 @@ const ManageInventory = () => {
                 disabled={isSubmitting}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                 {isSubmitting ? 'Acquiring...' : 'Commence Acquisition'}
+                 {isSubmitting ? (isEditMode ? 'Updating...' : 'Acquiring...') : (isEditMode ? 'Update Details' : 'Commence Acquisition')}
                  <div className="w-[1px] h-4 bg-white/20"></div>
                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </motion.button>

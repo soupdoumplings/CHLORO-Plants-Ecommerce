@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 
 const InventoryTable = () => {
@@ -130,7 +131,7 @@ const InventoryTable = () => {
                      </td>
                      <td className="py-8 px-4">
                         <div className="flex justify-end gap-6 items-center">
-                           <button className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</button>
+                           <Link to={`/admin/edit-plant/${item.id}`} className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</Link>
                            <button onClick={() => handleDelete(item.id)} className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">delete</button>
                         </div>
                      </td>
