@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Magnetic from '../../components/Magnetic';
-import { Aperture } from 'lucide-react';
+
 
 const Hero = () => {
   return (
@@ -63,7 +63,7 @@ const Hero = () => {
                 whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,1)' }}
                 className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm group-hover:bg-white group-hover:border-white"
               >
-                <Aperture className="w-6 h-6 text-white group-hover:text-[#31332c] transition-colors" strokeWidth={1.5} />
+                <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-[22px]">psychiatry</span>
               </motion.div>
             </Magnetic>
             <div>

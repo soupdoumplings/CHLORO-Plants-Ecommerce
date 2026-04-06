@@ -13,10 +13,10 @@ const Navbar = () => {
   const text = "text-[#FBF9F4]";
   const textDim = "text-[#FBF9F4]/70";
   const border = "border-[#FBF9F4]/20";
-  const accentText = "text-[#c6e9e9]"; 
+  const accentText = "text-[#c6e9e9]";
 
   return (
-    <motion.nav 
+    <motion.nav
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -27,11 +27,11 @@ const Navbar = () => {
         <Link to="/" className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
           CHLORO
         </Link>
-        
+
         {/* Navigation Links */}
         <div className="hidden md:flex gap-8 font-headline text-[13px] tracking-tight uppercase">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
           >
             Shop
@@ -39,8 +39,8 @@ const Navbar = () => {
           <a href="#" className={`${textDim} hover:${text} transition-colors`}>The Journal</a>
           <a href="#" className={`${textDim} hover:${text} transition-colors`}>Care Guides</a>
           {isAdmin && (
-            <Link 
-              to="/archive" 
+            <Link
+              to="/archive"
               className={`transition-all duration-300 ${location.pathname === '/archive' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
             >
               ADMIN
@@ -51,12 +51,12 @@ const Navbar = () => {
 
       {/* AI Diagnosis Center */}
       <Link to="/ai-diagnosis" className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 cursor-pointer group">
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.05, backgroundColor: '#FBF9F4' }}
           className={`w-10 h-10 border ${border} flex items-center justify-center transition-all duration-500 rounded-sm bg-transparent group-hover:bg-[#FBF9F4]`}
         >
           <span className={`material-symbols-outlined ${text} group-hover:text-[#0F3A3A] transition-colors text-[18px]`}>
-            Aperture
+            psychiatry
           </span>
         </motion.div>
         <div className="flex flex-col justify-center">
@@ -68,27 +68,27 @@ const Navbar = () => {
       {/* Utilities */}
       <div className="flex items-center gap-6">
         <div className={`hidden lg:flex items-center border ${border} px-3 py-1 bg-transparent group focus-within:border-[#FBF9F4] transition-all`}>
-           <input 
-             type="text" 
-             placeholder="Search Catalogue..." 
-             className={`bg-transparent border-none outline-none font-label text-[10px] tracking-widest uppercase w-40 placeholder:${textDim} ${text}`}
-           />
-           <span className={`material-symbols-outlined text-sm ${textDim} group-hover:${text} transition-colors cursor-pointer`}>search</span>
+          <input
+            type="text"
+            placeholder="Search Catalogue..."
+            className={`bg-transparent border-none outline-none font-label text-[10px] tracking-widest uppercase w-40 placeholder:${textDim} ${text}`}
+          />
+          <span className={`material-symbols-outlined text-sm ${textDim} group-hover:${text} transition-colors cursor-pointer`}>search</span>
         </div>
-        
+
         <div className="flex items-center gap-4">
-           <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}>
-              person
-           </Link>
-           <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative`}>
-              shopping_bag
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.8, type: 'spring', stiffness: 500 }}
-                className={`absolute -top-1 -right-1 w-2 h-2 ${accentText} rounded-full`}
-              />
-           </Link>
+          <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}>
+            person
+          </Link>
+          <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative`}>
+            shopping_bag
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.8, type: 'spring', stiffness: 500 }}
+              className={`absolute -top-1 -right-1 w-2 h-2 ${accentText} rounded-full`}
+            />
+          </Link>
         </div>
       </div>
     </motion.nav>

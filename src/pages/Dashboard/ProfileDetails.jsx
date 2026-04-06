@@ -1,9 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../lib/AuthContext';
 import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
 
 const ProfileDetails = () => {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -131,14 +145,28 @@ const ProfileDetails = () => {
             </div>
           </div>
 
-          {/* Save Button */}
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm mt-4"
-          >
-            Save Profile Changes
-          </motion.button>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-6 mt-4">
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm"
+            >
+              Save Profile Changes
+            </motion.button>
+
+            <motion.button
+              onClick={handleLogout}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="border border-[#B0B0A8]/40 text-[#6B6B6B] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] hover:text-[#F9F7F2] hover:border-[#1A1A1A] transition-all duration-300"
+            >
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[14px]">logout</span>
+                Sign Out
+              </span>
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Tabbed Orders Section underneath Personal Details */}
