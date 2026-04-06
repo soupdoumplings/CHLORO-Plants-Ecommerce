@@ -1,4 +1,5 @@
 import React from 'react';
+import { Aperture } from 'lucide-react';
 
 const Hero = () => {
   return (
@@ -27,6 +28,21 @@ const Hero = () => {
         <div className="flex flex-col md:flex-row gap-10 items-start md:items-center animate-in fade-in slide-in-from-bottom-6 duration-1000">
           <button className="bg-white text-[#31332c] px-12 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-xl shadow-black/10">
             Explore the Archive
+          </button>
+
+          {/* AI Diagnosis Button */}
+          <button className="flex items-center gap-4 group cursor-pointer transition-all duration-300">
+            <div className="w-12 h-12 flex items-center justify-center border border-white/20 backdrop-blur-sm group-hover:border-white/40 transition-colors">
+              <Aperture className="w-5 h-5 text-white" strokeWidth={1.2} />
+            </div>
+            <div className="text-left">
+              <span className="block text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold mb-1">
+                AI Powered
+              </span>
+              <span className="block font-headline text-2xl italic text-white/90 leading-tight">
+                Al Diagnosis
+              </span>
+            </div>
           </button>
         </div>
       </div>
