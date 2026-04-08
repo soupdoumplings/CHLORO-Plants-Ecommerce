@@ -24,7 +24,7 @@ const Navbar = () => {
     >
       <div className="flex items-center gap-12">
         {/* Branding */}
-        <Link to="/" className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
+        <Link to="/journal" className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
           CHLORO
         </Link>
 
@@ -36,7 +36,7 @@ const Navbar = () => {
           >
             Shop
           </Link>
-          <a href="#" className={`${textDim} hover:${text} transition-colors`}>The Journal</a>
+          <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:${text} transition-colors`}>The Journal</Link>
           <a href="#" className={`${textDim} hover:${text} transition-colors`}>Care Guides</a>
           {isAdmin && (
             <Link

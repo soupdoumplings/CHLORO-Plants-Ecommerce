@@ -12,6 +12,7 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 import AiDiagnosisPage from './pages/AiDiagnosis';
+import JournalPage from './pages/Journal';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 
@@ -77,6 +78,7 @@ const AnimatedRoutes = () => {
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
+        <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
       </Routes>
     </AnimatePresence>
   );
