@@ -12,7 +12,7 @@ const AuthPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleAuth = async (e) => {
@@ -29,7 +29,14 @@ const AuthPage = () => {
           throw new Error("Passwords do not match");
         }
         await signUp(email, password, fullName);
-        navigate('/');
+        
+        // Sign the user out so they must manually login
+        try { await signOut(); } catch(e) {}
+        
+        // Switch to the Login tab and clear password fields
+        setIsLogin(true);
+        setPassword('');
+        setConfirmPassword('');
       }
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('rate limit')) {
