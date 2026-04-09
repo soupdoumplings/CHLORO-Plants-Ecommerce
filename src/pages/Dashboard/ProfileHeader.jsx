@@ -1,7 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../lib/AuthContext';
 
 const ProfileHeader = () => {
+  const { user } = useAuth();
+  const fullName = user?.user_metadata?.full_name || user?.email || 'Member';
+  const firstName = fullName.split(' ')[0];
+
   return (
     <div className="pt-24 pb-10 lg:pt-32 lg:pb-14">
       <motion.p
@@ -18,7 +23,7 @@ const ProfileHeader = () => {
         transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         className="font-headline text-[clamp(2.5rem,5.5vw,4.5rem)] leading-[0.92] tracking-tight text-[#1A1A1A]"
       >
-        Welcome back, <em>Eleanor.</em>
+        Welcome back, <em>{firstName}.</em>
       </motion.h1>
     </div>
   );

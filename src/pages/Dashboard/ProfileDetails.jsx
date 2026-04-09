@@ -6,8 +6,11 @@ import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
 
 const ProfileDetails = () => {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const fullName = user?.user_metadata?.full_name || '';
+  const email = user?.email || '';
 
   const handleLogout = async () => {
     try {
@@ -94,7 +97,7 @@ const ProfileDetails = () => {
               </label>
               <input
                 type="text"
-                defaultValue="Eleanor St. James"
+                defaultValue={fullName}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
               />
             </div>
@@ -106,7 +109,7 @@ const ProfileDetails = () => {
               </label>
               <input
                 type="email"
-                defaultValue="eleanor.sj@studio.curate"
+                defaultValue={email}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
               />
             </div>
