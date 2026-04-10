@@ -1,22 +1,100 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
+import ManageInventory from './pages/ManageInventory';
+import DiscoveryPage from './pages/Discovery';
+import CartPage from './pages/Cart';
+import CheckoutPage from './pages/Checkout';
+import DashboardPage from './pages/Dashboard';
+import AuthPage from './pages/Auth/AuthPage';
+import ProductDetailPage from './pages/Product';
+import AiDiagnosisPage from './pages/AiDiagnosis';
+import JournalPage from './pages/Journal';
+
+import { AuthProvider, useAuth } from './lib/AuthContext';
+
+const ProtectedRoute = ({ children }) => {
+  const { session, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
+        {/* Minimal loading state while checking session */}
+        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+const AdminRoute = ({ children }) => {
+  const { session, isAdmin, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
+        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/discovery" replace />;
+  }
+  
+  return children;
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/register" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} />
+        
+        {/* Protected Routes */}
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
+        <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
+        <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
+        <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
+        <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
+        <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
+        <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/archive" element={<ArchivePage />} />
-          <Route path="/catalogue" element={<CataloguePage />} />
-          {/* Add more routes here as we build them */}
-          {/* <Route path="/login" element={<Login />} /> */}
-          {/* <Route path="/signup" element={<Signup />} /> */}
-        </Routes>
-      </div>
+      <AuthProvider>
+        <CustomCursor />
+        <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+          <AnimatedRoutes />
+        </div>
+      </AuthProvider>
     </Router>
   );
 }
