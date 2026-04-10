@@ -2,8 +2,10 @@ import { motion } from "framer-motion";
 import { RatingStars } from "./rating-stars";
 import { SocialLinks } from "./social-links";
 import { FeatureCard } from "./feature-card";
+import { useCart } from "../../../../lib/CartContext";
 
 export function ProductHero({ product }) {
+  const { addToBag } = useCart();
   return (
     <motion.section 
       initial={{ opacity: 0, y: 20 }}
@@ -129,9 +131,10 @@ export function ProductHero({ product }) {
             <motion.button 
               whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(45,122,78,0.25)' }}
               whileTap={{ scale: 0.97 }}
+              onClick={() => addToBag(product)}
               className="w-full sm:w-auto px-10 py-4 bg-[#2D7A4E] text-white text-xs tracking-[0.2em] font-medium uppercase rounded-full hover:bg-[#235F3D] shadow-lg shadow-[#2D7A4E]/20 transition-all duration-500 active:scale-95"
             >
-              Add to Cart
+              Add to Bag
             </motion.button>
           </motion.div>
         </div>

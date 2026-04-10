@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import monsteraImg from '../../assets/products/monstera.png';
 import wateringCanImg from '../../assets/products/watering-can.png';
+import { useCart } from '../../lib/CartContext';
 
 const ordersData = [
   {
@@ -51,6 +52,7 @@ const wishlistData = [
 
 const RecentOrders = () => {
   const [activeTab, setActiveTab] = useState('orders');
+  const { addToBag } = useCart();
 
   return (
     <motion.section
@@ -203,7 +205,10 @@ const RecentOrders = () => {
                   </p>
                 </div>
 
-                <button className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold shrink-0 text-[#C5A059] hover:text-[#785A1A] transition-colors duration-300">
+                <button 
+                  onClick={() => addToBag(item)}
+                  className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold shrink-0 text-[#C5A059] hover:text-[#785A1A] transition-colors duration-300"
+                >
                   ADD TO BAG
                 </button>
               </motion.div>

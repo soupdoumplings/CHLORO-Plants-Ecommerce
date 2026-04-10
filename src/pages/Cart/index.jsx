@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -6,29 +6,22 @@ import CartHeader from './CartHeader';
 import CartItem from './CartItem';
 import CartCrossSell from './CartCrossSell';
 import OrderSummary from './OrderSummary';
-import { initialCartItems } from './cartData';
+import { useCart } from '../../lib/CartContext';
 import { Link } from 'react-router-dom';
 
 const CartPage = () => {
-  const [items, setItems] = useState(initialCartItems);
+  const { cartItems: items, updateQuantity, removeFromBag, addToBag } = useCart();
 
   const handleUpdateQuantity = (id, newQty) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: newQty } : item))
-    );
+    updateQuantity(id, newQty);
   };
 
   const handleRemove = (id) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    removeFromBag(id);
   };
 
   const handleAddCrossSell = (product) => {
-    const exists = items.find((item) => item.id === product.id);
-    if (exists) {
-      handleUpdateQuantity(product.id, exists.quantity + 1);
-    } else {
-      setItems((prev) => [...prev, { ...product, quantity: 1, variant: 'SANTUARY BLEND' }]);
-    }
+    addToBag(product);
   };
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);

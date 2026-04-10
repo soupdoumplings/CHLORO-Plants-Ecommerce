@@ -15,6 +15,7 @@ import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
+import { CartProvider } from './lib/CartContext';
 
 const ProtectedRoute = ({ children }) => {
   const { session, loading } = useAuth();
@@ -90,10 +91,12 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CustomCursor />
-        <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-          <AnimatedRoutes />
-        </div>
+        <CartProvider>
+          <CustomCursor />
+          <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+            <AnimatedRoutes />
+          </div>
+        </CartProvider>
       </AuthProvider>
     </Router>
   );
