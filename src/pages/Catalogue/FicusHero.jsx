@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useCart } from '../../lib/CartContext';
 
 const FicusHero = () => {
+  const { addToBag } = useCart();
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-32 pt-16">
       {/* Left Column: Identity */}
@@ -10,7 +12,7 @@ const FicusHero = () => {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:col-span-4 lg:sticky lg:top-32 order-2 lg:order-1 text-left"
+        className="lg:col-span-5 lg:sticky lg:top-32 order-2 lg:order-1 text-left"
       >
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
@@ -60,9 +62,14 @@ const FicusHero = () => {
               <motion.button 
                 whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                 whileTap={{ scale: 0.97 }}
+                onClick={() => addToBag({
+                  id: 'ficus-lyrata-id', // Placeholder, ideally this would be dynamic from props
+                  name: 'Ficus Lyrata',
+                  price: 8900
+                })}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold"
               >
-                  Acquire Specimen
+                  Add to Bag
               </motion.button>
             </div>
           </motion.div>
@@ -74,7 +81,7 @@ const FicusHero = () => {
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:col-span-8 order-1 lg:order-2"
+        className="lg:col-span-7 order-1 lg:order-2"
       >
         <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
           <img 
