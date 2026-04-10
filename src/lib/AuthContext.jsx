@@ -91,8 +91,19 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
+  const signInWithProvider = async (provider) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) throw error;
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider }}>
       {!loading && children}
     </AuthContext.Provider>
   );
