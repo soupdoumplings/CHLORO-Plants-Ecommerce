@@ -6,13 +6,13 @@ import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
 
 const ProfileDetails = () => {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/login');
+      navigate('/');
     } catch (err) {
       console.error('Logout failed:', err);
     }
@@ -94,7 +94,7 @@ const ProfileDetails = () => {
               </label>
               <input
                 type="text"
-                defaultValue="Eleanor St. James"
+                defaultValue={user?.user_metadata?.full_name || ''}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
               />
             </div>
@@ -106,8 +106,9 @@ const ProfileDetails = () => {
               </label>
               <input
                 type="email"
-                defaultValue="eleanor.sj@studio.curate"
+                defaultValue={user?.email || ''}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+                disabled
               />
             </div>
 

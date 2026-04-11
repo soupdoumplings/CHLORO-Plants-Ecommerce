@@ -1,12 +1,24 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
+import { useCart } from '../lib/CartContext';
 
 const Navbar = () => {
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
+  const { totalItems } = useCart();
   const isHome = location.pathname === '/';
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   // Consistently apply dark theme
   const bg = "bg-[#0F3A3A]";
@@ -77,18 +89,41 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}>
-            person
-          </Link>
-          <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative`}>
-            shopping_bag
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.8, type: 'spring', stiffness: 500 }}
-              className={`absolute -top-1 -right-1 w-2 h-2 ${accentText} rounded-full`}
-            />
-          </Link>
+          {!user && (
+            <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:${text} transition-colors`}>
+              LOGIN
+            </Link>
+          )}
+          {user && (
+            <>
+              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`} title="Dashboard">
+                person
+              </Link>
+              <button 
+                onClick={handleLogout}
+                className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}
+                title="Logout"
+              >
+                logout
+              </button>
+              <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center`} title="Cart">
+                shopping_bag
+                <AnimatePresence>
+                  {totalItems > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
+                      className={`absolute -top-1.5 -right-1.5 w-3.5 h-3.5 ${bg === 'bg-transparent' ? 'bg-[#1A1A1A] text-[#F9F7F2]' : 'bg-[#c6e9e9] text-[#0F3A3A]'} rounded-full font-label text-[7px] font-bold flex items-center justify-center leading-none shadow-sm`}
+                    >
+                      {totalItems}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </motion.nav>

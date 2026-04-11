@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useCart } from '../lib/CartContext';
 
 const ProductCard = ({ product, delay = 0 }) => {
+  const { addToCart } = useCart();
   return (
     <motion.div 
       initial={{ opacity: 0, y: 30 }}
@@ -24,6 +26,11 @@ const ProductCard = ({ product, delay = 0 }) => {
         {/* Hover action */}
         <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
             <motion.button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToCart(product);
+              }}
               whileHover={{ y: -2, backgroundColor: '#31332c', color: '#fbf9f4' }}
               whileTap={{ scale: 0.97 }}
               className="bg-white/90 backdrop-blur-sm px-8 py-3 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-[#31332c] shadow-lg"
