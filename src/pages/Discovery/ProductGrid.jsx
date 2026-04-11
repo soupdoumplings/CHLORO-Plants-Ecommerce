@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useCart } from '../../lib/CartContext';
+
 
 const aspectMap = {
   square: 'aspect-square',
@@ -10,6 +12,7 @@ const aspectMap = {
 
 const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
+  const { addToBag } = useCart();
 
   return (
     <motion.div
@@ -48,11 +51,25 @@ const DiscoveryProductCard = ({ product, index }) => {
             initial={{ opacity: 0, y: 15 }}
             variants={{ hover: { opacity: 1, y: 0 } }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2"
           >
-            <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
-              View Details
-            </span>
+            <div className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center">
+              <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
+                View Details
+              </span>
+            </div>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToBag(product);
+              }}
+              className="bg-[#2F4F4F] text-white px-6 py-2.5 shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
+            >
+              <span className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold">
+                Add to Bag
+              </span>
+            </button>
           </motion.div>
 
           {/* Badge */}

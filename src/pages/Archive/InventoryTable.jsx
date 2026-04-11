@@ -1,16 +1,20 @@
+/**
+ * CHLORO — Admin Inventory CRUD Component
+ */
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 
 const InventoryTable = () => {
-  const [holdings, setHoldings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [holdings, setHoldings] = useState([]); // Stores specimen data from DB
+  const [loading, setLoading] = useState(true); // Tracks loading state
 
   useEffect(() => {
     fetchInventory();
   }, []);
 
+  // READ: Fetches all botanical specimens from Supabase (PostgreSQL)
   const fetchInventory = async () => {
     try {
       setLoading(true);
@@ -28,11 +32,13 @@ const InventoryTable = () => {
     }
   };
 
+  // DELETE: Removes a specimen from the database with confirmation
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to permanently delete this listing?")) return;
     try {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
+      // Update local state to reflect deletion without re-fetching
       setHoldings(prev => prev.filter(item => item.id !== id));
     } catch (err) {
       console.error("Error deleting product:", err.message);
@@ -77,19 +83,23 @@ const InventoryTable = () => {
               </tr>
            </thead>
            <tbody className="divide-y divide-[#B1B3A9]/10">
+             {/* Three-state conditional rendering: Loading / Empty / Data */}
              {loading ? (
+               // State 1: Data is being fetched from PostgreSQL
                <tr>
                  <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
                    Syncing Inventory...
                  </td>
                </tr>
              ) : holdings.length === 0 ? (
+               // State 2: Database returned no records
                <tr>
                  <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
                    Database empty. Add plants to begin.
                  </td>
                </tr>
              ) : (
+               // State 3: Dynamically render each specimen from the database
                <AnimatePresence>
                  {holdings.map((item, i) => (
                    <motion.tr 
@@ -114,21 +124,25 @@ const InventoryTable = () => {
                            {item.id.split('-')[0]}
                         </span>
                      </td>
+                     {/* Conditional health status indicator: green = active, red = archived */}
                      <td className="py-8 px-4">
                         <div className="flex items-center gap-3">
                            <span className={`w-2 h-2 rounded-full ${item.is_active ? 'bg-[#456565]' : 'bg-[#9F403D]'}`}></span>
                            <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.is_active ? 'Active' : 'Archived'}</p>
                         </div>
                      </td>
+                     {/* Stock count display */}
                      <td className="py-8 px-4">
                         <div className="flex items-center gap-2">
                            <span className="font-headline text-xl text-[#31332C]">{item.stock}</span>
                            <span className="font-label text-[9px] uppercase tracking-widest text-[#5E6058] font-bold">Units</span>
                         </div>
                      </td>
+                     {/* Price valuation in Nepali Rupees */}
                      <td className="py-8 px-4 text-right">
                         <p className="font-headline text-xl text-[#31332C]">रू {parseFloat(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
                      </td>
+                     {/* CRUD Actions: Edit (UPDATE) and Delete (DELETE) */}
                      <td className="py-8 px-4">
                         <div className="flex justify-end gap-6 items-center">
                            <Link to={`/admin/edit-plant/${item.id}`} className="material-symbols-outlined text-[#5E6058] hover:text-[#785A1A] transition-colors p-2 hover:bg-[#F5F4ED]">edit_calendar</Link>

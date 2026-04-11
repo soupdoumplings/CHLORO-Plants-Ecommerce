@@ -1,3 +1,8 @@
+/**
+ * CHLORO — Admin Profile & Account Management
+ * Displays user profile data from Supabase Auth metadata
+ * and provides secure logout with redirection.
+ */
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,20 +11,24 @@ import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
 
 const ProfileDetails = () => {
+  // Extracting user session and signOut function from AuthContext
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  // Reading profile data from Supabase Auth metadata
   const fullName = user?.user_metadata?.full_name || '';
   const email = user?.email || '';
 
+  // Secure logout handler with error handling and redirection
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/login');
+      navigate('/login'); // Redirect to login page after logout
     } catch (err) {
       console.error('Logout failed:', err);
     }
   };
+
 
   return (
     <motion.section
