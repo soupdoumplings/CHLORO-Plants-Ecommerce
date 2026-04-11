@@ -244,7 +244,7 @@ const ManageInventory = () => {
            >
               <Link to="/archive" className="font-label text-[11px] font-bold tracking-[0.2em] uppercase text-[#9F403D] hover:text-[#31332C] transition-colors flex items-center gap-2">
                  <span className="material-symbols-outlined text-[16px]">close</span>
-                 Abort Procedure
+                 Cancel
               </Link>
               <motion.button 
                 whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
@@ -253,7 +253,7 @@ const ManageInventory = () => {
                 disabled={isSubmitting}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                 {isSubmitting ? (isEditMode ? 'Updating...' : 'Acquiring...') : (isEditMode ? 'Update Details' : 'Commence Acquisition')}
+                 {isSubmitting ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save' : 'Add')}
                  <div className="w-[1px] h-4 bg-white/20"></div>
                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </motion.button>
