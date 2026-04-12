@@ -1,13 +1,50 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const CareSection = () => {
+const CareSection = ({ product }) => {
+  const optimalPlace = product?.optimal_place || 'Bright Indirect Light';
+  const waterFrequency = product?.water_frequency || 'Every 7 Days';
+  const plantName = product?.name || 'This specimen';
+
+  // Derive illumination description from optimal_place
+  const getIlluminationDesc = (place) => {
+    const lower = (place || '').toLowerCase();
+    if (lower.includes('direct') && !lower.includes('indirect')) {
+      return `${plantName} thrives in direct sunlight. Position near a south-facing window for optimal photosynthesis and vibrant growth patterns.`;
+    }
+    if (lower.includes('low') || lower.includes('shade')) {
+      return `${plantName} adapts well to low-light conditions. It can be placed in interior rooms with minimal natural light, though growth may slow.`;
+    }
+    return `${plantName} thrives in bright, filtered light. Direct sun may scorch the delicate broad-leaf membranes, while deep shade will cause the specimen to stretch and lose its sculptural density.`;
+  };
+
+  // Derive environment hints from optimal_place
+  const getEnvironmentDesc = (place) => {
+    const lower = (place || '').toLowerCase();
+    if (lower.includes('outdoor') || lower.includes('full sun')) {
+      return `${plantName} prefers outdoor conditions with good air circulation. Protect from frost and extreme wind exposure for best results.`;
+    }
+    return `${plantName} loathes drafts and sudden temperature shifts. Place in a stable, humid corner away from vents or doorways. It is a creature of habit.`;
+  };
+
+  // Derive environment checklist from optimal_place
+  const getEnvironmentChecklist = (place) => {
+    const lower = (place || '').toLowerCase();
+    if (lower.includes('low') || lower.includes('shade')) {
+      return ['Humidity: 50%+', 'Temp: 60°F - 80°F'];
+    }
+    if (lower.includes('outdoor') || lower.includes('full sun')) {
+      return ['Humidity: 40%+', 'Temp: 55°F - 95°F'];
+    }
+    return ['Humidity: 60%+', 'Temp: 65°F - 85°F'];
+  };
+
   const cards = [
     {
       icon: 'wb_sunny',
       title: 'Illumination',
-      desc: 'Thrives in bright, filtered light. Direct sun may scorch the delicate broad-leaf membranes, while deep shade will cause the specimen to stretch and lose its sculptural density.',
-      badge: 'Bright Indirect',
+      desc: getIlluminationDesc(optimalPlace),
+      badge: optimalPlace,
       bg: 'bg-[#F5F4ED]',
       hoverEffect: 'group-hover:rotate-45',
       extra: null,
@@ -15,7 +52,7 @@ const CareSection = () => {
     {
       icon: 'water_drop',
       title: 'Hydration',
-      desc: 'Water only when the top two inches of soil feel parched. Consistency is the hallmark of health for the Lyrata.',
+      desc: `Water only when the top two inches of soil feel parched. Consistency is the hallmark of health for ${plantName}.`,
       badge: null,
       bg: 'bg-[#E8E9E0]',
       hoverEffect: 'group-hover:scale-y-125',
@@ -24,7 +61,7 @@ const CareSection = () => {
     {
       icon: 'grid_view',
       title: 'Environment',
-      desc: 'The Lyrata loathes drafts and sudden temperature shifts. Place in a stable, humid corner away from vents or doorways. It is a creature of habit.',
+      desc: getEnvironmentDesc(optimalPlace),
       badge: null,
       bg: 'bg-[#E2E3D9]',
       hoverEffect: 'group-hover:scale-150',
@@ -85,7 +122,7 @@ const CareSection = () => {
                  <div className="space-y-6">
                     <div className="flex justify-between items-center border-b border-[#B1B3A9]/10 pb-3">
                        <span className="text-xs font-body text-[#31332C]">Frequency</span>
-                       <span className="text-xs font-label uppercase text-[#785A1A] font-black tracking-widest">Every 10 Days</span>
+                       <span className="text-xs font-label uppercase text-[#785A1A] font-black tracking-widest">{waterFrequency}</span>
                     </div>
                     <motion.button 
                       whileHover={{ y: -1 }}
@@ -100,7 +137,7 @@ const CareSection = () => {
 
             {card.extra === 'environment' && (
               <ul className="space-y-4 font-body text-xs text-[#31332C] font-bold">
-                {['Humidity: 60%+', 'Temp: 65°F - 85°F'].map((item, idx) => (
+                {getEnvironmentChecklist(optimalPlace).map((item, idx) => (
                   <motion.li 
                     key={idx}
                     initial={{ opacity: 0, x: -15 }}

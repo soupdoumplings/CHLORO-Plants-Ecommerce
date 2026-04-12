@@ -24,7 +24,7 @@ const DiscoveryProductCard = ({ product, index }) => {
       whileHover="hover"
       className="group"
     >
-      <Link to="/catalogue" className="cursor-pointer block">
+      <Link to={`/catalogue/${product.id}`} className="cursor-pointer block">
         {/* Image Container */}
         <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
           <motion.img

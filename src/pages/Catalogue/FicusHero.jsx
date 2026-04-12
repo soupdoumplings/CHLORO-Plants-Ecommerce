@@ -1,7 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const FicusHero = () => {
+const FicusHero = ({ product }) => {
+  const name = product?.name || 'Unknown Specimen';
+  const scientificName = product?.description || '';
+  const info = product?.info || 'No description available for this specimen.';
+  const provenance = product?.provenance || 'Origin unknown';
+  const price = product?.price ? `रू ${Number(product.price).toLocaleString()}` : 'Price on request';
+  const heroImage = product?.images && product.images.length > 0
+    ? product.images[0]
+    : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80';
+  const curatorQuote = product?.curator_quote || `"A rare specimen that demands patience and a refined understanding of its natural rhythms."`;
+
+  // Split the name into two lines if it has multiple words
+  const nameParts = name.split(' ');
+  const nameFirstLine = nameParts.slice(0, Math.ceil(nameParts.length / 2)).join(' ');
+  const nameSecondLine = nameParts.slice(Math.ceil(nameParts.length / 2)).join(' ');
+
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-32 pt-16">
       {/* Left Column: Identity */}
@@ -19,7 +34,7 @@ const FicusHero = () => {
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="font-label text-[10px] tracking-[0.2rem] uppercase text-[#785A1A] mb-6 font-bold"
           >
-            Specimen No. 842
+            {scientificName || 'Botanical Archive'}
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 50 }}
@@ -28,7 +43,7 @@ const FicusHero = () => {
             transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="font-headline text-8xl md:text-[9.5rem] leading-[0.8] mb-12 tracking-tighter text-[#31332C]"
           >
-            Ficus <br /> Lyrata
+            {nameFirstLine} {nameSecondLine && <><br />{nameSecondLine}</>}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -37,7 +52,7 @@ const FicusHero = () => {
             transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="font-body text-[#5E6058] leading-relaxed mb-12 max-w-sm text-lg opacity-90 transition-opacity hover:opacity-100"
           >
-              Known colloquially as the Fiddle-Leaf Fig, this architectural masterpiece is defined by its dramatic, violin-shaped foliage and sculptural presence. A cornerstone of the curated interior.
+              {info}
           </motion.p>
           
           <motion.div 
@@ -49,13 +64,13 @@ const FicusHero = () => {
           >
             <div>
               <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Provenance</p>
-              <p className="font-body text-sm italic text-[#31332C]">Western Africa, Tropical Lowland Rainforests</p>
+              <p className="font-body text-sm italic text-[#31332C]">{provenance}</p>
             </div>
             
             <div className="pt-12 border-t border-[#B1B3A9]/20 flex justify-between items-end">
               <div>
                 <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Investment</p>
-                <p className="font-headline text-4xl text-[#31332C]">रू 8,900</p>
+                <p className="font-headline text-4xl text-[#31332C]">{price}</p>
               </div>
               <motion.button 
                 whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
@@ -78,8 +93,8 @@ const FicusHero = () => {
       >
         <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
           <img 
-            src="https://images.pexels.com/photos/6477994/pexels-photo-6477994.jpeg" 
-            alt="Ficus Lyrata" 
+            src={heroImage} 
+            alt={name} 
             className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] transition-transform duration-[10s] hover:scale-105" 
           />
           <motion.div 
@@ -90,7 +105,7 @@ const FicusHero = () => {
             className="absolute bottom-12 -left-12 hidden lg:block bg-white p-10 w-72 shadow-2xl border border-[#B1B3A9]/5"
           >
             <p className="font-body text-xs italic leading-relaxed text-[#5E6058] opacity-80">
-              "The Lyrata requires patience and an understanding of light's gentle choreography. Focus on balance."
+              {curatorQuote}
             </p>
           </motion.div>
         </div>

@@ -35,7 +35,9 @@ const DiscoveryPage = () => {
             rawPrice: Number(p.price),
             image: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80',
             // Default category map to keep filters working if Categories are not fully built
-            category: 'Rare Foliage'
+            category: 'Rare Foliage',
+            is_featured: p.is_featured || false,
+            season: p.season || 'All Year'
         })));
       }
     };
@@ -48,6 +50,14 @@ const DiscoveryPage = () => {
     if (allowed) {
       items = items.filter((p) => allowed.includes(p.category));
     }
+
+    // Default top-level sort: Featured first
+    items.sort((a, b) => {
+      if (a.is_featured && !b.is_featured) return -1;
+      if (!a.is_featured && b.is_featured) return 1;
+      return 0; // Maintain existing order if both are featured or neither is
+    });
+
     if (activeSort === 'Price: Low to High') {
       items.sort((a, b) => a.rawPrice - b.rawPrice);
     } else if (activeSort === 'Price: High to Low') {
