@@ -8,7 +8,7 @@ const Footer = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-[#0F3A3A] pt-32 pb-16 px-12 border-t border-[#FBF9F4]/10 relative z-10 transition-colors duration-1000"
+      className="w-full bg-[#0F3A3A] pt-32 pb-16 px-12 border-t border-[#FBF9F4]/10 relative z-10 transition-colors duration-1000 cursor-auto"
     >
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-24 mb-32">
         {/* Brand Identification */}

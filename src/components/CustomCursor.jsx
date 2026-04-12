@@ -4,6 +4,7 @@ import { motion, useSpring, useMotionValue } from 'framer-motion';
 const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isHidden, setIsHidden] = useState(true);
+  const [isOverHeaderFooter, setIsOverHeaderFooter] = useState(false);
   const isHiddenRef = useRef(isHidden);
 
   const cursorSize = isHovered ? 40 : 12;
@@ -39,6 +40,8 @@ const CustomCursor = () => {
 
     // Event delegation is much cheaper than binding to 100+ elements
     const handleMouseOver = (e) => {
+      const isNavOrFooter = e.target.closest('nav, footer, header');
+      setIsOverHeaderFooter(!!isNavOrFooter);
       const isInteractable = e.target.closest('button, a, input, select, .cursor-pointer, [role="button"]');
       setIsHovered(!!isInteractable);
     };
@@ -72,10 +75,10 @@ const CustomCursor = () => {
         backgroundColor: isHovered ? 'rgba(49, 51, 44, 0.1)' : 'transparent',
         borderColor: isHovered ? 'transparent' : 'rgba(49, 51, 44, 0.6)',
         borderWidth: '1px',
-        opacity: isHidden ? 0 : 1,
+        opacity: (isHidden || isOverHeaderFooter) ? 0 : 1,
       }}
       initial={{ opacity: 0 }}
-      animate={{ opacity: isHidden ? 0 : 1 }}
+      animate={{ opacity: (isHidden || isOverHeaderFooter) ? 0 : 1 }}
       transition={{ opacity: { duration: 0.2 }, width: { duration: 0.2 }, height: { duration: 0.2 } }}
     />
   );

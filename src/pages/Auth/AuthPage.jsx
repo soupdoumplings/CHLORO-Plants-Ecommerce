@@ -322,7 +322,7 @@ const AuthPage = () => {
         {/* Footer */}
         <div className="py-6 text-center">
           <p className="font-label text-[8px] uppercase tracking-[0.3em] text-[#2F4F4F]/20 font-semibold">
-            © 2025 CHLORO — Himalayan Botanical Archive
+            © 2026 CHLORO — Himalayan Botanical Archive
           </p>
         </div>
       </div>

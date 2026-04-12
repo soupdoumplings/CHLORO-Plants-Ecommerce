@@ -33,7 +33,7 @@ const Navbar = () => {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-12 transition-all duration-500`}
+      className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-12 transition-all duration-500 cursor-auto`}
     >
       <div className="flex items-center gap-12">
         {/* Branding */}
@@ -47,10 +47,10 @@ const Navbar = () => {
             to="/"
             className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} ${hoverAccent}`}`}
           >
-            Shop
+            Home
           </Link>
+          <a href="#" className={`${textDim} ${hoverAccent} transition-colors`}>Shop</a>
           <a href="#" className={`${textDim} ${hoverAccent} transition-colors`}>The Journal</a>
-          <a href="#" className={`${textDim} ${hoverAccent} transition-colors`}>Care Guides</a>
           {isAdmin && (
             <Link
               to="/archive"
