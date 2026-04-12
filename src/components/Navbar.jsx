@@ -36,7 +36,7 @@ const Navbar = () => {
     >
       <div className="flex items-center gap-12">
         {/* Branding */}
-        <Link to={isAdmin ? "/archive" : "/journal"} className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
+        <Link to={isAdmin ? "/archive" : "/"} className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
           CHLORO
         </Link>
 
@@ -47,6 +47,12 @@ const Navbar = () => {
               <Link
                 to="/"
                 className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+              >
+                Home
+              </Link>
+              <Link
+                to="/discovery"
+                className={`transition-all duration-300 ${location.pathname === '/discovery' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
               >
                 Shop
               </Link>
@@ -123,7 +129,7 @@ const Navbar = () => {
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
                         transition={{ type: 'spring', stiffness: 500 }}
-                        className={`absolute -top-1.5 -right-1.5 w-3.5 h-3.5 ${bg === 'bg-transparent' ? 'bg-[#1A1A1A] text-[#F9F7F2]' : 'bg-[#c6e9e9] text-[#0F3A3A]'} rounded-full font-label text-[7px] font-bold flex items-center justify-center leading-none shadow-sm`}
+                        className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
                       >
                         {cartCount}
                       </motion.span>

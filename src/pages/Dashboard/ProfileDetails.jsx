@@ -3,10 +3,11 @@
  * Displays user profile data from Supabase Auth metadata
  * and provides secure logout with redirection.
  */
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
+import { supabase } from '../../supabase';
 import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
 
@@ -15,8 +16,16 @@ const ProfileDetails = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // Reading profile data from Supabase Auth metadata
-  const fullName = user?.user_metadata?.full_name || '';
+  const [localName, setLocalName] = useState(user?.user_metadata?.full_name || '');
+  const [localAvatar, setLocalAvatar] = useState(user?.user_metadata?.avatar_url || profileImg);
+  const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (user?.user_metadata?.full_name) setLocalName(user.user_metadata.full_name);
+    if (user?.user_metadata?.avatar_url) setLocalAvatar(user.user_metadata.avatar_url);
+  }, [user]);
+
   const email = user?.email || '';
 
   // Secure logout handler with error handling and redirection
@@ -26,6 +35,51 @@ const ProfileDetails = () => {
       navigate('/login'); // Redirect to login page after logout
     } catch (err) {
       console.error('Logout failed:', err);
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > 300) { height = Math.round((height * 300) / width); width = 300; }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          setLocalAvatar(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: localName, avatar_url: localAvatar }
+      });
+      if (error) throw error;
+      
+      // Update users table silently if exists
+      await supabase.from('users').update({ name: localName }).eq('id', user.id);
+    } catch (err) {
+      console.error('Error saving profile:', err.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -42,13 +96,14 @@ const ProfileDetails = () => {
       <div className="lg:col-span-4 xl:col-span-3 flex flex-col gap-8">
         {/* Profile Photo */}
         <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#EDEBE4] group">
+          <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
           <img
-            src={profileImg}
+            src={localAvatar}
             alt="Member profile"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
           />
           {/* Camera overlay button */}
-          <button className="absolute bottom-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all duration-300 group/btn">
+          <button onClick={handleImageClick} className="absolute bottom-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all duration-300 group/btn">
             <span className="material-symbols-outlined text-[18px] text-[#4A4A4A] group-hover/btn:text-[#1A1A1A] transition-colors">
               photo_camera
             </span>
@@ -106,7 +161,8 @@ const ProfileDetails = () => {
               </label>
               <input
                 type="text"
-                defaultValue={fullName}
+                value={localName}
+                onChange={(e) => setLocalName(e.target.value)}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
               />
             </div>
@@ -161,11 +217,13 @@ const ProfileDetails = () => {
           {/* Action Buttons */}
           <div className="flex items-center gap-6 mt-4">
             <motion.button
+              onClick={handleSaveProfile}
+              disabled={isSaving}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm"
+              className={`${isSaving ? 'opacity-50' : 'opacity-100'} bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm`}
             >
-              Save Profile Changes
+              {isSaving ? 'Saving...' : 'Save Profile Changes'}
             </motion.button>
 
             <motion.button
