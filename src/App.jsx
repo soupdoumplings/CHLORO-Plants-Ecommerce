@@ -57,6 +57,11 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const HomeRouteWrapper = () => {
+  const { isAdmin } = useAuth();
+  return isAdmin ? <Navigate to="/archive" replace /> : <HomePage />;
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
 
@@ -68,7 +73,7 @@ const AnimatedRoutes = () => {
         <Route path="/signup" element={<AuthPage />} />
         
         {/* Protected Routes */}
-        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><HomeRouteWrapper /></ProtectedRoute>} />
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
         <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />

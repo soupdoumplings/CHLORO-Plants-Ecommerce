@@ -26,7 +26,7 @@ const Navbar = () => {
     >
       <div className="flex items-center gap-12">
         {/* Branding */}
-        <Link to="/journal" className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
+        <Link to={isAdmin ? "/archive" : "/journal"} className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
           CHLORO
         </Link>
 
