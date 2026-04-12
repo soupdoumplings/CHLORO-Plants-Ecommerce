@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -6,8 +6,33 @@ import ArchiveHeader from './ArchiveHeader';
 import MetricsGrid from './MetricsGrid';
 import InventoryTable from './InventoryTable';
 import SystemLog from './SystemLog';
+import { supabase } from '../../supabase';
 
 const ArchivePage = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (err) {
+      console.error('Error fetching inventory:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -20,8 +45,8 @@ const ArchivePage = () => {
       
       <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
         <ArchiveHeader />
-        <MetricsGrid />
-        <InventoryTable />
+        <MetricsGrid products={products} loading={loading} />
+        <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
         <SystemLog />
       </main>
 

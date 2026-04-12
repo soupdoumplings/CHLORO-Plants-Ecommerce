@@ -6,31 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 
-const InventoryTable = () => {
-  const [holdings, setHoldings] = useState([]); // Stores specimen data from DB
-  const [loading, setLoading] = useState(true); // Tracks loading state
+const InventoryTable = ({ products, loading, onRefresh }) => {
+  const [holdings, setHoldings] = useState([]);
 
   useEffect(() => {
-    fetchInventory();
-  }, []);
-
-  // READ: Fetches all botanical specimens from Supabase (PostgreSQL)
-  const fetchInventory = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setHoldings(data || []);
-    } catch (err) {
-      console.error('Error fetching inventory:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setHoldings(products);
+  }, [products]);
 
   // DELETE: Removes a specimen from the database with confirmation
   const handleDelete = async (id) => {
@@ -38,8 +19,8 @@ const InventoryTable = () => {
     try {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
-      // Update local state to reflect deletion without re-fetching
-      setHoldings(prev => prev.filter(item => item.id !== id));
+      // Notify parent to refresh data
+      if (onRefresh) onRefresh();
     } catch (err) {
       console.error("Error deleting product:", err.message);
       alert("Failed to delete product.");
