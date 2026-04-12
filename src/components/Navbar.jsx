@@ -26,6 +26,7 @@ const Navbar = () => {
   const textDim = "text-[#FBF9F4]/70";
   const border = "border-[#FBF9F4]/20";
   const accentText = "text-[#c6e9e9]";
+  const hoverAccent = "hover:text-[#F58700]";
 
   return (
     <motion.nav
@@ -44,16 +45,16 @@ const Navbar = () => {
         <div className="hidden md:flex gap-8 font-headline text-[13px] tracking-tight uppercase">
           <Link
             to="/"
-            className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+            className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} ${hoverAccent}`}`}
           >
             Shop
           </Link>
-          <a href="#" className={`${textDim} hover:${text} transition-colors`}>The Journal</a>
-          <a href="#" className={`${textDim} hover:${text} transition-colors`}>Care Guides</a>
+          <a href="#" className={`${textDim} ${hoverAccent} transition-colors`}>The Journal</a>
+          <a href="#" className={`${textDim} ${hoverAccent} transition-colors`}>Care Guides</a>
           {isAdmin && (
             <Link
               to="/archive"
-              className={`transition-all duration-300 ${location.pathname === '/archive' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+              className={`transition-all duration-300 ${location.pathname === '/archive' ? `${text} border-b ${border}` : `${textDim} ${hoverAccent}`}`}
             >
               ADMIN
             </Link>
@@ -85,28 +86,28 @@ const Navbar = () => {
             placeholder="Search Catalogue..."
             className={`bg-transparent border-none outline-none font-label text-[10px] tracking-widest uppercase w-40 placeholder:${textDim} ${text}`}
           />
-          <span className={`material-symbols-outlined text-sm ${textDim} group-hover:${text} transition-colors cursor-pointer`}>search</span>
+          <span className={`material-symbols-outlined text-sm ${textDim} ${hoverAccent} transition-colors cursor-pointer`}>search</span>
         </div>
 
         <div className="flex items-center gap-4">
           {!user && (
-            <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:${text} transition-colors`}>
+            <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} ${hoverAccent} transition-colors`}>
               LOGIN
             </Link>
           )}
           {user && (
             <>
-              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`} title="Dashboard">
+              <Link to="/dashboard" className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`} title="Dashboard">
                 person
               </Link>
               <button 
                 onClick={handleLogout}
-                className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}
+                className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`}
                 title="Logout"
               >
                 logout
               </button>
-              <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center`} title="Cart">
+              <Link to="/cart" className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors relative flex items-center justify-center`} title="Cart">
                 shopping_bag
                 <AnimatePresence>
                   {totalItems > 0 && (
