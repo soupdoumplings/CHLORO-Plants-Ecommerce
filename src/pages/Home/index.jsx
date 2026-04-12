@@ -6,6 +6,8 @@ import Hero from './Hero';
 import Philosophy from './Philosophy';
 import ArchivePreview from './ArchivePreview';
 import VisualBreak from './VisualBreak';
+import CategoryShelf from './CategoryShelf';
+import WhyChooseUs from './WhyChooseUs';
 
 const HomePage = () => {
   return (
@@ -21,8 +23,10 @@ const HomePage = () => {
       <main className="w-full flex-grow">
         <Hero />
         <ArchivePreview />
+        <CategoryShelf />
         <Philosophy />
         <VisualBreak />
+        <WhyChooseUs />
       </main>
 
       <Footer />

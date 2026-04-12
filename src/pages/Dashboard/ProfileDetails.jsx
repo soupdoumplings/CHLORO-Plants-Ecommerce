@@ -120,6 +120,7 @@ const ProfileDetails = () => {
                 type="email"
                 defaultValue={email}
                 className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+                disabled
               />
             </div>
 

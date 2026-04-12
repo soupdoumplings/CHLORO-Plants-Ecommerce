@@ -26,12 +26,13 @@ const ProductCard = ({ product, delay = 0 }) => {
         {/* Hover action */}
         <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
             <motion.button 
-              whileHover={{ y: -2, backgroundColor: '#31332c', color: '#fbf9f4' }}
-              whileTap={{ scale: 0.97 }}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 addToBag(product);
               }}
+              whileHover={{ y: -2, backgroundColor: '#31332c', color: '#fbf9f4' }}
+              whileTap={{ scale: 0.97 }}
               className="bg-white/90 backdrop-blur-sm px-8 py-3 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-[#31332c] shadow-lg"
             >
               Add to Bag

@@ -62,8 +62,8 @@ const Editorial = () => {
         >
           <div className="aspect-[16/10] relative translate-x-12 md:translate-x-32 overflow-hidden shadow-2xl shadow-black/10">
             <img 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtLFUaM3Oonv-pGeO3SkHfTS8ZwCf94GQ15nwPbp0WAe_YF5VeRfOLpoQc47_h84EYZnhvybB2_NQ1RrQvzieJw8XOjn0MGh9ggtb62Y1yF8lljRQfuJiDT9wMhsXX_9okXQLtBUBnp2xz4ckjyGFNr0VEF4O0O6OlFzVenD2MUS2HpAB3lM77DvQrM5AM6aDQZCDRYsh5xXBXaHiaOzsejU5lSlIMDBsXwlFvyWS-LAFGzYNyAfSJrD6pkSo7mWojOCRg4uHsLhoX" 
-              alt="Verdant Heritage" 
+              src="/lof.jpg" 
+              alt="Wildflower Heritage" 
               className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110" 
             />
           </div>

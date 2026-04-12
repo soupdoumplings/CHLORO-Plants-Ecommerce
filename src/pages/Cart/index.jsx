@@ -6,8 +6,9 @@ import CartHeader from './CartHeader';
 import CartItem from './CartItem';
 import CartCrossSell from './CartCrossSell';
 import OrderSummary from './OrderSummary';
-import { useCart } from '../../lib/CartContext';
+
 import { Link } from 'react-router-dom';
+import { useCart } from '../../lib/CartContext';
 
 const CartPage = () => {
   const { cartItems: items, updateQuantity, removeFromBag, addToBag } = useCart();
