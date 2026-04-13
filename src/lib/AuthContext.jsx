@@ -42,38 +42,42 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const hydrateUserMeta = async (currentUser) => {
       try {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await ensureUserProfile(session.user);
-          await fetchRole(session.user);
-        }
+        await ensureUserProfile(currentUser);
+        await fetchRole(currentUser);
       } catch (err) {
-        console.error('Session init error:', err);
-      } finally {
-        setLoading(false);
+        console.error('User metadata hydrate error:', err);
       }
+    };
+
+    // Get initial session quickly; hydrate role/profile in background
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      if (session?.user) {
+        hydrateUserMeta(session.user);
+      } else {
+        setIsAdmin(false);
+      }
+    }).catch((err) => {
+      console.error('Session init error:', err);
+      setLoading(false);
     });
 
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        try {
-          setSession(session);
-          setUser(session?.user ?? null);
-          if (session?.user) {
-            await ensureUserProfile(session.user);
-            await fetchRole(session.user);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (err) {
-          console.error('Auth change error:', err);
-        } finally {
-          setLoading(false);
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+
+        if (session?.user) {
+          hydrateUserMeta(session.user);
+        } else {
+          setIsAdmin(false);
         }
       }
     );

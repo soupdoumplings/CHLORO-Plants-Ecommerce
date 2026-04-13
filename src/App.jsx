@@ -27,7 +27,7 @@ const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}>
+    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' })}>
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
