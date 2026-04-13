@@ -1,32 +1,43 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
-
-const FEATURED_PRODUCTS = [
-  { 
-    id: 1, 
-    name: "Monstera Deliciosa", 
-    price: "4,500", 
-    category: "Kathmandu Indoor Selection", 
-    image: "https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg" 
-  },
-  { 
-    id: 2, 
-    name: "Sansevieria 'Laurentii'", 
-    price: "2,200", 
-    category: "Low Maintenance Specimen", 
-    image: "https://images.pexels.com/photos/3699416/pexels-photo-3699416.jpeg" 
-  },
-  { 
-    id: 3, 
-    name: "Ficus Lyrata", 
-    price: "8,900", 
-    category: "Statement Foliage", 
-    image: "https://images.pexels.com/photos/8175394/pexels-photo-8175394.jpeg" 
-  }
-];
+import { supabase } from '../../supabase';
 
 const Archive = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (err) {
+        console.error('Error fetching featured products:', err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
+
+  // Normalize DB product shape to what ProductCard expects
+  const normalizeProduct = (item) => ({
+    id: item.id,
+    name: item.name,
+    price: parseFloat(item.price).toLocaleString('en-US'),
+    category: item.description || 'Himalayan Specimen',
+    image: item.images?.[0] || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
+  });
+
   return (
     <section className="py-32 px-12 bg-[#fbf9f4]">
         <div className="flex justify-between items-end mb-20">
@@ -67,11 +78,27 @@ const Archive = () => {
           </motion.div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
-          {FEATURED_PRODUCTS.map((p, i) => (
-            <ProductCard key={p.id} product={p} delay={i * 0.15} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-[#e8e9e0] h-[420px] w-full mb-6 rounded-sm" />
+                <div className="bg-[#e8e9e0] h-4 w-3/4 mb-3 rounded" />
+                <div className="bg-[#e8e9e0] h-3 w-1/2 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-24 text-[#5e6058] font-label text-[11px] uppercase tracking-widest">
+            No products found. Add plants from the admin panel.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
+            {products.map((p, i) => (
+              <ProductCard key={p.id} product={normalizeProduct(p)} delay={i * 0.15} />
+            ))}
+          </div>
+        )}
       </section>
   );
 };

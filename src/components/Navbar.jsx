@@ -26,13 +26,14 @@ const Navbar = () => {
   const textDim = "text-[#FBF9F4]/70";
   const border = "border-[#FBF9F4]/20";
   const accentText = "text-[#c6e9e9]";
+  const hoverAccent = "hover:text-[#F58700]";
 
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-12 transition-all duration-500`}
+      className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-12 transition-all duration-500 cursor-auto`}
     >
       <div className="flex items-center gap-12">
         {/* Branding */}
@@ -62,7 +63,7 @@ const Navbar = () => {
           {isAdmin && (
             <Link
               to="/archive"
-              className={`transition-all duration-300 ${location.pathname === '/archive' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+              className={`transition-all duration-300 ${location.pathname === '/archive' ? `${text} border-b ${border}` : `${textDim} ${hoverAccent}`}`}
             >
               ADMIN
             </Link>
@@ -108,12 +109,12 @@ const Navbar = () => {
             </Link>
           ) : (
             <>
-              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`} title="Dashboard">
+              <Link to="/dashboard" className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`} title="Dashboard">
                 person
               </Link>
               <button 
                 onClick={handleLogout}
-                className={`material-symbols-outlined ${text} hover:${accentText} transition-colors`}
+                className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`}
                 title="Logout"
               >
                 logout
