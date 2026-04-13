@@ -47,11 +47,11 @@ const DiscoveryProductCard = ({ product, index }) => {
     >
       <Link to={`/catalogue/${product.id}`} className="cursor-pointer block">
         {/* Image Container */}
-        <div className={`${aspect} overflow-hidden bg-[#EDEBE4] relative mb-5`}>
+        <div className={`${aspect} relative mb-5 overflow-hidden bg-[#EDEBE4]`}>
           <motion.img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             variants={{ hover: { scale: 1.05 } }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           />
@@ -63,7 +63,8 @@ const DiscoveryProductCard = ({ product, index }) => {
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-black/[0.04]"
           />
-        </Link>
+        </div>
+      </Link>
 
         {/* View Product CTA - slides up from below the frame */}
         <motion.div
@@ -102,8 +103,6 @@ const DiscoveryProductCard = ({ product, index }) => {
             </span>
           </motion.div>
         )}
-      </div>
-
       {/* Product Info */}
       <Link to={`/product/${product.id}`} className="block">
         <div className="flex items-start justify-between gap-2">
