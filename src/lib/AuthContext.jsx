@@ -43,28 +43,40 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        ensureUserProfile(session.user);
-        fetchRole(session.user);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      try {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          await ensureUserProfile(session.user);
+          await fetchRole(session.user);
+        }
+      } catch (err) {
+        console.error('Session init error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // Listen to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        ensureUserProfile(session.user);
-        fetchRole(session.user);
-      } else {
-        setIsAdmin(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        try {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await ensureUserProfile(session.user);
+            await fetchRole(session.user);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (err) {
+          console.error('Auth change error:', err);
+        } finally {
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -123,7 +135,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
