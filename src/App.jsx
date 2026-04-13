@@ -13,49 +13,10 @@ import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
+import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
-
-const ProtectedRoute = ({ children }) => {
-  const { session, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
-        {/* Minimal loading state while checking session */}
-        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
-
-const AdminRoute = ({ children }) => {
-  const { session, isAdmin, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#FBF9F4]">
-        <div className="w-8 h-8 rounded-full border-t-2 border-[#2F4F4F] animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!isAdmin) {
-    return <Navigate to="/discovery" replace />;
-  }
-  
-  return children;
-};
 
 const HomeRouteWrapper = () => {
   const { isAdmin } = useAuth();
@@ -68,9 +29,9 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}>
       <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/register" element={<AuthPage />} />
-        <Route path="/signup" element={<AuthPage />} />
+        <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
+        <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
+        <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
         
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute><HomeRouteWrapper /></ProtectedRoute>} />

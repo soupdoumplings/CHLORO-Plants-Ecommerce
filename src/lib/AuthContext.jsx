@@ -81,13 +81,14 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email, password, fullName) => {
+  const signUp = async (email, password, fullName, phone = '') => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
+          phone,
         }
       }
     });
@@ -95,12 +96,19 @@ export const AuthProvider = ({ children }) => {
     
     if (data?.user) {
       // Attempt to immediately create their user profile row, failing silently if already exists
-      const { error: dbError } = await supabase.from('users').insert([{
+      const baseUserRow = {
         id: data.user.id,
         email: email,
         name: fullName,
         role: 'USER'
-      }]);
+      };
+      const userRow = phone ? { ...baseUserRow, phone } : baseUserRow;
+      let { error: dbError } = await supabase.from('users').insert([userRow]);
+      // Backward-compatible fallback if the users table doesn't have a phone column yet.
+      if (dbError && phone) {
+        const fallback = await supabase.from('users').insert([baseUserRow]);
+        dbError = fallback.error;
+      }
       // If db fails, console log but don't strictly crash the sign up
       if (dbError) console.error("Error creating public.user:", dbError.message);
     }

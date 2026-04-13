@@ -1,19 +1,32 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Phone } from 'lucide-react';
 import { useAuth } from '../../lib/AuthContext';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signIn, signUp, signOut, signInWithProvider } = useAuth();
   const navigate = useNavigate();
+
+  const passwordCriteria = useMemo(() => {
+    return {
+      length: password.length >= 8,
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+  }, [password]);
+
+  const isPasswordStrong = passwordCriteria.length && passwordCriteria.special;
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -25,22 +38,25 @@ const AuthPage = () => {
         await signIn(email, password);
         navigate('/');
       } else {
-        if (password !== confirmPassword) {
-          throw new Error("Passwords do not match");
+        if (!isPasswordStrong) {
+          throw new Error('Password must be 8+ characters and include a special character.');
         }
-        await signUp(email, password, fullName);
-        
-        // Sign the user out so they must manually login
-        try { await signOut(); } catch(e) {}
-        
-        // Switch to the Login tab and clear password fields
+        if (password !== confirmPassword) {
+          throw new Error('Passwords do not match');
+        }
+        await signUp(email, password, fullName, phone);
+        try {
+          await signOut();
+        } catch (err) {
+          // Keep UX stable even if signout fails after signup.
+        }
         setIsLogin(true);
         setPassword('');
         setConfirmPassword('');
       }
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('rate limit')) {
-        setErrorMsg('Supabase email rate limit exceeded! To fix this: Go to Supabase Dashboard -> Authentication -> Providers -> Email -> Uncheck "Confirm email".');
+        setErrorMsg('Supabase email rate limit exceeded. Try again in a few minutes.');
       } else {
         setErrorMsg(err.message || 'An error occurred during authentication.');
       }
@@ -59,103 +75,58 @@ const AuthPage = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="flex h-screen bg-[#fbf9f4] overflow-hidden"
+      className="flex h-screen overflow-hidden bg-[#fbf9f4]"
     >
-
-      {/* ── Left Panel: Cinematic Flower Image ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="hidden lg:block lg:w-[55%] relative"
+        className="relative hidden lg:block lg:w-[55%]"
       >
-        <img
-          src="/auth-flower.png"
-          alt="CHLORO Botanical"
-          className="w-full h-full object-cover"
-        />
-        {/* Teal-tinted gradient overlays */}
+        <img src="/auth-flower.png" alt="CHLORO Botanical" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a3333]/90 via-[#2F4F4F]/30 to-[#2F4F4F]/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#2F4F4F]/20" />
-
-        {/* Brand & Quote */}
-        <div className="absolute inset-0 flex flex-col justify-between p-14 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          >
-            <h1 className="font-headline text-white/90 text-2xl tracking-[0.15em] font-light">
-              CHLORO
-            </h1>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="max-w-lg"
-          >
-            <div className="w-10 h-px bg-[#c6e9e9]/40 mb-8" />
-            <p className="font-headline italic text-white/85 text-3xl leading-relaxed">
-              "Nature does not hurry, yet everything is accomplished."
-            </p>
-          </motion.div>
-        </div>
       </motion.div>
 
-      {/* ── Right Panel: Auth Forms ── */}
-      <div className="w-full lg:w-[45%] bg-[#fbf9f4] flex flex-col h-screen">
-
-        {/* Mobile brand */}
-        <div className="lg:hidden pt-10 px-10">
-          <h1 className="font-headline text-[#2F4F4F] text-xl tracking-[0.15em] font-light">CHLORO</h1>
+      <div className="flex h-screen w-full flex-col bg-[#fbf9f4] lg:w-[45%]">
+        <div className="px-10 pt-10 lg:hidden">
+          <h1 className="font-headline text-xl font-light tracking-[0.15em] text-[#2F4F4F]">CHLORO</h1>
         </div>
 
-        {/* Centered form area */}
-        <div className="flex-1 flex items-center justify-center px-10 md:px-16 lg:px-20">
+        <div className="flex flex-1 items-center justify-center px-10 py-10 md:px-16 lg:px-20">
           <div className="w-full max-w-[360px]">
-
-            {/* Tabs */}
-            <div className="flex items-center gap-8 mb-12">
-              <button
-                onClick={() => setIsLogin(true)}
-                className="relative pb-3 outline-none"
-              >
-                <span className={`font-label text-[10px] uppercase tracking-[0.2em] font-semibold transition-colors duration-300 ${isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
+            <div className="mb-12 flex items-center gap-8">
+              <button onClick={() => setIsLogin(true)} className="relative pb-3 outline-none">
+                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Sign In
                 </span>
                 {isLogin && (
                   <motion.div
                     layoutId="tab-indicator"
                     className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
               </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className="relative pb-3 outline-none"
-              >
-                <span className={`font-label text-[10px] uppercase tracking-[0.2em] font-semibold transition-colors duration-300 ${!isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
+              <button onClick={() => setIsLogin(false)} className="relative pb-3 outline-none">
+                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${!isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Create Account
                 </span>
                 {!isLogin && (
                   <motion.div
                     layoutId="tab-indicator"
                     className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
               </button>
             </div>
 
-            {/* Animated form area */}
             <AnimatePresence mode="wait">
               {isLogin ? (
                 <motion.form
@@ -166,49 +137,42 @@ const AuthPage = () => {
                   transition={{ duration: 0.25 }}
                   onSubmit={handleAuth}
                 >
-                  <h2 className="font-headline text-[2.2rem] leading-tight text-[#31332c] mb-2">
-                    Welcome back.
-                  </h2>
-                  <p className="font-body text-[13px] text-[#797c73] mb-10 leading-relaxed">
+                  <h2 className="mb-2 font-headline text-[2.2rem] leading-tight text-[#31332c]">Welcome back.</h2>
+                  <p className="mb-10 font-body text-[13px] leading-relaxed text-[#797c73]">
                     Continue your journey through our curated botanical collections.
                   </p>
 
-                  <div className="space-y-7 mb-10">
-                    {errorMsg && (
-                      <div className="bg-red-50 text-red-500 font-body text-[12px] p-3 rounded border border-red-100">
-                        {errorMsg}
-                      </div>
-                    )}
+                  <div className="mb-10 space-y-7">
+                    {errorMsg && <div className="rounded border border-red-100 bg-red-50 p-3 font-body text-[12px] text-red-500">{errorMsg}</div>}
                     <div>
-                      <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-3">
-                        Email Address
-                      </label>
+                      <label className="mb-3 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
                       <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-3 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
                     </div>
-                    <div>
-                      <div className="flex justify-between items-end mb-3">
-                        <label className="font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold">
-                          Password
-                        </label>
-                        <button type="button" className="font-label text-[9px] uppercase tracking-[0.15em] text-[#456565]/50 hover:text-[#2F4F4F] transition-colors duration-300">
-                          Forgot?
-                        </button>
-                      </div>
+                    <div className="relative">
+                      <label className="mb-3 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Password</label>
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-3 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        placeholder="********"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-3 pr-8 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors duration-200 hover:text-[#2F4F4F]"
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
 
@@ -217,39 +181,35 @@ const AuthPage = () => {
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#2F4F4F] py-4 font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-[#e0fffe] shadow-lg shadow-[#2F4F4F]/20 transition-all duration-300 hover:bg-[#1a3333] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? 'Processing...' : 'Enter Portfolio'}
                   </motion.button>
 
-                  <div className="flex items-center gap-4 my-8">
-                    <div className="flex-1 h-px bg-[#2F4F4F]/8" />
-                    <span className="font-label text-[8px] uppercase tracking-[0.25em] text-[#2F4F4F]/25 font-semibold">or continue with</span>
-                    <div className="flex-1 h-px bg-[#2F4F4F]/8" />
+                  <div className="my-8 flex items-center gap-4">
+                    <div className="h-px flex-1 bg-[#2F4F4F]/8" />
+                    <span className="font-label text-[8px] font-semibold uppercase tracking-[0.25em] text-[#2F4F4F]/25">or continue with</span>
+                    <div className="h-px flex-1 bg-[#2F4F4F]/8" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => handleOAuth('google')}
-                      className="border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] uppercase tracking-[0.15em] font-semibold text-[#456565]/60 flex items-center justify-center gap-2.5 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F] transition-all duration-300"
+                      className="flex items-center justify-center gap-2.5 border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#456565]/60 transition-all duration-300 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F]"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" /><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
-                      Signin with Google
+                      Google
                     </button>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => handleOAuth('apple')}
-                      className="border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] uppercase tracking-[0.15em] font-semibold text-[#456565]/60 flex items-center justify-center gap-2.5 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F] transition-all duration-300"
+                      className="flex items-center justify-center gap-2.5 border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#456565]/60 transition-all duration-300 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F]"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" /></svg>
-                      Signin with Apple
+                      Apple
                     </button>
                   </div>
                 </motion.form>
-
               ) : (
-
                 <motion.form
                   key="signup"
                   initial={{ opacity: 0, y: 8 }}
@@ -258,70 +218,90 @@ const AuthPage = () => {
                   transition={{ duration: 0.25 }}
                   onSubmit={handleAuth}
                 >
-                  <h2 className="font-headline text-[2.2rem] leading-tight text-[#31332c] mb-2">
-                    Join CHLORO.
-                  </h2>
-                  <p className="font-body text-[13px] text-[#797c73] mb-8 leading-relaxed">
-                    Create your account to explore our curated collection.
-                  </p>
+                  <h2 className="mb-2 font-headline text-[2.2rem] leading-tight text-[#31332c]">Join CHLORO.</h2>
+                  <p className="mb-8 font-body text-[13px] leading-relaxed text-[#797c73]">Create your account to explore our curated collection.</p>
 
-                  <div className="space-y-5 mb-8">
-                    {errorMsg && (
-                      <div className="bg-red-50 text-red-500 font-body text-[12px] p-3 rounded border border-red-100">
-                        {errorMsg}
-                      </div>
-                    )}
+                  <div className="mb-8 space-y-5">
+                    {errorMsg && <div className="rounded border border-red-100 bg-red-50 p-3 font-body text-[12px] text-red-500">{errorMsg}</div>}
                     <div>
-                      <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-2.5">
-                        Full Name
-                      </label>
+                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Full Name</label>
                       <input
                         type="text"
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Your Name"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-2.5 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
                     </div>
                     <div>
-                      <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-2.5">
-                        Email Address
-                      </label>
+                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
                       <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-2.5 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
                     </div>
                     <div>
-                      <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-2.5">
-                        Password
-                      </label>
+                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Phone Number</label>
+                      <div className="flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60">
+                        <Phone size={14} className="mb-2.5 mr-2 shrink-0 text-[#2F4F4F]/30" />
+                        <input
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="+977 9800000000"
+                          className="w-full bg-transparent pb-2.5 font-body text-[14px] text-[#31332c] outline-none placeholder:text-[#31332c]/20"
+                        />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Password</label>
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        placeholder="********"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-2.5 pr-8 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute bottom-2.5 right-0 text-[#2F4F4F]/40 transition-colors duration-200 hover:text-[#2F4F4F]"
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                      <div className="mt-2 flex gap-4">
+                        <span className={`text-[8px] uppercase tracking-widest transition-colors duration-300 ${passwordCriteria.length ? 'text-green-600' : 'text-[#2F4F4F]/30'}`}>8+ Chars</span>
+                        <span className={`text-[8px] uppercase tracking-widest transition-colors duration-300 ${passwordCriteria.special ? 'text-green-600' : 'text-[#2F4F4F]/30'}`}>Special Char</span>
+                        <span className={`ml-auto text-[8px] font-bold uppercase transition-colors duration-300 ${isPasswordStrong ? 'text-green-600' : 'text-orange-400'}`}>
+                          {password.length > 0 ? (isPasswordStrong ? 'Strong' : 'Weak') : ''}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block font-label text-[9px] uppercase tracking-[0.2em] text-[#456565] font-semibold mb-2.5">
-                        Confirm Password
-                      </label>
+                    <div className="relative">
+                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Confirm Password</label>
                       <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-transparent border-b border-[#2F4F4F]/15 pb-2.5 font-body text-[14px] text-[#31332c] outline-none focus:border-[#2F4F4F]/60 transition-colors duration-300 placeholder:text-[#31332c]/20"
+                        placeholder="********"
+                        className="w-full border-b border-[#2F4F4F]/15 bg-transparent pb-2.5 pr-8 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        className="absolute bottom-2.5 right-0 text-[#2F4F4F]/40 transition-colors duration-200 hover:text-[#2F4F4F]"
+                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
 
@@ -330,28 +310,14 @@ const AuthPage = () => {
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
                     type="submit"
-                    className="w-full bg-[#2F4F4F] text-[#e0fffe] font-label text-[10px] uppercase tracking-[0.25em] py-4 font-semibold hover:bg-[#1a3333] transition-all duration-300 shadow-lg shadow-[#2F4F4F]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#2F4F4F] py-4 font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-[#e0fffe] shadow-lg shadow-[#2F4F4F]/20 transition-all duration-300 hover:bg-[#1a3333] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? 'Processing...' : 'Create Account'}
                   </motion.button>
-
-                  <p className="mt-6 text-center font-body text-[11px] text-[#456565]/50 leading-relaxed">
-                    By joining, you agree to our{' '}
-                    <span className="underline underline-offset-2 cursor-pointer hover:text-[#2F4F4F] transition-colors">Terms</span>
-                    {' '}&{' '}
-                    <span className="underline underline-offset-2 cursor-pointer hover:text-[#2F4F4F] transition-colors">Privacy Policy</span>.
-                  </p>
                 </motion.form>
               )}
             </AnimatePresence>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="py-6 text-center">
-          <p className="font-label text-[8px] uppercase tracking-[0.3em] text-[#2F4F4F]/20 font-semibold">
-            © 2026 CHLORO — Himalayan Botanical Archive
-          </p>
         </div>
       </div>
     </motion.div>
@@ -359,3 +325,4 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
+
