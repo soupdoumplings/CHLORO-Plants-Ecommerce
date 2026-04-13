@@ -4,6 +4,8 @@ import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
+const CART_LIMIT = 15;
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,13 +52,32 @@ export const CartProvider = ({ children }) => {
   }, [session]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) return;
+    if (!session?.user) return { success: false, error: 'Not logged in' };
+
+    // Enforce cart limit
+    const currentTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    if (currentTotal + quantity > CART_LIMIT) {
+      return { success: false, error: `Cart limit is ${CART_LIMIT} items` };
+    }
 
     try {
+      // Parse price: handle both raw numbers and formatted strings like "रू 50.00"
+      let priceValue = 0;
+      if (typeof product.price === 'number') {
+        priceValue = product.price;
+      } else if (product.rawPrice) {
+        priceValue = Number(product.rawPrice);
+      } else {
+        priceValue = Number(String(product.price).replace(/[^0-9.]/g, ''));
+      }
+
       // Check if item already exists in bag
       const existingItem = cartItems.find(item => item.productId === product.id);
 
       if (existingItem) {
+        if (existingItem.quantity + quantity > CART_LIMIT) {
+          return { success: false, error: `Cart limit is ${CART_LIMIT} items` };
+        }
         const { error } = await supabase
           .from('cart_items')
           .update({ quantity: existingItem.quantity + quantity })
@@ -70,15 +91,17 @@ export const CartProvider = ({ children }) => {
             user_id: session.user.id,
             product_id: product.id,
             quantity: quantity,
-            price_snapshot: Number(product.price.toString().replace(/[^0-9.]/g, ''))
+            price_snapshot: priceValue
           }]);
         
         if (error) throw error;
       }
 
       await fetchCart(); // Refresh cart
+      return { success: true };
     } catch (err) {
       console.error('Error adding to bag:', err.message);
+      return { success: false, error: err.message };
     }
   };
 
@@ -137,7 +160,8 @@ export const CartProvider = ({ children }) => {
       updateQuantity, 
       removeFromBag, 
       clearBag,
-      cartCount 
+      cartCount,
+      CART_LIMIT
     }}>
       {children}
     </CartContext.Provider>
