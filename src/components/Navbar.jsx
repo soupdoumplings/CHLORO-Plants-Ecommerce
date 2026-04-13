@@ -57,7 +57,6 @@ const Navbar = () => {
                 Shop
               </Link>
               <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:${text} transition-colors`}>The Journal</Link>
-              <a href="#" className={`${textDim} hover:${text} transition-colors`}>Care Guides</a>
             </>
           )}
           {isAdmin && (

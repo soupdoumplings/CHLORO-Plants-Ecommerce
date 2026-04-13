@@ -27,11 +27,29 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
+    // Ensure the user has a row in public.users (fixes foreign key errors for cart, orders, etc.)
+    const ensureUserProfile = async (currentUser) => {
+      if (!currentUser) return;
+      const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).single();
+      if (!data) {
+        const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'User';
+        await supabase.from('users').insert([{
+          id: currentUser.id,
+          email: currentUser.email,
+          name: name,
+          role: 'USER'
+        }]);
+      }
+    };
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchRole(session.user);
+      if (session?.user) {
+        ensureUserProfile(session.user);
+        fetchRole(session.user);
+      }
       setLoading(false);
     });
 
@@ -40,6 +58,7 @@ export const AuthProvider = ({ children }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        ensureUserProfile(session.user);
         fetchRole(session.user);
       } else {
         setIsAdmin(false);
