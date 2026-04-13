@@ -1,8 +1,11 @@
-import { Search, User, ShoppingCart, ChevronDown, ArrowLeft } from "lucide-react";
+import { Search, User, ShoppingBag, ChevronDown, ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useCart } from "../../../../lib/CartContext";
 
 export function DetailHeader({ onBack }) {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const { cartCount } = useCart();
 
   const navItems = [
     {
@@ -88,12 +91,14 @@ export function DetailHeader({ onBack }) {
               <button className="hover:text-gray-600 transition-colors">
                 <User className="w-5 h-5" />
               </button>
-              <button className="hover:text-gray-600 transition-colors relative">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                  0
-                </span>
-              </button>
+              <Link to="/cart" className="hover:text-gray-600 transition-colors relative">
+                <ShoppingBag className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
         </div>

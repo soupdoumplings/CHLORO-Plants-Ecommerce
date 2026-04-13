@@ -1,8 +1,17 @@
+/**
+ * CHLORO — Global Design System & Tailwind CSS 4 Configuration
+ * Custom theme tokens for the Himalayan botanical brand identity.
+ * All colors, fonts, and spacing are defined here for consistency.
+ */
+
+/* Google Fonts: Newsreader (headlines) & Inter (body text) */
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@100..900&display=swap');
+/* Material Symbols for icon system */
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* Custom Design Tokens for the CHLORO brand */
 @theme {
   --font-headline: "Newsreader", serif;
   --font-body: "Inter", sans-serif;

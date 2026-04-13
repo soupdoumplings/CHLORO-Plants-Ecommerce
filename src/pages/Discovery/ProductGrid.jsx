@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '../../lib/CartContext';
+
 
 const aspectMap = {
   square: 'aspect-square',
@@ -10,6 +12,25 @@ const aspectMap = {
 
 const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
+  const { addToBag } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const handleAddToBag = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      const result = await addToBag(product);
+      if (result?.success) {
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1800);
+      } else if (result?.error) {
+        alert(result.error);
+      }
+    } catch (err) {
+      console.error('Add to bag failed:', err);
+    }
+  };
 
   return (
     <motion.div
@@ -22,7 +43,7 @@ const DiscoveryProductCard = ({ product, index }) => {
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover="hover"
-      className="group"
+      className="group relative"
     >
       <Link to={`/catalogue/${product.id}`} className="cursor-pointer block">
         {/* Image Container */}
@@ -42,36 +63,49 @@ const DiscoveryProductCard = ({ product, index }) => {
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-black/[0.04]"
           />
+        </Link>
 
-          {/* View Product CTA - slides up from below the frame */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            variants={{ hover: { opacity: 1, y: 0 } }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm"
-          >
+        {/* View Product CTA - slides up from below the frame */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          variants={{ hover: { opacity: 1, y: 0 } }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2 z-10"
+        >
+          <Link to={`/product/${product.id}`} className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center">
             <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
               View Details
             </span>
+          </Link>
+          <button
+            type="button"
+            onClick={handleAddToBag}
+            className="bg-[#2F4F4F] text-white px-6 py-2.5 shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
+          >
+            <span className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold">
+              {added ? 'Added' : 'Add to Bag'}
+            </span>
+          </button>
+        </motion.div>
+
+        {/* Badge */}
+        {product.badge && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="absolute top-4 left-4"
+          >
+            <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
+              {product.badge}
+            </span>
           </motion.div>
+        )}
+      </div>
 
-          {/* Badge */}
-          {product.badge && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="absolute top-4 left-4"
-            >
-              <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
-                {product.badge}
-              </span>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Product Info */}
+      {/* Product Info */}
+      <Link to={`/product/${product.id}`} className="block">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
             <h3 className="font-headline text-[18px] text-[#1A1A1A] leading-snug group-hover:text-[#C5A059] transition-colors duration-300">

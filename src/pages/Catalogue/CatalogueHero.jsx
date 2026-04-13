@@ -1,6 +1,8 @@
 import React from 'react';
+import { useCart } from '../../lib/CartContext';
 
 const CatalogueHero = () => {
+  const { addToBag } = useCart();
   return (
     <section className="relative w-full min-h-[966px] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
       
@@ -32,7 +34,14 @@ const CatalogueHero = () => {
               <span className="font-sans text-[10px] tracking-[0.16em] uppercase text-[#31332C]/50 font-bold">Price</span>
               <p className="font-headline text-3xl text-[#31332C]">रू 12,500</p>
             </div>
-            <button className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 text-[11px] tracking-[0.16em] uppercase hover:bg-[#31332C] transition-all transform hover:-translate-y-1 shadow-lg shadow-black/5">
+            <button 
+              onClick={() => addToBag({
+                id: 'himalayan-orchid-id',
+                name: 'Himalayan Orchid',
+                price: 12500
+              })}
+              className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 text-[11px] tracking-[0.16em] uppercase hover:bg-[#31332C] transition-all transform hover:-translate-y-1 shadow-lg shadow-black/5"
+            >
               Add to Bag
             </button>
           </div>
