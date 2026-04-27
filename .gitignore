@@ -29,5 +29,4 @@ dist-ssr
 !.env.example
 
 # Local scratch / sensitive files
-credential.txt
 test.txt
