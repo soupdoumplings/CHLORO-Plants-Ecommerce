@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WBS — Petals &amp; Pots (Sprint 1)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    min-width: 1600px;
+  }
+
+  h1 {
+    font-size: 20px;
+    color: #2D2D2D;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 36px;
+    font-style: italic;
+  }
+
+  /* ── WBS Container ──────────────────────────────── */
+  .wbs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  /* ── Node Boxes ─────────────────────────────────── */
+  .node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 4px;
+    line-height: 1.4;
+    padding: 8px 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .node.root {
+    background: #3B5249;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 32px;
+    min-width: 200px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .node.l1 {
+    background: #6B8F7B;
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 10px 10px;
+    min-width: 130px;
+    max-width: 150px;
+    min-height: 50px;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .node.l1.critical {
+    background: #C75000;
+  }
+  .node.l2 {
+    background: #E8E0D0;
+    color: #3B3B3B;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 7px 6px;
+    min-width: 120px;
+    max-width: 135px;
+    min-height: 40px;
+    border-radius: 3px;
+    border: 1px solid #C8C0B0;
+  }
+
+  /* ── Vertical connector from root ───────────────── */
+  .trunk {
+    width: 2px;
+    height: 32px;
+    background: #888;
+    z-index: 1;
+  }
+
+  /* ── L1 Row (horizontal layout) ─────────────────── */
+  .l1-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Horizontal bus line behind L1 boxes */
+  .l1-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 75px;
+    right: 75px;
+    height: 2px;
+    background: #888;
+    z-index: 0;
+  }
+
+  /* Each L1 column */
+  .l1-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+    margin: 0 8px;
+  }
+
+  /* Vertical stub: bus → L1 box */
+  .l1-stub {
+    width: 2px;
+    height: 22px;
+    background: #888;
+    z-index: 1;
+  }
+
+  /* Vertical connector: L1 box → L2 stack */
+  .l1-to-l2 {
+    width: 2px;
+    height: 18px;
+    background: #888;
+    z-index: 1;
+  }
+
+  /* ── L2 Stack (vertical children) ───────────────── */
+  .l2-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Small vertical connector between L2 boxes */
+  .l2-link {
+    width: 2px;
+    height: 6px;
+    background: #888;
+    z-index: 1;
+  }
+
+  /* ── Legend ──────────────────────────────────────── */
+  .legend {
+    margin-top: 40px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    font-size: 11px;
+    color: #555;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #aaa;
+  }
+</style>
+</head>
+<body>
+
+<h1>Work Breakdown Structure — Petals &amp; Pots (Sprint 1)</h1>
+<p class="subtitle">React 19 · Vite 8 · Tailwind CSS 4 · Framer Motion · Supabase · Kindwise API &nbsp;|&nbsp; April 2026</p>
+
+<div class="wbs">
+  <!-- ROOT NODE -->
+  <div class="node root">Petals &amp; Pots<br>E-Commerce Platform</div>
+  <div class="trunk"></div>
+
+  <!-- L1 ROW -->
+  <div class="l1-row" id="l1row"></div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#3B5249"></div>
+    <span>Root</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#6B8F7B"></div>
+    <span>Work Package (Level 1)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#C75000"></div>
+    <span>Critical Path</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#E8E0D0"></div>
+    <span>Task (Level 2)</span>
+  </div>
+</div>
+
+<script>
+const categories = [
+  {
+    code: "1.0",
+    name: "Project\nManagement",
+    critical: false,
+    tasks: [
+      "1.1 Requirements\n& Scope",
+      "1.2 Sprint\nPlanning",
+      "1.3 Progress\nTracking"
+    ]
+  },
+  {
+    code: "2.0",
+    name: "Frontend\nDevelopment",
+    critical: false,
+    tasks: [
+      "2.1 Design System\nPalette · Typography\nCursor · Transitions",
+      "2.2 Pages\nAuth · Home · Catalogue\nDiscovery · Product\nDashboard · Journal",
+      "2.3 Components\nNavbar · Footer\nProductCard\nPageTransition"
+    ]
+  },
+  {
+    code: "3.0",
+    name: "Backend\n& Database",
+    critical: false,
+    tasks: [
+      "3.1 Supabase\nSetup & Config",
+      "3.2 Database Schema\nCategories · Users\nProducts · Orders\nCart · Wishlist\nReviews · Reminders\nDiagnosis History",
+      "3.3 Authentication\n& Role-Based\nAccess Control"
+    ]
+  },
+  {
+    code: "4.0",
+    name: "E-Commerce\nModule",
+    critical: false,
+    tasks: [
+      "4.1 Cart System\nContext · CRUD\nCross-Sell · Summary",
+      "4.2 Checkout Flow\nShipping · Payment\nConfirmation",
+      "4.3 Payment\nIntegration\nCard · eSewa · Khalti",
+      "4.4 Order\nManagement\nHistory · Status\nTracking"
+    ]
+  },
+  {
+    code: "5.0",
+    name: "AI & Smart\nFeatures",
+    critical: false,
+    tasks: [
+      "5.1 Plant Diagnosis\nImage Upload\nKindwise API\nTreatment Tips",
+      "5.2 Watering\nReminders\nScheduling &\nNotifications"
+    ]
+  },
+  {
+    code: "6.0",
+    name: "Admin\nPanel",
+    critical: false,
+    tasks: [
+      "6.1 Inventory\nManagement\nAdd · Edit · Delete\nEditorial Fields",
+      "6.2 Archive\nDashboard\nProduct Listing\nCRUD Operations"
+    ]
+  },
+  {
+    code: "7.0",
+    name: "Testing &\nDeployment",
+    critical: false,
+    tasks: [
+      "7.1 Quality\nAssurance\nComponent · Flow\nCross-Browser",
+      "7.2 Deployment\nVite Build\nBranch Mgmt\nCI/CD"
+    ]
+  }
+];
+
+const row = document.getElementById('l1row');
+
+categories.forEach(cat => {
+  const col = document.createElement('div');
+  col.className = 'l1-col';
+
+  // Vertical stub from bus to L1 box
+  const stub = document.createElement('div');
+  stub.className = 'l1-stub';
+  col.appendChild(stub);
+
+  // L1 box
+  const l1 = document.createElement('div');
+  l1.className = 'node l1' + (cat.critical ? ' critical' : '');
+  l1.innerHTML = cat.name.replace(/\n/g, '<br>');
+  col.appendChild(l1);
+
+  // Vertical connector from L1 to L2 stack
+  const conn = document.createElement('div');
+  conn.className = 'l1-to-l2';
+  col.appendChild(conn);
+
+  // L2 task stack
+  const stack = document.createElement('div');
+  stack.className = 'l2-stack';
+
+  cat.tasks.forEach((task, i) => {
+    // Small connector between L2 boxes
+    if (i > 0) {
+      const link = document.createElement('div');
+      link.className = 'l2-link';
+      stack.appendChild(link);
+    }
+
+    const l2 = document.createElement('div');
+    l2.className = 'node l2';
+
+    // Highlight Payment Integration in orange border
+    if (task.includes('4.3 Payment')) {
+      l2.style.borderColor = '#C75000';
+      l2.style.borderWidth = '2px';
+      l2.style.background = '#FFF0E6';
+    }
+
+    l2.innerHTML = task.replace(/\n/g, '<br>');
+    stack.appendChild(l2);
+  });
+
+  col.appendChild(stack);
+  row.appendChild(col);
+});
+</script>
+</body>
+</html>
