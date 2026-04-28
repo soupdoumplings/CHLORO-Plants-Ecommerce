@@ -24,9 +24,8 @@ dist-ssr
 *.sw?
 
 # Environment files
-.env
 .env.*
-!.env.example
+!.env
 
 # Local scratch / sensitive files
 test.txt
