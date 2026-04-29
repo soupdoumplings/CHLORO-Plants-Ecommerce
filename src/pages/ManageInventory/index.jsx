@@ -19,6 +19,8 @@ const ManageInventory = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [season, setSeason] = useState('All Year');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [category, setCategory] = useState('Indoor Plants');
+  const [tagsInput, setTagsInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
@@ -48,6 +50,8 @@ const ManageInventory = () => {
             setImageUrl(data.images && data.images.length > 0 ? data.images[0] : '');
             setSeason(data.season || 'All Year');
             setIsFeatured(data.is_featured || false);
+            setCategory(data.category || 'Indoor Plants');
+            setTagsInput(data.tags ? data.tags.join(', ') : '');
           }
         } catch (err) {
           setErrorMsg('Failed to load plant details.');
@@ -71,6 +75,8 @@ const ManageInventory = () => {
       ? [imageUrl.trim()]
       : ["https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80"];
 
+    const productTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
+
     try {
       let error;
       if (isEditMode) {
@@ -86,7 +92,9 @@ const ManageInventory = () => {
           curator_quote: curatorQuote,
           images: productImages,
           season,
-          is_featured: isFeatured
+          is_featured: isFeatured,
+          category,
+          tags: productTags
         }).eq('id', id);
         error = updateError;
       } else {
@@ -102,7 +110,9 @@ const ManageInventory = () => {
           curator_quote: curatorQuote,
           images: productImages,
           season,
-          is_featured: isFeatured
+          is_featured: isFeatured,
+          category,
+          tags: productTags
         });
         error = insertError;
       }
@@ -208,6 +218,24 @@ const ManageInventory = () => {
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Curator Quote / Tagline</label>
                      <textarea value={curatorQuote} onChange={e => setCuratorQuote(e.target.value)} placeholder='e.g. "The Lyrata requires patience and an understanding of light&apos;s gentle choreography."' rows="2" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[16px] italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full resize-none"></textarea>
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Primary Category</label>
+                     <select value={category} onChange={e => setCategory(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
+                        <option value="Indoor Plants">Indoor Plants</option>
+                        <option value="Pots & Planters">Pots & Planters</option>
+                        <option value="Gardening Tools">Gardening Tools</option>
+                        <option value="Fresh Flowers">Fresh Flowers</option>
+                        <option value="Outdoor Plants">Outdoor Plants</option>
+                        <option value="Plant Care">Plant Care</option>
+                     </select>
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Product Tags / Collections</label>
+                     <input type="text" value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="e.g. Pet-Friendly, Low-Maintenance, New Arrivals" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[15px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <p className="font-body text-[11px] text-[#5E6058]/60">Comma separated. Used for homepage filters and discovery badges.</p>
                   </div>
 
                   <div className="flex flex-col gap-3 group">
