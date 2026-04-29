@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -8,6 +8,15 @@ import CheckoutSummary from './CheckoutSummary';
 import OrderHistory from './OrderHistory';
 
 const CheckoutPage = () => {
+  const [paymentMethod, setPaymentMethod] = useState('esewa');
+  const [shippingData, setShippingData] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    phone: '',
+  });
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -29,7 +38,12 @@ const CheckoutPage = () => {
             className="lg:col-span-7 xl:col-span-8 w-full flex justify-end"
           >
              <div className="w-full">
-               <CheckoutForm />
+               <CheckoutForm 
+                 paymentMethod={paymentMethod}
+                 setPaymentMethod={setPaymentMethod}
+                 shippingData={shippingData}
+                 setShippingData={setShippingData}
+               />
              </div>
           </motion.div>
 
@@ -39,7 +53,10 @@ const CheckoutPage = () => {
             transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5 xl:col-span-4 w-full h-full lg:static relative z-10"
           >
-            <CheckoutSummary />
+            <CheckoutSummary 
+              paymentMethod={paymentMethod}
+              shippingData={shippingData}
+            />
           </motion.div>
         </div>
       </main>
