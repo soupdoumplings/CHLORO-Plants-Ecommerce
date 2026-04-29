@@ -109,16 +109,6 @@ const Navbar = () => {
             </Link>
           ) : (
             <>
-              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`} title="Dashboard">
-                person
-              </Link>
-              <button 
-                onClick={handleLogout}
-                className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
-                title="Logout"
-              >
-                logout
-              </button>
               {!isAdmin && (
                 <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
                   shopping_bag
@@ -137,6 +127,16 @@ const Navbar = () => {
                   </AnimatePresence>
                 </Link>
               )}
+              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`} title="Dashboard">
+                person
+              </Link>
+              <button
+                onClick={handleLogout}
+                className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
+                title="Logout"
+              >
+                logout
+              </button>
             </>
           )}
         </div>

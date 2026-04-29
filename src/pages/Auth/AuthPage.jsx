@@ -88,9 +88,22 @@ const AuthPage = () => {
         transition={{ duration: 1.2 }}
         className="relative hidden lg:block lg:w-[55%]"
       >
-        <img src="/auth-flower.png" alt="CHLORO Botanical" className="h-full w-full object-cover" />
+        <img src="/phool.png" alt="CHLORO Botanical" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a3333]/90 via-[#2F4F4F]/30 to-[#2F4F4F]/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#2F4F4F]/20" />
+        
+        {/* Brand Presence */}
+        <div className="absolute top-16 left-16 z-10">
+          <h1 className="font-headline text-2xl tracking-[0.25em] text-[#FBF9F4] opacity-80 uppercase">CHLORO</h1>
+        </div>
+        
+        {/* Editorial Context */}
+        <div className="absolute bottom-24 left-16 z-10 max-w-sm">
+          <div className="w-12 h-[1px] bg-[#FBF9F4] opacity-40 mb-10" />
+          <p className="font-headline italic text-[28px] text-[#FBF9F4] leading-[1.6] opacity-90">
+            "Nature does not hurry, yet everything is accomplished."
+          </p>
+        </div>
       </motion.div>
 
       <div className="flex h-screen w-full flex-col bg-[#fbf9f4] lg:w-[45%]">

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
 import CategoryFilter from './CategoryFilter';
@@ -16,15 +17,22 @@ const categoryMap = {
   'Care': ['Living Ecosystem'],
 };
 
+const HOME_CATEGORY_PLANTS = {
+  'New Arrivals': ['Peace Lily', 'Lavender'],
+  'Low-Maintenance': ['Monstera Albo'],
+  'Pet-Friendly': ['Money Tree', 'Orchid'],
+  'Gifts': ['salsa'],
+};
+
 const DiscoveryPage = () => {
+  const [searchParams] = useSearchParams();
+  const filterParam = searchParams.get('filter');
   const [activeCategory, setActiveCategory] = useState('All Objects');
   const [activeSort, setActiveSort] = useState('Latest');
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      // Assuming all fetched products go into the "All Objects" category default.
-      // You should eventually relate with Category UUIDs, but for now we map them simply.
       const { data, error } = await supabase.from('products').select('*');
       if (!error && data) {
         setAllProducts(data.map(p => ({
@@ -34,7 +42,6 @@ const DiscoveryPage = () => {
             price: `रू ${Number(p.price).toFixed(2)}`,
             rawPrice: Number(p.price),
             image: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80',
-            // Default category map to keep filters working if Categories are not fully built
             category: 'Rare Foliage',
             is_featured: p.is_featured || false,
             season: p.season || 'All Year'
@@ -46,6 +53,14 @@ const DiscoveryPage = () => {
 
   const filteredProducts = useMemo(() => {
     let items = [...allProducts];
+
+    // Priority 1: Filter from Home Page Categories (via URL param)
+    if (filterParam && HOME_CATEGORY_PLANTS[filterParam]) {
+      const allowedNames = HOME_CATEGORY_PLANTS[filterParam];
+      items = items.filter(p => allowedNames.some(name => p.name.toLowerCase().includes(name.toLowerCase())));
+    }
+
+    // Priority 2: Filter from Discovery Page Tabs
     const allowed = categoryMap[activeCategory];
     if (allowed) {
       items = items.filter((p) => allowed.includes(p.category));
@@ -55,7 +70,7 @@ const DiscoveryPage = () => {
     items.sort((a, b) => {
       if (a.is_featured && !b.is_featured) return -1;
       if (!a.is_featured && b.is_featured) return 1;
-      return 0; // Maintain existing order if both are featured or neither is
+      return 0; 
     });
 
     if (activeSort === 'Price: Low to High') {
@@ -64,7 +79,7 @@ const DiscoveryPage = () => {
       items.sort((a, b) => b.rawPrice - a.rawPrice);
     }
     return items;
-  }, [allProducts, activeCategory, activeSort]);
+  }, [allProducts, activeCategory, activeSort, filterParam]);
 
   return (
     <motion.div 
@@ -79,9 +94,17 @@ const DiscoveryPage = () => {
         <DiscoveryHero />
         <CategoryFilter
           activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
+          onCategoryChange={(cat) => {
+            setActiveCategory(cat);
+            if (filterParam) {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.delete('filter');
+              window.history.replaceState({}, '', `${window.location.pathname}?${newParams.toString()}`);
+            }
+          }}
           activeSort={activeSort}
           onSortChange={setActiveSort}
+          productCount={filteredProducts.length}
         />
         <ProductGrid products={filteredProducts} />
         <Newsletter />

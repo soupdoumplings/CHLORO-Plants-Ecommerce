@@ -10,7 +10,6 @@ import CartPage from './pages/Cart';
 import CheckoutPage from './pages/Checkout';
 import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
-import ProductDetailPage from './pages/Product';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
 import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
@@ -44,7 +43,6 @@ const AnimatedRoutes = () => {
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
       </Routes>

@@ -6,25 +6,25 @@ const CATEGORIES = [
     id: 1,
     title: 'New Arrivals',
     image: 'https://images.unsplash.com/photo-1545241047-6083a3684587?q=80&w=2574&auto=format&fit=crop',
-    link: '/discovery'
+    link: '/discovery?filter=New Arrivals'
   },
   {
     id: 2,
     title: 'Low-Maintenance',
     image: 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?q=80&w=2691&auto=format&fit=crop',
-    link: '/discovery'
+    link: '/discovery?filter=Low-Maintenance'
   },
   {
     id: 3,
     title: 'Pet-Friendly',
     image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2688&auto=format&fit=crop', // French bulldog image
-    link: '/discovery'
+    link: '/discovery?filter=Pet-Friendly'
   },
   {
     id: 4,
     title: 'Gifts',
     image: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2574&auto=format&fit=crop',
-    link: '/discovery'
+    link: '/discovery?filter=Gifts'
   }
 ];
 

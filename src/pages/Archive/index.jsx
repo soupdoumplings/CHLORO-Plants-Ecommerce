@@ -52,15 +52,7 @@ const ArchivePage = () => {
 
       <Footer />
       
-      {/* Editorial Vertical Detail */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="hidden lg:block absolute left-12 top-[1200px] h-[500px] w-[1px] bg-[#B1B3A9]/10 pt-16 z-0 pointer-events-none"
-      >
-          <span className="text-[9px] uppercase tracking-[0.4em] text-[#31332C]/20 vertical-text-rotate origin-center mt-32">Archival Manifest v.4.2</span>
-      </motion.div>
+
     </motion.div>
   );
 };

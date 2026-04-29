@@ -73,7 +73,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2 z-10"
         >
-          <Link to={`/product/${product.id}`} className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center">
+          <Link to={`/catalogue/${product.id}`} className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center">
             <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
               View Details
             </span>
@@ -104,7 +104,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           </motion.div>
         )}
       {/* Product Info */}
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/catalogue/${product.id}`} className="block">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
             <h3 className="font-headline text-[18px] text-[#1A1A1A] leading-snug group-hover:text-[#C5A059] transition-colors duration-300">

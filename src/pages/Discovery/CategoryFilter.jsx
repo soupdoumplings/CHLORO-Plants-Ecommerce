@@ -11,7 +11,7 @@ const categories = [
 
 const sortOptions = ['Latest', 'Price: Low to High', 'Price: High to Low', 'Popular'];
 
-const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortChange }) => {
+const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortChange, productCount }) => {
   const [sortOpen, setSortOpen] = useState(false);
 
   return (
@@ -52,7 +52,7 @@ const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortCh
             onClick={() => setSortOpen(!sortOpen)}
             className="flex items-center gap-2 font-label text-[11px] tracking-[0.06em] uppercase text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors"
           >
-            <span className="text-[#B0B0A8]">Showing 24 results</span>
+            <span className="text-[#B0B0A8]">Showing {productCount} results</span>
             <span className="mx-2 text-[#B0B0A8]">·</span>
             <span className="font-semibold">Sort by {activeSort}</span>
             <motion.span
