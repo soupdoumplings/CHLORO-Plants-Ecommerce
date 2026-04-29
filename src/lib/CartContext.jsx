@@ -97,6 +97,14 @@ export const CartProvider = ({ children }) => {
         if (error) throw error;
       }
 
+      // Create a notification for the added item
+      await supabase.from('notifications').insert([{
+        user_id: session.user.id,
+        type: 'SYSTEM',
+        message: `You added ${quantity}x ${product.name || 'item'} to your bag.`,
+        link: '/cart'
+      }]);
+
       await fetchCart(); // Refresh cart
       return { success: true };
     } catch (err) {
