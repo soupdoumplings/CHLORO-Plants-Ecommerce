@@ -34,7 +34,7 @@ const AnimatedRoutes = () => {
         <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
         
         {/* Protected Routes */}
-        <Route path="/" element={<ProtectedRoute><HomeRouteWrapper /></ProtectedRoute>} />
+        <Route path="/" element={<HomeRouteWrapper />} />
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
         <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
         <Route path="/catalogue/:id" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />

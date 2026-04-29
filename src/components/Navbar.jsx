@@ -47,17 +47,17 @@ const Navbar = () => {
             <>
               <Link
                 to="/"
-                className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+                className={`transition-all duration-300 ${location.pathname === '/' ? `${text} border-b ${border}` : `${textDim} hover:text-[#628141]`}`}
               >
                 Home
               </Link>
               <Link
                 to="/discovery"
-                className={`transition-all duration-300 ${location.pathname === '/discovery' ? `${text} border-b ${border}` : `${textDim} hover:${text}`}`}
+                className={`transition-all duration-300 ${location.pathname === '/discovery' ? `${text} border-b ${border}` : `${textDim} hover:text-[#628141]`}`}
               >
                 Shop
               </Link>
-              <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:${text} transition-colors`}>The Journal</Link>
+              <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:text-[#628141] transition-colors`}>The Journal</Link>
             </>
           )}
           {isAdmin && (
@@ -98,29 +98,29 @@ const Navbar = () => {
               placeholder="Search Catalogue..."
               className={`bg-transparent border-none outline-none font-label text-[10px] tracking-widest uppercase w-40 placeholder:${textDim} ${text}`}
             />
-            <span className={`material-symbols-outlined text-sm ${textDim} group-hover:${text} transition-colors cursor-pointer`}>search</span>
+            <span className={`material-symbols-outlined text-sm ${textDim} group-hover:text-[#628141] transition-colors cursor-pointer`}>search</span>
           </div>
         )}
 
         <div className="flex items-center gap-4">
           {!user ? (
-            <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:${text} transition-colors`}>
+            <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors`}>
               LOGIN
             </Link>
           ) : (
             <>
-              <Link to="/dashboard" className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`} title="Dashboard">
+              <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`} title="Dashboard">
                 person
               </Link>
               <button 
                 onClick={handleLogout}
-                className={`material-symbols-outlined ${text} ${hoverAccent} transition-colors`}
+                className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
                 title="Logout"
               >
                 logout
               </button>
               {!isAdmin && (
-                <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center`} title="Cart">
+                <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
                   shopping_bag
                   <AnimatePresence>
                     {cartCount > 0 && (
