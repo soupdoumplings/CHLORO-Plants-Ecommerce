@@ -17,6 +17,7 @@ import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
+import { NotificationProvider } from './lib/NotificationContext';
 
 const HomeRouteWrapper = () => {
   const { isAdmin } = useAuth();
@@ -58,12 +59,14 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CartProvider>
-          <CustomCursor />
-          <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-            <AnimatedRoutes />
-          </div>
-        </CartProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <CustomCursor />
+            <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+              <AnimatedRoutes />
+            </div>
+          </CartProvider>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );

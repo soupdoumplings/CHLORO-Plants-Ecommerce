@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { useCart } from '../lib/CartContext';
+import { useNotifications } from '../lib/NotificationContext';
+
+const timeAgo = (dateStr) => {
+  if (!dateStr) return '';
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  return `${Math.floor(diffInSeconds / 86400)} days ago`;
+};
+
+const getIcon = (type) => {
+  switch (type) {
+    case 'PLANT_TIP': return '🌿';
+    case 'DIAGNOSIS': return '🔍';
+    case 'SALE': return '🏷️';
+    case 'SYSTEM':
+    default: return '🔔';
+  }
+};
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const { cartCount } = useCart();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications() || { notifications: [], unreadCount: 0 };
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationsRef = useRef(null);
+  
   const isHome = location.pathname === '/';
 
   const handleLogout = async () => {
@@ -19,6 +46,16 @@ const Navbar = () => {
       console.error('Logout failed:', err);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Consistently apply dark theme
   const bg = "bg-[#0F3A3A]";
@@ -119,23 +156,122 @@ const Navbar = () => {
               >
                 logout
               </button>
+              
               {!isAdmin && (
-                <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center`} title="Cart">
-                  shopping_bag
-                  <AnimatePresence>
-                    {cartCount > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: 'spring', stiffness: 500 }}
-                        className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
-                      >
-                        {cartCount}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </Link>
+                <>
+                  <div className="relative flex items-center justify-center" ref={notificationsRef}>
+                    <button 
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center outline-none`} 
+                      title="Notifications"
+                    >
+                      notifications
+                      <AnimatePresence>
+                        {unreadCount > 0 && (
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            transition={{ type: 'spring', stiffness: 500 }}
+                            className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#F58700] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                          >
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showNotifications && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-12 right-0 w-80 bg-[#0F3A3A] border border-[#FBF9F4]/20 shadow-2xl overflow-hidden flex flex-col z-50 cursor-auto"
+                        >
+                          <div className="flex items-center justify-between p-4 border-b border-[#FBF9F4]/20 bg-[#0A2E2E]">
+                            <h3 className="font-headline text-[#FBF9F4] text-sm uppercase tracking-wider">Notifications</h3>
+                            {unreadCount > 0 && (
+                              <button 
+                                onClick={markAllAsRead}
+                                className="font-label text-[#c6e9e9] hover:text-[#F58700] text-[10px] uppercase tracking-widest transition-colors"
+                              >
+                                Mark all as read
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="max-h-[360px] overflow-y-auto no-scrollbar">
+                            {notifications.length === 0 ? (
+                              <div className="p-6 text-center text-[#FBF9F4]/50 font-label text-xs uppercase tracking-widest">
+                                No notifications yet
+                              </div>
+                            ) : (
+                              notifications.slice(0, 10).map((notif) => (
+                                <div 
+                                  key={notif.id}
+                                  onClick={() => !notif.is_read && markAsRead(notif.id)}
+                                  className={`p-4 border-b border-[#FBF9F4]/10 last:border-b-0 flex gap-3 transition-colors ${!notif.is_read ? 'bg-[#FBF9F4]/5 cursor-pointer hover:bg-[#FBF9F4]/10' : 'bg-transparent'}`}
+                                >
+                                  <div className="text-xl flex-shrink-0 mt-0.5">
+                                    {getIcon(notif.type)}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`text-sm mb-1 ${!notif.is_read ? 'text-[#FBF9F4] font-medium' : 'text-[#FBF9F4]/70 font-normal'}`}>
+                                      {notif.message}
+                                    </p>
+                                    <div className="flex items-center justify-between mt-1.5">
+                                      <span className="font-label text-[9px] uppercase tracking-wider text-[#FBF9F4]/40">
+                                        {timeAgo(notif.created_at)}
+                                      </span>
+                                      {notif.link && (
+                                        <a 
+                                          href={notif.link}
+                                          onClick={(e) => e.stopPropagation()} 
+                                          className="font-label text-[9px] text-[#c6e9e9] hover:text-[#F58700] uppercase tracking-wider transition-colors"
+                                        >
+                                          View
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {!notif.is_read && (
+                                    <div className="w-2 h-2 rounded-full bg-[#F58700] flex-shrink-0 mt-1.5" />
+                                  )}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                          {notifications.length > 10 && (
+                            <div className="p-3 text-center border-t border-[#FBF9F4]/20 bg-[#0A2E2E]">
+                              <span className="font-label text-[10px] text-[#FBF9F4]/50 uppercase tracking-widest">
+                                Showing latest 10
+                              </span>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <Link to="/cart" className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center`} title="Cart">
+                    shopping_bag
+                    <AnimatePresence>
+                      {cartCount > 0 && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          transition={{ type: 'spring', stiffness: 500 }}
+                          className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                        >
+                          {cartCount}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Link>
+                </>
               )}
             </>
           )}
