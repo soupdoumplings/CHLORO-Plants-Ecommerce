@@ -28,6 +28,21 @@ const FicusHero = ({ product }) => {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         className="lg:col-span-5 lg:sticky lg:top-32 order-2 lg:order-1 text-left"
       >
+          {product?.tags && product.tags.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-wrap gap-2 mb-4"
+            >
+              {product.tags.map(tag => (
+                <span key={tag} className="inline-block bg-[#0D3535] text-[#FBF9F4] font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium shadow-sm max-w-[150px] truncate">
+                  {tag}
+                </span>
+              ))}
+            </motion.div>
+          )}
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const categories = [
-  'All Objects',
-  'Rare Plants',
-  'Ceramics',
-  'Tools',
-  'Care',
-];
-
 const sortOptions = ['Latest', 'Price: Low to High', 'Price: High to Low', 'Popular'];
 
-const CategoryFilter = ({ activeCategory, onCategoryChange, activeSort, onSortChange, productCount }) => {
+const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCategoryChange, activeSort, onSortChange, productCount }) => {
   const [sortOpen, setSortOpen] = useState(false);
 
   return (

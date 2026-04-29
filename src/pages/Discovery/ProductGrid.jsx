@@ -89,18 +89,20 @@ const DiscoveryProductCard = ({ product, index }) => {
           </button>
         </motion.div>
 
-        {/* Badge */}
-        {product.badge && (
+        {/* Tags */}
+        {product.tags && product.tags.length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="absolute top-4 left-4"
+            className="absolute top-4 left-4 flex flex-col items-start gap-1.5 pointer-events-none"
           >
-            <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
-              {product.badge}
-            </span>
+            {product.tags.slice(0, 2).map((tag, idx) => (
+              <span key={`${product.id}-${tag}`} className="inline-block bg-[#0D3535] text-[#FBF9F4] font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium shadow-sm max-w-[150px] truncate">
+                {tag}
+              </span>
+            ))}
           </motion.div>
         )}
       {/* Product Info */}
