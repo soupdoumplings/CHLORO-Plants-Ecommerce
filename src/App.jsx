@@ -8,6 +8,8 @@ import ManageInventory from './pages/ManageInventory';
 import DiscoveryPage from './pages/Discovery';
 import CartPage from './pages/Cart';
 import CheckoutPage from './pages/Checkout';
+import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import PaymentFailure from './pages/Checkout/PaymentFailure';
 import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
@@ -43,6 +45,8 @@ const AnimatedRoutes = () => {
         <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/payment/failure" element={<ProtectedRoute><PaymentFailure /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
