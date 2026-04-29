@@ -1,8 +1,8 @@
 /**
- * Payment Gateway Utilities — eSewa
+ * Payment Gateway Utilities — eSewa & Khalti
  * 
- * Handles eSewa payment initiation via hidden form POST
- * with HMAC-SHA256 signature generation.
+ * eSewa: Hidden form POST redirect with HMAC signing
+ * Khalti: API-based payment initiation and redirect
  */
 import CryptoJS from 'crypto-js';
 
@@ -13,6 +13,11 @@ const ESEWA_CONFIG = {
   secretKey: '8gBm/:&EnhH.1/q',
 };
 
+// ─── Khalti Configuration (Test Mode) ────────────────────────
+const KHALTI_CONFIG = {
+  endpoint: 'https://a.khalti.com/api/v2/epayment/initiate/',
+  secretKey: 'live_secret_key_68791341fdd94846a146f0457ff7b455',
+};
 /**
  * Generate HMAC-SHA256 signature for eSewa
  */
@@ -72,6 +77,45 @@ export const initiateEsewaPayment = ({
 
   document.body.appendChild(form);
   form.submit();
+};
+
+/**
+ * Initiate Khalti payment via API call
+ */
+export const initiateKhaltiPayment = async ({
+  amount,
+  purchaseOrderId,
+  purchaseOrderName,
+  returnUrl,
+  websiteUrl,
+}) => {
+  try {
+    const response = await fetch(KHALTI_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${KHALTI_CONFIG.secretKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        return_url: returnUrl,
+        website_url: websiteUrl,
+        amount: amount,
+        purchase_order_id: purchaseOrderId,
+        purchase_order_name: purchaseOrderName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Khalti initiation failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Khalti payment error:', error);
+    throw error;
+  }
 };
 
 /**
