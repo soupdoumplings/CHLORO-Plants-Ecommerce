@@ -1,7 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CheckoutForm = () => {
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+
   return (
     <div className="flex flex-col gap-14 lg:gap-20 w-full max-w-[640px]">
       {/* ----------------- STEP 1: SHIPPING ----------------- */}
@@ -12,8 +14,27 @@ const CheckoutForm = () => {
         transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="flex justify-between items-end border-b border-[#B0B0A8]/20 pb-4 mb-8">
-          <h2 className="font-headline text-[24px] italic text-[#1A1A1A] leading-none">Shipping Address</h2>
+          <h2 className="font-headline text-[24px] italic text-[#1A1A1A] leading-none">Contact & Shipping</h2>
           <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-medium mb-1 relative top-[1px]">Step 01 / 02</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="flex flex-col gap-2.5">
+            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Email Address</label>
+            <input 
+              type="email" 
+              placeholder="julian@example.com"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Phone Number</label>
+            <input 
+              type="tel" 
+              placeholder="+977 98..."
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -60,6 +81,62 @@ const CheckoutForm = () => {
             />
           </div>
         </div>
+
+        <div className="mt-8 mb-4 flex items-center gap-3">
+          <input 
+            type="checkbox" 
+            id="sameAsShipping" 
+            checked={sameAsShipping}
+            onChange={(e) => setSameAsShipping(e.target.checked)}
+            className="w-4 h-4 accent-[#1A1A1A] border-[#B0B0A8]/40 bg-transparent cursor-pointer"
+          />
+          <label htmlFor="sameAsShipping" className="font-label text-[10px] tracking-[0.1em] uppercase text-[#4A4A4A] cursor-pointer pt-[2px]">
+            Billing address is same as shipping
+          </label>
+        </div>
+
+        <AnimatePresence>
+          {!sameAsShipping && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="overflow-hidden"
+            >
+              <div className="pt-6 border-t border-[#B0B0A8]/20 mt-4">
+                <h3 className="font-headline text-[18px] italic text-[#1A1A1A] mb-6">Billing Address</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="flex flex-col gap-2.5">
+                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2.5 mb-6">
+                  <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Billing Address</label>
+                  <input type="text" placeholder="Street name and house number" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2.5">
+                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
 
       {/* ----------------- STEP 2: PAYMENT ----------------- */}

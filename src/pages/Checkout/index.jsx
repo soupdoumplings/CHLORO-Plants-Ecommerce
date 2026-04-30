@@ -6,8 +6,10 @@ import CheckoutHeader from './CheckoutHeader';
 import CheckoutForm from './CheckoutForm';
 import CheckoutSummary from './CheckoutSummary';
 import OrderHistory from './OrderHistory';
+import { useAuth } from '../../lib/AuthContext';
 
 const CheckoutPage = () => {
+  const { user } = useAuth();
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -45,9 +47,11 @@ const CheckoutPage = () => {
       </main>
 
       {/* Member Archive Section */}
-      <section className="bg-white mt-12 w-full">
-         <OrderHistory />
-      </section>
+      {user && (
+        <section className="bg-white mt-12 w-full">
+           <OrderHistory />
+        </section>
+      )}
 
       <Footer />
     </motion.div>

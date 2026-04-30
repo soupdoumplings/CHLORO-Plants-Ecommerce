@@ -70,7 +70,9 @@ const Navbar = () => {
                 >
                   Shop
                 </Link>
-                <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:text-[#628141] transition-colors`}>The Journal</Link>
+                {user && (
+                  <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:text-[#628141] transition-colors`}>The Journal</Link>
+                )}
               </>
             )}
             {isAdmin && (
@@ -119,31 +121,31 @@ const Navbar = () => {
           )}
 
           <div className="flex items-center gap-4">
+            {!isAdmin && (
+              <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
+                shopping_bag
+                <AnimatePresence>
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
+                      className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            )}
             {!user ? (
-              <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors`}>
+              <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
                 LOGIN
               </Link>
             ) : (
               <>
-                {!isAdmin && (
-                  <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
-                    shopping_bag
-                    <AnimatePresence>
-                      {cartCount > 0 && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          transition={{ type: 'spring', stiffness: 500 }}
-                          className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
-                        >
-                          {cartCount}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                )}
-                <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`} title="Dashboard">
+                <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
                   person
                 </Link>
                 <button

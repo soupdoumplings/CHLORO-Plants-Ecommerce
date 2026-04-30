@@ -32,16 +32,18 @@ const AnimatedRoutes = () => {
         <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
         
-        {/* Protected Routes */}
+        {/* Public Routes */}
         <Route path="/" element={<HomeRouteWrapper />} />
+        <Route path="/catalogue" element={<CataloguePage />} />
+        <Route path="/catalogue/:id" element={<CataloguePage />} />
+        <Route path="/discovery" element={<DiscoveryPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* Protected Routes */}
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
-        <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
-        <Route path="/catalogue/:id" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
-        <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
-        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
-        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
