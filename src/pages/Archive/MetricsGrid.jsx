@@ -63,7 +63,7 @@ const MetricsGrid = ({ products, loading }) => {
   ];
 
   return (
-    <section className="mb-24 px-12 max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-[#B1B3A9]/20 bg-white shadow-2xl shadow-black/5">
+    <section className="mb-16 lg:mb-24 w-full max-w-[1440px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-l border-t border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5">
       {data.map((metric, i) => (
         <motion.div 
           key={i}
@@ -71,7 +71,7 @@ const MetricsGrid = ({ products, loading }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.7, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className={`p-10 group hover:bg-[#FBF9F4] transition-colors ${i < 3 ? 'border-b lg:border-b-0 lg:border-r border-[#B1B3A9]/20' : ''}`}
+          className="p-6 md:p-8 lg:p-10 group hover:bg-[#FBF9F4] transition-colors border-r border-b border-[#B1B3A9]/20"
         >
           <p className="font-label text-xs tracking-widest text-[#5E6058] uppercase mb-4">{metric.label}</p>
           <motion.h3 
@@ -79,7 +79,7 @@ const MetricsGrid = ({ products, loading }) => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className={`font-headline text-5xl ${metric.valueColor} mb-6 tracking-tight`}
+            className={`font-headline text-4xl md:text-5xl ${metric.valueColor} mb-6 tracking-tight truncate`}
           >
             {metric.value}
           </motion.h3>

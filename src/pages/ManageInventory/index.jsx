@@ -279,9 +279,17 @@ const ManageInventory = () => {
                       </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 group">
-                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Stock Quantity</label>
-                     <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="1" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full md:w-1/3" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <div className="flex flex-col gap-3 group">
+                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Stock Quantity</label>
+                         <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="1" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                      </div>
+                      <div className="flex flex-col gap-3 group">
+                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black transition-colors">Total Inventory Value</label>
+                         <div className="bg-transparent border-b border-[#31332C]/20 py-4 font-headline text-xl text-[#785A1A] w-full flex items-center min-h-[57px]">
+                           रू {((parseFloat(price) || 0) * (parseInt(stock, 10) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                         </div>
+                      </div>
                   </div>
                   {/* Section Label: Display Attributes (New) */}
                   <div className="flex items-center gap-3 pb-2 border-b border-[#B1B3A9]/15 pt-4">

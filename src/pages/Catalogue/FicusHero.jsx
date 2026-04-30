@@ -43,7 +43,7 @@ const FicusHero = ({ product }) => {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:col-span-5 lg:sticky lg:top-32 order-2 lg:order-1 text-left"
+        className="lg:col-span-6 lg:sticky lg:top-32 order-2 lg:order-1 text-left pr-8"
       >
           {product?.tags && product.tags.length > 0 && (
             <motion.div 
@@ -123,7 +123,7 @@ const FicusHero = ({ product }) => {
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:col-span-7 order-1 lg:order-2"
+        className="lg:col-span-5 lg:col-start-8 order-1 lg:order-2"
       >
         <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
           <img 
