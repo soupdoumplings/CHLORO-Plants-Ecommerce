@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 
 const FicusHero = ({ product }) => {
+  const { addToBag } = useCart();
+  const [added, setAdded] = useState(false);
   const name = product?.name || 'Unknown Specimen';
   const scientificName = product?.description || '';
   const info = product?.info || 'No description available for this specimen.';
@@ -17,6 +19,21 @@ const FicusHero = ({ product }) => {
   const nameParts = name.split(' ');
   const nameFirstLine = nameParts.slice(0, Math.ceil(nameParts.length / 2)).join(' ');
   const nameSecondLine = nameParts.slice(Math.ceil(nameParts.length / 2)).join(' ');
+
+  const handleAddToBag = async () => {
+    if (!product) return;
+    try {
+      const result = await addToBag(product);
+      if (result?.success) {
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1800);
+      } else if (result?.error) {
+        alert(result.error);
+      }
+    } catch (err) {
+      console.error('Add to bag failed:', err);
+    }
+  };
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-32 pt-16">
@@ -91,14 +108,10 @@ const FicusHero = ({ product }) => {
               <motion.button 
                 whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => addToBag({
-                  id: 'ficus-lyrata-id', // Placeholder, ideally this would be dynamic from props
-                  name: 'Ficus Lyrata',
-                  price: 8900
-                })}
-                className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold"
+                onClick={handleAddToBag}
+                className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold w-[200px]"
               >
-                  Add to Bag
+                  {added ? 'Added' : 'Add to Bag'}
               </motion.button>
             </div>
           </motion.div>

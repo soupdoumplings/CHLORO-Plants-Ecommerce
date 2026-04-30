@@ -12,6 +12,8 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
+import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import PaymentFailure from './pages/Checkout/PaymentFailure';
 import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
@@ -39,6 +41,8 @@ const AnimatedRoutes = () => {
         <Route path="/discovery" element={<DiscoveryPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/failure" element={<PaymentFailure />} />
 
         {/* Protected Routes */}
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />

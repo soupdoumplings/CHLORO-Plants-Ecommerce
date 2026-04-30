@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CheckoutForm = () => {
+const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
   const [sameAsShipping, setSameAsShipping] = useState(true);
 
   return (
@@ -152,57 +152,142 @@ const CheckoutForm = () => {
           <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-medium mb-1 relative top-[1px]">Step 02 / 02</span>
         </div>
 
-        <div className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10">
-          <div className="flex justify-between items-center mb-6">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Card Information</label>
-            <div className="flex gap-2">
-              <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
-              <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
-              <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
+        <div className="flex flex-col gap-4 mb-8">
+          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'card' ? 'border-[#1A1A1A] bg-white shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+            <div className="flex items-center gap-5 relative z-10">
+              <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#1A1A1A] w-4 h-4" />
+              <div className="flex flex-col">
+                <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'card' ? 'text-[#1A1A1A]' : 'text-[#4A4A4A]'}`}>Pay Securely</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Credit / Debit Card</span>
+              </div>
             </div>
-          </div>
+            <div className={`relative z-10 transition-opacity ${paymentMethod === 'card' ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}>
+              <span className="material-symbols-outlined text-[28px] text-[#1A1A1A]">credit_card</span>
+            </div>
+          </label>
 
-          <div className="flex flex-col space-y-4">
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Card Number"
-                className="w-full border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
-                defaultValue=""
-              />
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#B0B0A8] text-[20px]">
-                credit_card
-              </span>
+          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'esewa' ? 'border-[#60BB46]/40 bg-[#60BB46]/5 shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+            <div className="flex items-center gap-5 relative z-10">
+              <input type="radio" name="payment" value="esewa" checked={paymentMethod === 'esewa'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#60BB46] w-4 h-4" />
+              <div className="flex flex-col">
+                <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'esewa' ? 'text-[#2C5E1D]' : 'text-[#4A4A4A] group-hover:text-[#2C5E1D]'}`}>Pay with eSewa</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Digital Wallet</span>
+              </div>
             </div>
+            <div className={`relative z-10 transition-opacity ${paymentMethod === 'esewa' ? 'opacity-100' : 'opacity-60 group-hover:opacity-80'}`}>
+              <svg viewBox="0 0 40 40" className="w-8 h-8"><circle cx="20" cy="20" r="18" fill="#60BB46"/><text x="20" y="26" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">e</text></svg>
+            </div>
+          </label>
 
-            <div className="flex gap-4">
-              <input 
-                type="text" 
-                placeholder="MM / YY"
-                className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
-              />
-              <input 
-                type="text" 
-                placeholder="CVC"
-                className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
-              />
+          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'khalti' ? 'border-[#5C2D91]/40 bg-[#5C2D91]/5 shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+            <div className="flex items-center gap-5 relative z-10">
+              <input type="radio" name="payment" value="khalti" checked={paymentMethod === 'khalti'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#5C2D91] w-4 h-4" />
+              <div className="flex flex-col">
+                <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'khalti' ? 'text-[#3D1A68]' : 'text-[#4A4A4A] group-hover:text-[#3D1A68]'}`}>Pay with Khalti</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Digital Wallet</span>
+              </div>
             </div>
-          </div>
+            <div className={`relative z-10 transition-opacity ${paymentMethod === 'khalti' ? 'opacity-100' : 'opacity-60 group-hover:opacity-80'}`}>
+              <svg viewBox="0 0 40 40" className="w-8 h-8"><circle cx="20" cy="20" r="18" fill="#5C2D91"/><text x="20" y="26" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">K</text></svg>
+            </div>
+          </label>
+
+          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'cod' ? 'border-[#2F4F4F]/40 bg-[#2F4F4F]/5 shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+            <div className="flex items-center gap-5 relative z-10">
+              <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#2F4F4F] w-4 h-4" />
+              <div className="flex flex-col">
+                <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'cod' ? 'text-[#1A2E2E]' : 'text-[#4A4A4A] group-hover:text-[#1A2E2E]'}`}>Cash on Delivery</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Pay at Doorstep</span>
+              </div>
+            </div>
+            <div className={`relative z-10 transition-opacity ${paymentMethod === 'cod' ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}>
+              <svg viewBox="0 0 40 40" className="w-8 h-8"><circle cx="20" cy="20" r="18" fill="#2F4F4F"/><text x="20" y="26" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold" fontFamily="Arial">₹</text></svg>
+            </div>
+          </label>
         </div>
 
-        {/* Error Banner */}
-        <div className="bg-[#FAF2F2] border-l-2 border-[#D94F4F] py-3.5 px-4 flex items-center gap-3 mb-6">
-          <span className="material-symbols-outlined text-[#D94F4F] text-[15px] opacity-80">error</span>
-          <p className="font-label text-[9px] tracking-[0.05em] text-[#9F403D] font-medium leading-none pt-[1px]">
-            Your card was declined. Please check your card details and try again.
-          </p>
-        </div>
+        <AnimatePresence mode="wait">
+          {paymentMethod === 'card' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10 overflow-hidden"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Card Information</label>
+                <div className="flex gap-2">
+                  <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
+                  <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
+                  <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
+                </div>
+              </div>
 
-        {/* Processing CTA */}
-        <button className="w-full bg-[#B0B0A8]/80 text-white/90 py-5 px-6 font-label text-[11px] tracking-[0.2em] uppercase font-semibold cursor-not-allowed transition-all border border-[#B0B0A8]/20">
-          Processing...
-        </button>
+              <div className="flex flex-col space-y-4">
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="Card Number"
+                    className="w-full border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                    defaultValue=""
+                  />
+                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#B0B0A8] text-[20px]">
+                    credit_card
+                  </span>
+                </div>
 
+                <div className="flex gap-4">
+                  <input 
+                    type="text" 
+                    placeholder="MM / YY"
+                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="CVC"
+                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {paymentMethod === 'esewa' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-[#60B246]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#60B246]/30 text-center overflow-hidden"
+            >
+              <h3 className="font-headline text-[18px] text-[#2C5E1D] mb-2">Pay with eSewa</h3>
+              <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to the eSewa portal to complete your transaction securely.</p>
+            </motion.div>
+          )}
+
+          {paymentMethod === 'khalti' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-[#5C2D91]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#5C2D91]/30 text-center overflow-hidden"
+            >
+              <h3 className="font-headline text-[18px] text-[#3D1A68] mb-2">Pay with Khalti</h3>
+              <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to Khalti's secure checkout page to complete your payment.</p>
+            </motion.div>
+          )}
+
+          {paymentMethod === 'cod' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10 text-center overflow-hidden"
+            >
+              <h3 className="font-headline text-[18px] text-[#1A1A1A] mb-2">Cash on Delivery</h3>
+              <p className="font-body text-[#4A4A4A] text-[13px]">You will pay the courier when your botanical specimen is safely delivered.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
     </div>
   );

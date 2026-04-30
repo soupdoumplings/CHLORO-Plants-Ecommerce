@@ -13,7 +13,8 @@ export const CartProvider = ({ children }) => {
 
   const fetchCart = async () => {
     if (!session?.user) {
-      setCartItems([]);
+      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      setCartItems(guestCart);
       setLoading(false);
       return;
     }
@@ -52,8 +53,6 @@ export const CartProvider = ({ children }) => {
   }, [session]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) return { success: false, error: 'Not logged in' };
-
     // Enforce cart limit
     const currentTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     if (currentTotal + quantity > CART_LIMIT) {
@@ -69,6 +68,32 @@ export const CartProvider = ({ children }) => {
         priceValue = Number(product.rawPrice);
       } else {
         priceValue = Number(String(product.price).replace(/[^0-9.]/g, ''));
+      }
+
+      if (!session?.user) {
+        // Guest cart logic
+        const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+        const existingItem = guestCart.find(item => item.productId === product.id);
+        
+        if (existingItem) {
+          if (existingItem.quantity + quantity > CART_LIMIT) {
+             return { success: false, error: `Cart limit is ${CART_LIMIT} items` };
+          }
+          existingItem.quantity += quantity;
+        } else {
+          guestCart.push({
+            id: `guest_${Date.now()}_${Math.random()}`,
+            productId: product.id,
+            name: product.name,
+            price: Number(priceValue),
+            quantity: quantity,
+            image: product.images?.[0] || product.image || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
+            variant: 'STUDIO SPECIMEN'
+          });
+        }
+        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+        setCartItems(guestCart);
+        return { success: true };
       }
 
       // Check if item already exists in bag
@@ -108,6 +133,17 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (id, newQty) => {
     if (newQty < 1) return removeFromBag(id);
 
+    if (!session?.user) {
+      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      const itemIndex = guestCart.findIndex(item => item.id === id);
+      if (itemIndex > -1) {
+        guestCart[itemIndex].quantity = newQty;
+        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+        setCartItems(guestCart);
+      }
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -122,6 +158,14 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromBag = async (id) => {
+    if (!session?.user) {
+      let guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      guestCart = guestCart.filter(item => item.id !== id);
+      localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+      setCartItems(guestCart);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -136,7 +180,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearBag = async () => {
-    if (!session?.user) return;
+    if (!session?.user) {
+      localStorage.removeItem('chloro_guest_cart');
+      setCartItems([]);
+      return;
+    }
     try {
       const { error } = await supabase
         .from('cart_items')
