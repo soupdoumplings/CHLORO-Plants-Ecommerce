@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ArchiveHeader from './ArchiveHeader';
+import BroadcastWidget from './BroadcastWidget';
 import MetricsGrid from './MetricsGrid';
 import InventoryTable from './InventoryTable';
 import SystemLog from './SystemLog';
@@ -45,6 +46,7 @@ const ArchivePage = () => {
       
       <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
         <ArchiveHeader />
+        <BroadcastWidget />
         <MetricsGrid products={products} loading={loading} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
         <SystemLog />
