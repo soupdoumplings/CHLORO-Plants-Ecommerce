@@ -36,7 +36,6 @@ const AuthPage = () => {
     try {
       if (isLogin) {
         await signIn(email, password);
-        navigate('/');
       } else {
         if (!isPasswordStrong) {
           throw new Error('Password must be 8+ characters and include a special character.');

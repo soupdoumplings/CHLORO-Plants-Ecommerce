@@ -14,14 +14,15 @@ import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
 import PaymentSuccess from './pages/Checkout/PaymentSuccess';
 import PaymentFailure from './pages/Checkout/PaymentFailure';
-import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
+import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { NotificationProvider } from './lib/NotificationContext';
 
 const HomeRouteWrapper = () => {
-  const { isAdmin } = useAuth();
+  const { session, isAdmin } = useAuth();
+  if (session && isAdmin === null) return <SecurityLoading />;
   return isAdmin ? <Navigate to="/archive" replace /> : <HomePage />;
 };
 
