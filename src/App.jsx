@@ -19,6 +19,7 @@ import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './compo
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { NotificationProvider } from './lib/NotificationContext';
+import { GeoLocationProvider } from './lib/GeoLocationProvider';
 
 const HomeRouteWrapper = () => {
   const { session, isAdmin } = useAuth();
@@ -65,12 +66,14 @@ function App() {
     <Router>
       <AuthProvider>
         <NotificationProvider>
-          <CartProvider>
-            <CustomCursor />
-            <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-              <AnimatedRoutes />
-            </div>
-          </CartProvider>
+          <GeoLocationProvider>
+            <CartProvider>
+              <CustomCursor />
+              <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+                <AnimatedRoutes />
+              </div>
+            </CartProvider>
+          </GeoLocationProvider>
         </NotificationProvider>
       </AuthProvider>
     </Router>

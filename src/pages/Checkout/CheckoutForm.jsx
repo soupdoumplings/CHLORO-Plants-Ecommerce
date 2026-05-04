@@ -1,13 +1,86 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { useGeoLocation } from '../../lib/useGeoLocation';
+
+const emptyAddress = {
+  addressLine: '',
+  city: '',
+  postalCode: '',
+};
+
+const getAddressFields = (detectedLocation) => {
+  if (!detectedLocation?.address) return emptyAddress;
+
+  return {
+    addressLine: detectedLocation.address.addressLine || '',
+    city: detectedLocation.address.city || '',
+    postalCode: detectedLocation.address.postalCode || '',
+  };
+};
+
+const getDetectedLocationLabel = (detectedLocation) => {
+  if (!detectedLocation?.address) return 'your current area';
+  return detectedLocation.address.neighbourhood
+    || detectedLocation.address.addressLine
+    || detectedLocation.address.city
+    || detectedLocation.address.country
+    || 'your current area';
+};
 
 const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
   const [sameAsShipping, setSameAsShipping] = useState(true);
+  const { location, loading: locating, error: locationError, isSupported, requestLocation } = useGeoLocation();
+  const [shippingAddress, setShippingAddress] = useState(() => getAddressFields(location));
+  const [billingAddress, setBillingAddress] = useState(() => getAddressFields(location));
+  const hasRequestedLocation = useRef(false);
+
+  const fillAddressFromLocation = useCallback((detectedLocation) => {
+    if (!detectedLocation?.address) return;
+
+    const detectedAddress = getAddressFields(detectedLocation);
+
+    setShippingAddress((current) => ({
+      addressLine: current.addressLine || detectedAddress.addressLine,
+      city: current.city || detectedAddress.city,
+      postalCode: current.postalCode || detectedAddress.postalCode,
+    }));
+
+    setBillingAddress((current) => ({
+      addressLine: sameAsShipping ? detectedAddress.addressLine : current.addressLine || detectedAddress.addressLine,
+      city: sameAsShipping ? detectedAddress.city : current.city || detectedAddress.city,
+      postalCode: sameAsShipping ? detectedAddress.postalCode : current.postalCode || detectedAddress.postalCode,
+    }));
+  }, [sameAsShipping]);
+
+  useEffect(() => {
+    if (!location && !hasRequestedLocation.current && isSupported) {
+      hasRequestedLocation.current = true;
+      requestLocation().then((result) => {
+        if (result.success) fillAddressFromLocation(result.location);
+      });
+    }
+  }, [fillAddressFromLocation, location, isSupported, requestLocation]);
+
+  const handleUseCurrentLocation = async () => {
+    const result = await requestLocation();
+    if (result.success) fillAddressFromLocation(result.location);
+  };
+
+  const handleShippingChange = (field, value) => {
+    setShippingAddress((current) => ({ ...current, [field]: value }));
+    if (sameAsShipping) {
+      setBillingAddress((current) => ({ ...current, [field]: value }));
+    }
+  };
+
+  const handleBillingChange = (field, value) => {
+    setBillingAddress((current) => ({ ...current, [field]: value }));
+  };
 
   return (
     <div className="flex flex-col gap-14 lg:gap-20 w-full max-w-[640px]">
       {/* ----------------- STEP 1: SHIPPING ----------------- */}
-      <motion.section 
+      <Motion.section 
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -16,6 +89,37 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
         <div className="flex justify-between items-end border-b border-[#B0B0A8]/20 pb-4 mb-8">
           <h2 className="font-headline text-[24px] italic text-[#1A1A1A] leading-none">Contact & Shipping</h2>
           <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-medium mb-1 relative top-[1px]">Step 01 / 02</span>
+        </div>
+
+        <div className="bg-[#F3F1EA] border border-[#B0B0A8]/20 p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="material-symbols-outlined text-[#0F3A3A] text-[20px] mt-0.5">my_location</span>
+            <div>
+              <p className="font-label text-[9px] tracking-[0.16em] uppercase text-[#1A1A1A] font-bold mb-1">
+                Location Autofill
+              </p>
+              <p className="font-body text-[12px] leading-relaxed text-[#5E6058]">
+                {locating
+                  ? 'Detecting your current location...'
+                  : location
+                    ? `Detected ${getDetectedLocationLabel(location)}.`
+                    : 'Allow location access to fill your shipping and billing address.'}
+              </p>
+              {locationError && (
+                <p className="font-label text-[9px] tracking-[0.06em] text-[#9F403D] font-semibold mt-2">
+                  {locationError}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleUseCurrentLocation}
+            disabled={!isSupported || locating}
+            className="border border-[#0F3A3A] text-[#0F3A3A] px-5 py-3 font-label text-[9px] tracking-[0.16em] uppercase font-bold hover:bg-[#0F3A3A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          >
+            {locating ? 'Locating...' : 'Use Location'}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -42,7 +146,6 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
             <input 
               type="text" 
-              defaultValue="Julian"
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -50,7 +153,6 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
             <input 
               type="text" 
-              defaultValue="Huxley"
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -61,6 +163,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
           <input 
             type="text" 
             placeholder="Street name and house number"
+            value={shippingAddress.addressLine}
+            onChange={(e) => handleShippingChange('addressLine', e.target.value)}
             className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
           />
         </div>
@@ -70,6 +174,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
             <input 
               type="text" 
+              value={shippingAddress.city}
+              onChange={(e) => handleShippingChange('city', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -77,6 +183,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
             <input 
               type="text" 
+              value={shippingAddress.postalCode}
+              onChange={(e) => handleShippingChange('postalCode', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -87,7 +195,10 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             type="checkbox" 
             id="sameAsShipping" 
             checked={sameAsShipping}
-            onChange={(e) => setSameAsShipping(e.target.checked)}
+            onChange={(e) => {
+              setSameAsShipping(e.target.checked);
+              if (e.target.checked) setBillingAddress(shippingAddress);
+            }}
             className="w-4 h-4 accent-[#1A1A1A] border-[#B0B0A8]/40 bg-transparent cursor-pointer"
           />
           <label htmlFor="sameAsShipping" className="font-label text-[10px] tracking-[0.1em] uppercase text-[#4A4A4A] cursor-pointer pt-[2px]">
@@ -97,7 +208,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
 
         <AnimatePresence>
           {!sameAsShipping && (
-            <motion.div
+            <Motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -120,27 +231,43 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
 
                 <div className="flex flex-col gap-2.5 mb-6">
                   <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Billing Address</label>
-                  <input type="text" placeholder="Street name and house number" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                  <input
+                    type="text"
+                    placeholder="Street name and house number"
+                    value={billingAddress.addressLine}
+                    onChange={(e) => handleBillingChange('addressLine', e.target.value)}
+                    className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2.5">
                     <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
-                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                    <input
+                      type="text"
+                      value={billingAddress.city}
+                      onChange={(e) => handleBillingChange('city', e.target.value)}
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                    />
                   </div>
                   <div className="flex flex-col gap-2.5">
                     <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
-                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                    <input
+                      type="text"
+                      value={billingAddress.postalCode}
+                      onChange={(e) => handleBillingChange('postalCode', e.target.value)}
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                    />
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
-      </motion.section>
+      </Motion.section>
 
       {/* ----------------- STEP 2: PAYMENT ----------------- */}
-      <motion.section 
+      <Motion.section 
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-20px' }}
@@ -208,7 +335,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
 
         <AnimatePresence mode="wait">
           {paymentMethod === 'card' && (
-            <motion.div 
+            <Motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -249,11 +376,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
                   />
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           )}
 
           {paymentMethod === 'esewa' && (
-            <motion.div 
+            <Motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -261,11 +388,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             >
               <h3 className="font-headline text-[18px] text-[#2C5E1D] mb-2">Pay with eSewa</h3>
               <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to the eSewa portal to complete your transaction securely.</p>
-            </motion.div>
+            </Motion.div>
           )}
 
           {paymentMethod === 'khalti' && (
-            <motion.div 
+            <Motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -273,11 +400,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             >
               <h3 className="font-headline text-[18px] text-[#3D1A68] mb-2">Pay with Khalti</h3>
               <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to Khalti's secure checkout page to complete your payment.</p>
-            </motion.div>
+            </Motion.div>
           )}
 
           {paymentMethod === 'cod' && (
-            <motion.div 
+            <Motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -285,10 +412,10 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             >
               <h3 className="font-headline text-[18px] text-[#1A1A1A] mb-2">Cash on Delivery</h3>
               <p className="font-body text-[#4A4A4A] text-[13px]">You will pay the courier when your botanical specimen is safely delivered.</p>
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
-      </motion.section>
+      </Motion.section>
     </div>
   );
 };
