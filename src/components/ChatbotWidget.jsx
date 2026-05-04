@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, ChevronLeft, Bot, User } from 'lucide-react';
+import { Leaf, X, ChevronLeft, Bot, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const CATEGORIES = {
@@ -105,7 +105,7 @@ export default function ChatbotWidget() {
             className="fixed bottom-6 right-6 w-14 h-14 bg-[#375757] text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-[#244545] transition-colors z-50 group cursor-pointer"
             style={{ cursor: 'none' }} // Integrate with global custom cursor if present
           >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <Leaf className="w-6 h-6 group-hover:scale-110 transition-transform" />
           </motion.button>
         )}
       </AnimatePresence>
