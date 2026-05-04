@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 
 const CATEGORIES = {
   "Onboarding": [
-    "Are you shopping for yourself or as a gift?",
+    "Are you shopping for yourself, or looking for a gift?",
     "Are you a first-time plant parent or an experienced grower?",
     "What kind of space are you decorating: home, office, or balcony?"
   ],
