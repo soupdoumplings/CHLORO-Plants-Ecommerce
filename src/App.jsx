@@ -54,6 +54,7 @@ const AnimatedRoutes = () => {
 };
 
 import CustomCursor from './components/CustomCursor';
+import ChatbotWidget from './components/ChatbotWidget';
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
             <CustomCursor />
             <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
               <AnimatedRoutes />
+              <ChatbotWidget />
             </div>
           </CartProvider>
         </NotificationProvider>
