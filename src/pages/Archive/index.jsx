@@ -43,7 +43,7 @@ const ArchivePage = () => {
     >
       <Navbar />
       
-      <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
+      <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[72px] px-6 md:px-12 pt-10">
         <ArchiveHeader />
         <MetricsGrid products={products} loading={loading} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />

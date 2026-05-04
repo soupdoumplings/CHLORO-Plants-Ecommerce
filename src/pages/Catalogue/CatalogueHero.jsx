@@ -4,10 +4,10 @@ import { useCart } from '../../lib/CartContext';
 const CatalogueHero = () => {
   const { addToBag } = useCart();
   return (
-    <section className="relative w-full min-h-[966px] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
+    <section className="relative w-full min-h-[80vh] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
       
       {/* Left Column: Identity */}
-      <div className="w-full md:w-[410px] flex flex-col items-start px-12 pt-16 gap-12 text-left">
+      <div className="w-full md:w-[410px] flex flex-col items-start px-12 pt-10 gap-8 text-left">
         <div className="space-y-4">
           <span className="font-sans text-[10px] tracking-[0.32em] uppercase text-[#785A1A]">
             Specimen No. 1042
@@ -49,7 +49,7 @@ const CatalogueHero = () => {
       </div>
 
       {/* Right Column: Visual Focus */}
-      <div className="flex-1 bg-[#F5F4ED] relative h-[966px] overflow-hidden">
+      <div className="flex-1 bg-[#F5F4ED] relative min-h-[600px] md:h-auto overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1599931302353-8d693f41af90?q=80&w=2574&auto=format&fit=crop" 
           alt="Himalayan Orchid" 

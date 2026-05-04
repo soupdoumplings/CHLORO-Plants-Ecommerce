@@ -4,11 +4,11 @@ import heroImage from '../../assets/discovery-hero.png';
 
 const DiscoveryHero = () => {
   return (
-    <section className="w-full pt-[82px]">
+    <section className="w-full pt-[72px]">
       <div className="max-w-[1440px] mx-auto px-10 lg:px-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[75vh] items-center">
           {/* Left — Editorial Copy */}
-          <div className="flex flex-col justify-center py-20 lg:py-32 lg:pr-16">
+          <div className="flex flex-col justify-center py-12 lg:py-20 lg:pr-16">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

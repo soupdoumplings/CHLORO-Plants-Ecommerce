@@ -35,7 +35,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="font-headline text-7xl md:text-[10rem] tracking-tighter leading-[0.85] text-white mb-10"
+          className="font-headline text-7xl md:text-[8rem] tracking-tighter leading-[0.85] text-white mb-8"
         >
           Himalayan <br />
           <span className="italic font-extralight opacity-95">Elegance.</span>
@@ -45,7 +45,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col md:flex-row gap-10 items-start md:items-center"
+          className="flex flex-col md:flex-row gap-8 items-start md:items-center"
         >
           <Magnetic magnetism={15}>
             <motion.button

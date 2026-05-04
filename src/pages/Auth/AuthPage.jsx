@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Phone } from 'lucide-react';
+import { Eye, EyeOff, Phone, Leaf } from 'lucide-react';
+import { FaGoogle, FaApple } from 'react-icons/fa';
 import { useAuth } from '../../lib/AuthContext';
 
 const AuthPage = () => {
@@ -91,12 +92,12 @@ const AuthPage = () => {
         <img src="/phool.png" alt="CHLORO Botanical" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a3333]/90 via-[#2F4F4F]/30 to-[#2F4F4F]/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#2F4F4F]/20" />
-        
+
         {/* Brand Presence */}
         <div className="absolute top-16 left-16 z-10">
           <h1 className="font-headline text-2xl tracking-[0.25em] text-[#FBF9F4] opacity-80 uppercase">CHLORO</h1>
         </div>
-        
+
         {/* Editorial Context */}
         <div className="absolute bottom-24 left-16 z-10 max-w-sm">
           <div className="w-12 h-[1px] bg-[#FBF9F4] opacity-40 mb-10" />
@@ -106,14 +107,21 @@ const AuthPage = () => {
         </div>
       </motion.div>
 
-      <div className="flex h-screen w-full flex-col bg-[#fbf9f4] lg:w-[45%]">
+      <div className="relative flex h-screen w-full flex-col overflow-y-auto bg-[#fbf9f4] lg:w-[45%]">
+        <button
+          onClick={() => navigate('/')}
+          className="absolute top-10 left-10 z-20 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]"
+        >
+          <Leaf size={22} className="-scale-x-100" />
+        </button>
+
         <div className="px-10 pt-10 lg:hidden">
           <h1 className="font-headline text-xl font-light tracking-[0.15em] text-[#2F4F4F]">CHLORO</h1>
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-10 py-10 md:px-16 lg:px-20">
+        <div className="flex flex-1 items-center justify-center px-10 py-4 md:px-16 lg:px-20">
           <div className="w-full max-w-[360px]">
-            <div className="mb-12 flex items-center gap-8">
+            <div className="mb-6 flex items-center gap-8">
               <button onClick={() => setIsLogin(true)} className="relative pb-3 outline-none">
                 <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Sign In
@@ -150,12 +158,12 @@ const AuthPage = () => {
                   transition={{ duration: 0.25 }}
                   onSubmit={handleAuth}
                 >
-                  <h2 className="mb-2 font-headline text-[2.2rem] leading-tight text-[#31332c]">Welcome back.</h2>
-                  <p className="mb-10 font-body text-[13px] leading-relaxed text-[#797c73]">
+                   <h2 className="mb-1 font-headline text-[2rem] leading-tight text-[#31332c]">Welcome back.</h2>
+                  <p className="mb-4 font-body text-[13px] leading-relaxed text-[#797c73]">
                     Continue your journey through our curated botanical collections.
                   </p>
 
-                  <div className="mb-10 space-y-7">
+                  <div className="mb-6 space-y-4">
                     {errorMsg && <div className="rounded border border-red-100 bg-red-50 p-3 font-body text-[12px] text-red-500">{errorMsg}</div>}
                     <div>
                       <label className="mb-3 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
@@ -199,7 +207,7 @@ const AuthPage = () => {
                     {isLoading ? 'Processing...' : 'Enter Portfolio'}
                   </motion.button>
 
-                  <div className="my-8 flex items-center gap-4">
+                  <div className="my-4 flex items-center gap-4">
                     <div className="h-px flex-1 bg-[#2F4F4F]/8" />
                     <span className="font-label text-[8px] font-semibold uppercase tracking-[0.25em] text-[#2F4F4F]/25">or continue with</span>
                     <div className="h-px flex-1 bg-[#2F4F4F]/8" />
@@ -211,14 +219,16 @@ const AuthPage = () => {
                       onClick={() => handleOAuth('google')}
                       className="flex items-center justify-center gap-2.5 border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#456565]/60 transition-all duration-300 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F]"
                     >
-                      Google
+                      <FaGoogle className="text-[12px] opacity-70" />
+                      SIGNIN WITH GOOGLE
                     </button>
                     <button
                       type="button"
                       onClick={() => handleOAuth('apple')}
                       className="flex items-center justify-center gap-2.5 border border-[#2F4F4F]/12 py-3.5 font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#456565]/60 transition-all duration-300 hover:border-[#2F4F4F]/30 hover:text-[#2F4F4F]"
                     >
-                      Apple
+                      <FaApple className="text-[13px] opacity-70" />
+                      SIGNIN WITH APPLE
                     </button>
                   </div>
                 </motion.form>
@@ -330,6 +340,12 @@ const AuthPage = () => {
                 </motion.form>
               )}
             </AnimatePresence>
+
+            <div className="mt-6 text-center">
+              <p className="font-label text-[9px] uppercase tracking-[0.25em] text-[#2F4F4F]/30">
+                © 2026 CHLORO — Rooted in Elegance.
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ const AiDiagnosisPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto flex items-center justify-center px-12 pt-16 pb-32 mt-[82px] min-h-[70vh]">
+      <main className="flex-grow w-full max-w-[1440px] mx-auto flex items-center justify-center px-12 pt-10 pb-20 mt-[72px] min-h-[60vh]">
         <div className="text-center max-w-2xl">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}

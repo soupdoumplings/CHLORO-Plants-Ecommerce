@@ -42,7 +42,7 @@ const FicusHero = ({ product }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="font-headline text-8xl md:text-[9.5rem] leading-[0.8] mb-12 tracking-tighter text-[#31332C]"
+            className="font-headline text-8xl md:text-[7.5rem] leading-[0.8] mb-12 tracking-tighter text-[#31332C]"
           >
             {nameFirstLine} {nameSecondLine && <><br />{nameSecondLine}</>}
           </motion.h1>
@@ -81,7 +81,7 @@ const FicusHero = ({ product }) => {
                   name: 'Ficus Lyrata',
                   price: 8900
                 })}
-                className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold"
+                className="bg-[#5F5E5E] text-[#FAF7F6] px-8 py-4 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold"
               >
                   Add to Bag
               </motion.button>
@@ -97,18 +97,20 @@ const FicusHero = ({ product }) => {
         transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         className="lg:col-span-7 order-1 lg:order-2"
       >
-        <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
-          <img 
-            src={heroImage} 
-            alt={name} 
-            className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] transition-transform duration-[10s] hover:scale-105" 
-          />
+        <div className="relative">
+          <div className="aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
+            <img 
+              src={heroImage} 
+              alt={name} 
+              className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] transition-transform duration-[10s] hover:scale-105" 
+            />
+          </div>
           <motion.div 
             initial={{ opacity: 0, x: -30, y: 20 }}
             whileInView={{ opacity: 1, x: 0, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-12 -left-12 hidden lg:block bg-white p-10 w-72 shadow-2xl border border-[#B1B3A9]/5"
+            className="absolute bottom-12 -left-6 hidden lg:block bg-white p-8 w-72 shadow-2xl border border-[#B1B3A9]/5 z-20"
           >
             <p className="font-body text-xs italic leading-relaxed text-[#5E6058] opacity-80">
               {curatorQuote}
