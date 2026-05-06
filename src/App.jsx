@@ -13,11 +13,14 @@ import AuthPage from './pages/Auth/AuthPage';
 import ProductDetailPage from './pages/Product';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
+import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import PaymentFailure from './pages/Checkout/PaymentFailure';
 import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { NotificationProvider } from './lib/NotificationContext';
+import { GeoLocationProvider } from './lib/GeoLocationProvider';
 
 const HomeRouteWrapper = () => {
   const { isAdmin } = useAuth();
@@ -44,6 +47,8 @@ const AnimatedRoutes = () => {
         <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/payment/failure" element={<ProtectedRoute><PaymentFailure /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
@@ -60,12 +65,14 @@ function App() {
     <Router>
       <AuthProvider>
         <NotificationProvider>
-          <CartProvider>
-            <CustomCursor />
-            <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-              <AnimatedRoutes />
-            </div>
-          </CartProvider>
+          <GeoLocationProvider>
+            <CartProvider>
+              <CustomCursor />
+              <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+                <AnimatedRoutes />
+              </div>
+            </CartProvider>
+          </GeoLocationProvider>
         </NotificationProvider>
       </AuthProvider>
     </Router>

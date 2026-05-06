@@ -61,7 +61,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      // Parse price: handle both raw numbers and formatted strings like "रू 50.00"
+      // Parse price: handle both raw numbers and formatted strings like "NPR 50.00"
       let priceValue = 0;
       if (typeof product.price === 'number') {
         priceValue = product.price;
