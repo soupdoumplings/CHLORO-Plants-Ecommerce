@@ -36,7 +36,7 @@ const AnimatedRoutes = () => {
         <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
-        
+
         {/* Public Routes */}
         <Route path="/" element={<HomeRouteWrapper />} />
         <Route path="/catalogue" element={<CataloguePage />} />

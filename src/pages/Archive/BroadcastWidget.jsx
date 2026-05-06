@@ -13,7 +13,7 @@ const BroadcastWidget = () => {
 
     setStatus('LOADING');
     try {
-      // Use a secure database function (RPC) to bypass Row Level Security 
+      // Use a secure database function (RPC) to bypass Row Level Security
       // and safely insert the notification for all users
       const { error: rpcError } = await supabase.rpc('broadcast_notification', {
         p_type: type,

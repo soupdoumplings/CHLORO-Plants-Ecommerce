@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
@@ -18,7 +19,7 @@ export const CartProvider = ({ children }) => {
     navigate('/login', { state: { from: `${location.pathname}${location.search}` } });
   };
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (!session?.user) {
       setCartItems([]);
       setLoading(false);
@@ -52,11 +53,11 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     fetchCart();
-  }, [session]);
+  }, [fetchCart]);
 
   const addToBag = async (product, quantity = 1) => {
     if (!session?.user) {
@@ -92,7 +93,7 @@ export const CartProvider = ({ children }) => {
           .from('cart_items')
           .update({ quantity: existingItem.quantity + quantity })
           .eq('id', existingItem.id);
-        
+
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -103,7 +104,7 @@ export const CartProvider = ({ children }) => {
             quantity: quantity,
             price_snapshot: priceValue
           }]);
-        
+
         if (error) throw error;
       }
 
@@ -184,12 +185,12 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
-      loading, 
-      addToBag, 
-      updateQuantity, 
-      removeFromBag, 
+    <CartContext.Provider value={{
+      cartItems,
+      loading,
+      addToBag,
+      updateQuantity,
+      removeFromBag,
       clearBag,
       cartCount,
       CART_LIMIT

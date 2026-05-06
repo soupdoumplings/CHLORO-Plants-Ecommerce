@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           setIsAdmin(false);
         }
-      } catch (err) {
+      } catch {
         setIsAdmin(false);
       }
     };
@@ -102,7 +103,7 @@ export const AuthProvider = ({ children }) => {
       }
     });
     if (error) throw error;
-    
+
     if (data?.user) {
       // Attempt to immediately create their user profile row, failing silently if already exists
       const baseUserRow = {

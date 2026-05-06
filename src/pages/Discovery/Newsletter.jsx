@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
@@ -18,14 +18,14 @@ const Newsletter = () => {
     <section className="w-full bg-[#F3F1EA] py-28 lg:py-36">
       <div className="max-w-[600px] mx-auto px-10 text-center">
         {/* Decorative divider */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="flex items-center justify-center gap-4 mb-10"
         >
-          <motion.span
+          <Motion.span
             initial={{ width: 0 }}
             whileInView={{ width: 32 }}
             viewport={{ once: true }}
@@ -35,16 +35,16 @@ const Newsletter = () => {
           <span className="material-symbols-outlined text-[#2F4F4F] text-[20px]">
             local_florist
           </span>
-          <motion.span
+          <Motion.span
             initial={{ width: 0 }}
             whileInView={{ width: 32 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="h-[1px] bg-[#B0B0A8]/40"
           />
-        </motion.div>
+        </Motion.div>
 
-        <motion.h2
+        <Motion.h2
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -53,9 +53,9 @@ const Newsletter = () => {
         >
           Receive the quarterly Journal on{' '}
           <span className="italic font-light">botanical preservation.</span>
-        </motion.h2>
+        </Motion.h2>
 
-        <motion.form
+        <Motion.form
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
@@ -77,15 +77,15 @@ const Newsletter = () => {
             />
           </div>
 
-          <motion.button
+          <Motion.button
             type="submit"
             whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(47, 79, 79, 0.2)' }}
             whileTap={{ scale: 0.97 }}
             className="mt-4 bg-[#2F4F4F] text-white px-10 py-3.5 font-label text-[10px] tracking-[0.15em] uppercase font-semibold hover:bg-[#243F3F] active:scale-[0.98] transition-all duration-300"
           >
             {submitted ? 'Subscribed ✓' : 'Subscribe'}
-          </motion.button>
-        </motion.form>
+          </Motion.button>
+        </Motion.form>
       </div>
     </section>
   );

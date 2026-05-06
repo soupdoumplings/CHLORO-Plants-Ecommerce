@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 
@@ -7,10 +7,8 @@ const SearchOverlay = ({ onClose }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [focused, setFocused] = useState(true);
   const inputRef = useRef(null);
   const navigate = useNavigate();
-  const debounceRef = useRef(null);
 
   // Autofocus input on mount
   useEffect(() => {
@@ -50,7 +48,10 @@ const SearchOverlay = ({ onClose }) => {
     setLoading(false);
   }, [allProducts]);
 
-  useEffect(() => { search(query); }, [query, search]);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => search(query), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [query, search]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -73,7 +74,7 @@ const SearchOverlay = ({ onClose }) => {
   return (
     <AnimatePresence>
       {/* Backdrop */}
-      <motion.div
+      <Motion.div
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -84,7 +85,7 @@ const SearchOverlay = ({ onClose }) => {
       />
 
       {/* Panel */}
-      <motion.div
+      <Motion.div
         key="panel"
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,18 +101,17 @@ const SearchOverlay = ({ onClose }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setFocused(true)}
             placeholder="Search plants, ceramics, tools..."
             className="flex-1 bg-transparent border-none outline-none font-headline text-[22px] md:text-[28px] text-[#FBF9F4] placeholder:text-[#FBF9F4]/25 leading-none"
           />
           {loading && (
-            <motion.span
+            <Motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="material-symbols-outlined text-[#C5A059] text-[18px] animate-spin shrink-0"
             >
               progress_activity
-            </motion.span>
+            </Motion.span>
           )}
           <button
             type="button"
@@ -128,7 +128,7 @@ const SearchOverlay = ({ onClose }) => {
         {/* Results */}
         <AnimatePresence mode="wait">
           {query.trim() && (
-            <motion.div
+            <Motion.div
               key="results"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -144,7 +144,7 @@ const SearchOverlay = ({ onClose }) => {
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {results.map((item, i) => (
-                        <motion.button
+                        <Motion.button
                           key={item.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -175,7 +175,7 @@ const SearchOverlay = ({ onClose }) => {
                           <span className="material-symbols-outlined text-[#FBF9F4]/20 group-hover:text-[#C5A059] group-hover:translate-x-0.5 transition-all text-[18px] shrink-0">
                             arrow_forward
                           </span>
-                        </motion.button>
+                        </Motion.button>
                       ))}
                     </div>
 
@@ -189,7 +189,7 @@ const SearchOverlay = ({ onClose }) => {
                     </button>
                   </>
                 ) : !loading ? (
-                  <motion.div
+                  <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="py-6"
@@ -200,7 +200,7 @@ const SearchOverlay = ({ onClose }) => {
                     <p className="font-label text-[10px] uppercase tracking-[0.18em] text-[#FBF9F4]/20 mt-2">
                       Try a different search term
                     </p>
-                  </motion.div>
+                  </Motion.div>
                 ) : null}
               </div>
 
@@ -213,10 +213,10 @@ const SearchOverlay = ({ onClose }) => {
                   <kbd className="bg-[#FBF9F4]/10 px-1.5 py-0.5 rounded text-[9px]">Esc</kbd> to close
                 </span>
               </div>
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </Motion.div>
     </AnimatePresence>
   );
 };

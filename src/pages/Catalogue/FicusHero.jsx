@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 
 const FicusHero = ({ product }) => {
@@ -38,7 +38,7 @@ const FicusHero = ({ product }) => {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-32 pt-16">
       {/* Left Column: Identity */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, x: -40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '-60px' }}
@@ -46,7 +46,7 @@ const FicusHero = ({ product }) => {
         className="lg:col-span-6 lg:sticky lg:top-32 order-2 lg:order-1 text-left pr-8"
       >
           {product?.tags && product.tags.length > 0 && (
-            <motion.div 
+            <Motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -58,9 +58,9 @@ const FicusHero = ({ product }) => {
                   {tag}
                 </span>
               ))}
-            </motion.div>
+            </Motion.div>
           )}
-          <motion.p 
+          <Motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -68,8 +68,8 @@ const FicusHero = ({ product }) => {
             className="font-label text-[10px] tracking-[0.2rem] uppercase text-[#785A1A] mb-6 font-bold"
           >
             {scientificName || 'Botanical Archive'}
-          </motion.p>
-          <motion.h1 
+          </Motion.p>
+          <Motion.h1
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -77,8 +77,8 @@ const FicusHero = ({ product }) => {
             className="font-headline text-8xl md:text-[9.5rem] leading-[0.8] mb-12 tracking-tighter text-[#31332C]"
           >
             {nameFirstLine} {nameSecondLine && <><br />{nameSecondLine}</>}
-          </motion.h1>
-          <motion.p 
+          </Motion.h1>
+          <Motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -86,9 +86,9 @@ const FicusHero = ({ product }) => {
             className="font-body text-[#5E6058] leading-relaxed mb-12 max-w-sm text-lg opacity-90 transition-opacity hover:opacity-100"
           >
               {info}
-          </motion.p>
-          
-          <motion.div 
+          </Motion.p>
+
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -99,26 +99,26 @@ const FicusHero = ({ product }) => {
               <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Provenance</p>
               <p className="font-body text-sm italic text-[#31332C]">{provenance}</p>
             </div>
-            
+
             <div className="pt-12 border-t border-[#B1B3A9]/20 flex justify-between items-end">
               <div>
                 <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Investment</p>
                 <p className="font-headline text-4xl text-[#31332C]">{price}</p>
               </div>
-              <motion.button 
+              <Motion.button
                 whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleAddToBag}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold w-[200px]"
               >
                   {added ? 'Added' : 'Add to Bag'}
-              </motion.button>
+              </Motion.button>
             </div>
-          </motion.div>
-      </motion.div>
+          </Motion.div>
+      </Motion.div>
 
       {/* Right Column: Visual Focus */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, scale: 0.97, y: 30 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
@@ -126,12 +126,12 @@ const FicusHero = ({ product }) => {
         className="lg:col-span-5 lg:col-start-8 order-1 lg:order-2"
       >
         <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F4ED]">
-          <img 
-            src={heroImage} 
-            alt={name} 
-            className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] transition-transform duration-[10s] hover:scale-105" 
+          <img
+            src={heroImage}
+            alt={name}
+            className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] transition-transform duration-[10s] hover:scale-105"
           />
-          <motion.div 
+          <Motion.div
             initial={{ opacity: 0, x: -30, y: 20 }}
             whileInView={{ opacity: 1, x: 0, y: 0 }}
             viewport={{ once: true }}
@@ -141,9 +141,9 @@ const FicusHero = ({ product }) => {
             <p className="font-body text-xs italic leading-relaxed text-[#5E6058] opacity-80">
               {curatorQuote}
             </p>
-          </motion.div>
+          </Motion.div>
         </div>
-      </motion.div>
+      </Motion.div>
     </section>
   );
 };

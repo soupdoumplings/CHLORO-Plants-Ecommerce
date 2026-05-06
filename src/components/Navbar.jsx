@@ -11,7 +11,7 @@ const timeAgo = (dateStr) => {
   const now = new Date();
   const date = new Date(dateStr);
   const diffInSeconds = Math.floor((now - date) / 1000);
-  
+
   if (diffInSeconds < 60) return 'Just now';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
@@ -36,7 +36,7 @@ const Navbar = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications() || { notifications: [], unreadCount: 0 };
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef(null);
-  
+
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Close search on route change
@@ -162,9 +162,9 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
-                    <button 
+                    <button
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center outline-none`} 
+                      className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center outline-none`}
                       title="Notifications"
                     >
                       notifications
@@ -182,7 +182,7 @@ const Navbar = () => {
                         )}
                       </AnimatePresence>
                     </button>
-                    
+
                     <AnimatePresence>
                       {showNotifications && (
                         <Motion.div
@@ -195,7 +195,7 @@ const Navbar = () => {
                           <div className="flex items-center justify-between p-4 border-b border-[#FBF9F4]/20 bg-[#0A2E2E]">
                             <h3 className="font-headline text-[#FBF9F4] text-sm uppercase tracking-wider">Notifications</h3>
                             {unreadCount > 0 && (
-                              <button 
+                              <button
                                 onClick={markAllAsRead}
                                 className="font-label text-[#c6e9e9] hover:text-[#F58700] text-[10px] uppercase tracking-widest transition-colors"
                               >
@@ -203,7 +203,7 @@ const Navbar = () => {
                               </button>
                             )}
                           </div>
-                          
+
                           <div className="max-h-[360px] overflow-y-auto no-scrollbar">
                             {notifications.length === 0 ? (
                               <div className="p-6 text-center text-[#FBF9F4]/50 font-label text-xs uppercase tracking-widest">
@@ -211,7 +211,7 @@ const Navbar = () => {
                               </div>
                             ) : (
                               notifications.slice(0, 10).map((notif) => (
-                                <div 
+                                <div
                                   key={notif.id}
                                   onClick={() => !notif.is_read && markAsRead(notif.id)}
                                   className={`p-4 border-b border-[#FBF9F4]/10 last:border-b-0 flex gap-3 transition-colors ${!notif.is_read ? 'bg-[#FBF9F4]/5 cursor-pointer hover:bg-[#FBF9F4]/10' : 'bg-transparent'}`}
@@ -228,9 +228,9 @@ const Navbar = () => {
                                         {timeAgo(notif.created_at)}
                                       </span>
                                       {notif.link && (
-                                        <a 
+                                        <a
                                           href={notif.link}
-                                          onClick={(e) => e.stopPropagation()} 
+                                          onClick={(e) => e.stopPropagation()}
                                           className="font-label text-[9px] text-[#c6e9e9] hover:text-[#F58700] uppercase tracking-wider transition-colors"
                                         >
                                           View
@@ -276,7 +276,7 @@ const Navbar = () => {
                     </AnimatePresence>
                   </Link>
                 )}
-            
+
             {!user ? (
               <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
                 LOGIN

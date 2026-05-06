@@ -1,11 +1,11 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-const OrderSummary = ({ subtotal, shipping, tax, total }) => {
+const OrderSummary = ({ subtotal, tax, total }) => {
   return (
     <div className="w-full bg-[#EDEBE4] p-8 lg:p-14 sticky top-[120px]">
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -19,7 +19,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
             <span>Subtotal</span>
             <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
           </div>
-          
+
           <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
             <span>Shipping</span>
             <span className="text-[#1A1A1A] text-right max-w-[120px]">Calculated at checkout</span>
@@ -42,7 +42,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
         </div>
 
         {/* Checkout CTA */}
-        <Link 
+        <Link
           to="/checkout"
           className="w-full block text-center bg-[#1A1A1A] text-white py-5 px-6 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#2F4F4F] transition-all duration-300 active:scale-[0.98] mb-5"
         >
@@ -73,7 +73,7 @@ const OrderSummary = ({ subtotal, shipping, tax, total }) => {
           </div>
         </div>
 
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
 import NotificationToast from '../components/NotificationToast';
@@ -11,10 +12,20 @@ export const NotificationProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [currentToast, setCurrentToast] = useState(null);
 
+  const showToast = useCallback((notification) => {
+    setCurrentToast(notification);
+    // Auto dismiss after 5s
+    setTimeout(() => {
+      setCurrentToast(current => current?.id === notification.id ? null : current);
+    }, 5000);
+  }, []);
+
   useEffect(() => {
     if (!user) {
-      setNotifications([]);
-      setUnreadCount(0);
+      queueMicrotask(() => {
+        setNotifications([]);
+        setUnreadCount(0);
+      });
       return;
     }
 
@@ -26,7 +37,7 @@ export const NotificationProvider = ({ children }) => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50); // Keep reasonable limit
-      
+
       if (!error && data) {
         setNotifications(data);
         setUnreadCount(data.filter(n => !n.is_read).length);
@@ -37,11 +48,11 @@ export const NotificationProvider = ({ children }) => {
 
     // Subscribe to realtime changes
     const channel = supabase.channel('notifications-channel')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications', 
-        filter: `user_id=eq.${user.id}` 
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
       }, (payload) => {
         const newNotification = payload.new;
         setNotifications(prev => [newNotification, ...prev]);
@@ -55,8 +66,7 @@ export const NotificationProvider = ({ children }) => {
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
         const updatedNotification = payload.new;
-        setNotifications(prev => prev.map(n => n.id === updatedNotification.id ? updatedNotification : n));
-        
+
         // Recalculate unread count on update
         setNotifications(prev => {
            const next = prev.map(n => n.id === updatedNotification.id ? updatedNotification : n);
@@ -69,15 +79,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
-
-  const showToast = (notification) => {
-    setCurrentToast(notification);
-    // Auto dismiss after 5s
-    setTimeout(() => {
-      setCurrentToast(current => current?.id === notification.id ? null : current);
-    }, 5000);
-  };
+  }, [user, showToast]);
 
   const markAsRead = async (id) => {
     // Optimistic UI update

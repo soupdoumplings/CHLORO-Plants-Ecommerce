@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const NotificationToast = ({ toast, onClose }) => {
   if (!toast) return null;
@@ -16,7 +16,7 @@ const NotificationToast = ({ toast, onClose }) => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -32,14 +32,10 @@ const NotificationToast = ({ toast, onClose }) => {
               {toast.message}
             </p>
             {toast.link && (
-              <a 
-                href={toast.link} 
+              <a
+                href={toast.link}
                 className="font-label text-[#c6e9e9] hover:text-[#F58700] text-xs uppercase tracking-wider transition-colors inline-block mt-1"
-                onClick={(e) => {
-                  if (toast.link.startsWith('/')) {
-                    // let router handle it if needed, but standard a tag works too if we want a full reload
-                    // To be safe with React Router, users usually use Link, but for simplicity here an 'a' tag or programmatic navigation works.
-                  }
+                onClick={() => {
                   onClose();
                 }}
               >
@@ -47,14 +43,14 @@ const NotificationToast = ({ toast, onClose }) => {
               </a>
             )}
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="ml-3 text-[#FBF9F4]/50 hover:text-[#FBF9F4] transition-colors flex-shrink-0 focus:outline-none"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
-      </motion.div>
+      </Motion.div>
     </AnimatePresence>
   );
 };

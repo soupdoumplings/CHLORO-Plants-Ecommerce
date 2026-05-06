@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { useCart } from '../../lib/CartContext';
@@ -131,7 +131,7 @@ const PaymentSuccess = () => {
   }, [clearBag]);
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -142,49 +142,49 @@ const PaymentSuccess = () => {
 
       <main className="flex-grow w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 pt-16 lg:pt-24 pb-24 mt-[82px]">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch">
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-7 bg-white border border-[#B0B0A8]/20 shadow-sm px-6 py-8 sm:p-10 lg:p-14 flex flex-col justify-between min-h-[640px]"
           >
             <div>
-              <motion.div
+              <Motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="w-20 h-20 bg-[#0F3A3A] text-[#FBF9F4] flex items-center justify-center mb-10 shadow-sm"
                 aria-hidden="true"
               >
-                <motion.span
+                <Motion.span
                   initial={{ scale: 0.4, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.35, delay: 0.55 }}
                   className="material-symbols-outlined text-[38px]"
                 >
                   check
-                </motion.span>
-              </motion.div>
+                </Motion.span>
+              </Motion.div>
 
-              <motion.p
+              <Motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.35 }}
                 className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold mb-5"
               >
                 Payment Successful
-              </motion.p>
+              </Motion.p>
 
-              <motion.h1
+              <Motion.h1
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className="font-headline text-[clamp(2.5rem,7vw,5.75rem)] leading-[0.9] text-[#1A1A1A] mb-8 max-w-[760px]"
               >
                 Your order is safely rooted.
-              </motion.h1>
+              </Motion.h1>
 
-              <motion.p
+              <Motion.p
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 0.6 }}
@@ -192,9 +192,9 @@ const PaymentSuccess = () => {
               >
                 We have confirmed your order through {transaction.method}. A receipt and fulfilment
                 update will be sent shortly, and your bag has been cleared for your next curation.
-              </motion.p>
+              </Motion.p>
 
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.75 }}
@@ -210,10 +210,10 @@ const PaymentSuccess = () => {
                     </span>
                   </div>
                 ))}
-              </motion.div>
+              </Motion.div>
             </div>
 
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.9 }}
@@ -231,10 +231,10 @@ const PaymentSuccess = () => {
               >
                 View Dashboard
               </Link>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
 
-          <motion.aside
+          <Motion.aside
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
@@ -288,12 +288,12 @@ const PaymentSuccess = () => {
                 ))}
               </div>
             </div>
-          </motion.aside>
+          </Motion.aside>
         </section>
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

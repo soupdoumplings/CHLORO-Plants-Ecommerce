@@ -186,7 +186,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           <span>Subtotal</span>
           <span className="text-[#1A1A1A]">NPR {subtotal.toFixed(2)}</span>
         </div>
-        
+
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
           <span>Shipping <span className="text-[#6B6B6B]/70 capitalize tracking-normal text-[10px] font-medium ml-1">(Editorial Rate)</span></span>
           <span className="text-[#1A1A1A]">NPR {shipping.toFixed(2)}</span>
@@ -220,7 +220,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
         </Motion.div>
       )}
 
-      <button 
+      <button
         onClick={handlePayment}
         disabled={processing || cartItems.length === 0}
         className="w-full py-5 px-6 font-label text-[11px] tracking-[0.2em] uppercase font-semibold transition-all duration-300 shadow-sm mb-6 disabled:opacity-50 disabled:cursor-not-allowed text-white"

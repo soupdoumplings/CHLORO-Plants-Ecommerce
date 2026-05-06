@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { motion as Motion, useSpring, useMotionValue } from 'framer-motion';
 
 const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -29,7 +29,7 @@ const CustomCursor = () => {
       // By using translateX/Y -50% in the styles, we don't need to calculate offsets here
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      
+
       if (isHiddenRef.current) {
         setIsHidden(false);
       }
@@ -63,7 +63,7 @@ const CustomCursor = () => {
   if (typeof window === 'undefined') return null;
 
   return (
-    <motion.div
+    <Motion.div
       className="fixed top-0 left-0 rounded-full border pointer-events-none z-[9999] hidden md:block"
       style={{
         width: cursorSize,

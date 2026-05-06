@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -53,11 +53,11 @@ const ManageInventory = () => {
             setCategory(data.category || 'Indoor Plants');
             setTagsInput(data.tags ? data.tags.join(', ') : '');
           }
-        } catch (err) {
+        } catch {
           setErrorMsg('Failed to load plant details.');
         }
       };
-      
+
       fetchPlant();
     }
   }, [id, isEditMode]);
@@ -118,7 +118,7 @@ const ManageInventory = () => {
       }
 
       if (error) throw error;
-      
+
       navigate('/discovery');
     } catch (err) {
       setErrorMsg(err.message || 'Error occurred while saving product.');
@@ -128,7 +128,7 @@ const ManageInventory = () => {
   };
 
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -136,12 +136,12 @@ const ManageInventory = () => {
       className="min-h-screen bg-[#FBF9F4] flex flex-col items-center overflow-x-hidden w-full relative"
     >
       <Navbar />
-      
+
       <main className="w-full max-w-[1920px] mx-auto flex-grow pt-[140px] px-6 md:px-12 pb-32">
         <div className="max-w-6xl mx-auto w-full">
-           
+
            {/* Header Section */}
-           <motion.div 
+           <Motion.div
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -149,18 +149,18 @@ const ManageInventory = () => {
            >
                <Link to="/archive" className="material-symbols-outlined text-[#31332C]/60 hover:text-[#31332C] transition-colors bg-[#EFEEE6] p-2 rounded-full cursor-pointer hover:bg-[#E2E3D9]">arrow_back</Link>
                <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">{isEditMode ? 'Edit Plant Listing' : 'New Plant Listing'}</span>
-           </motion.div>
-           
-           <motion.h1 
+           </Motion.div>
+
+           <Motion.h1
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
              className="font-headline text-5xl md:text-6xl leading-tight text-[#31332C] tracking-tight mb-12"
            >
              {isEditMode ? 'Update Plant Details' : 'Add Plant for Sale'}
-           </motion.h1>
-           
-           <motion.div 
+           </Motion.h1>
+
+           <Motion.div
              initial={{ scaleX: 0 }}
              animate={{ scaleX: 1 }}
              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -168,13 +168,13 @@ const ManageInventory = () => {
            />
 
            {/* Interactive Layout Section */}
-           <motion.div 
+           <Motion.div
              initial={{ opacity: 0, y: 25 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
              className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-12"
            >
-               
+
                {/* Left Column Data */}
                <div className="lg:col-span-8 bg-white p-10 md:p-14 border border-[#B1B3A9]/20 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-10">
                   {errorMsg && (
@@ -308,7 +308,7 @@ const ManageInventory = () => {
                             <option value="Summer Only">Summer Only</option>
                          </select>
                       </div>
-                      
+
                       <div className="flex flex-col gap-3 group justify-center">
                          <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors mb-2">Featured Status</label>
                          <label className="relative inline-flex items-center cursor-pointer max-w-max">
@@ -323,7 +323,7 @@ const ManageInventory = () => {
                </div>
 
                {/* Right Column - Image Preview */}
-               <motion.div 
+               <Motion.div
                  initial={{ opacity: 0, x: 20 }}
                  animate={{ opacity: 1, x: 0 }}
                  transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -334,15 +334,15 @@ const ManageInventory = () => {
                         <span className="material-symbols-outlined text-[14px]">photo_camera</span>
                         Asset Preview
                      </label>
-                     <motion.div 
+                     <Motion.div
                        whileHover={{ borderColor: '#785A1A', backgroundColor: 'rgba(251,249,244,0.5)' }}
                        className="flex-grow w-full border border-[#B1B3A9]/20 bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 transition-all group min-h-[400px] overflow-hidden"
                      >
                         {imageUrl.trim() ? (
                           <div className="w-full h-full relative">
-                            <img 
-                              src={imageUrl} 
-                              alt="Plant preview" 
+                            <img
+                              src={imageUrl}
+                              alt="Plant preview"
                               className="w-full h-full object-cover rounded-lg max-h-[500px]"
                               onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                             />
@@ -360,11 +360,11 @@ const ManageInventory = () => {
                             <p className="font-body text-xs text-[#5E6058]/60 text-center max-w-[200px]">Paste an image URL in the field on the left to preview.</p>
                           </>
                         )}
-                     </motion.div>
+                     </Motion.div>
 
                      {/* Quick Info Preview */}
                      {name && (
-                       <motion.div 
+                       <Motion.div
                          initial={{ opacity: 0 }}
                          animate={{ opacity: 1 }}
                          className="bg-[#F5F4ED] border border-[#B1B3A9]/15 rounded-xl p-5 space-y-3"
@@ -381,22 +381,22 @@ const ManageInventory = () => {
                          {price && (
                            <p className="font-headline text-xl text-[#31332C]">रू {Number(price).toLocaleString()}</p>
                          )}
-                       </motion.div>
+                       </Motion.div>
                      )}
                    </div>
-               </motion.div>
-           </motion.div>
-           
-           <motion.div 
+               </Motion.div>
+           </Motion.div>
+
+           <Motion.div
              initial={{ scaleX: 0 }}
              whileInView={{ scaleX: 1 }}
              viewport={{ once: true }}
              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
              className="w-full h-[1px] bg-[#B1B3A9]/20 mt-16 mb-8 origin-left"
            />
-           
+
            {/* Action Handlers */}
-           <motion.div 
+           <Motion.div
              initial={{ opacity: 0, y: 15 }}
              whileInView={{ opacity: 1, y: 0 }}
              viewport={{ once: true }}
@@ -407,7 +407,7 @@ const ManageInventory = () => {
                  <span className="material-symbols-outlined text-[16px]">close</span>
                  Cancel
               </Link>
-              <motion.button 
+              <Motion.button
                 whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleAcquire}
@@ -417,14 +417,14 @@ const ManageInventory = () => {
                  {isSubmitting ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save' : 'Add')}
                  <div className="w-[1px] h-4 bg-white/20"></div>
                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </motion.button>
-           </motion.div>
+              </Motion.button>
+           </Motion.div>
 
         </div>
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

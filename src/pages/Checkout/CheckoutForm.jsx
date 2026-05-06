@@ -104,7 +104,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
   return (
     <div className="flex flex-col gap-14 lg:gap-20 w-full max-w-[640px]">
       {/* ----------------- STEP 1: SHIPPING ----------------- */}
-      <Motion.section 
+      <Motion.section
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -149,8 +149,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="julian@example.com"
               value={checkoutDetails.email}
               onChange={(e) => updateDetails({ email: e.target.value })}
@@ -159,8 +159,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           </div>
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Phone Number</label>
-            <input 
-              type="tel" 
+            <input
+              type="tel"
               placeholder="+977 98..."
               value={checkoutDetails.phone}
               onChange={(e) => updateDetails({ phone: e.target.value })}
@@ -172,8 +172,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={checkoutDetails.firstName}
               onChange={(e) => updateDetails({ firstName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -181,8 +181,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           </div>
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={checkoutDetails.lastName}
               onChange={(e) => updateDetails({ lastName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -192,8 +192,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
 
         <div className="flex flex-col gap-2.5 mb-6">
           <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Shipping Address</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Street name and house number"
             value={shippingAddress.addressLine}
             onChange={(e) => handleShippingChange('addressLine', e.target.value)}
@@ -204,8 +204,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={shippingAddress.city}
               onChange={(e) => handleShippingChange('city', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -213,8 +213,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           </div>
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={shippingAddress.postalCode}
               onChange={(e) => handleShippingChange('postalCode', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -223,9 +223,9 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         </div>
 
         <div className="mt-8 mb-4 flex items-center gap-3">
-          <input 
-            type="checkbox" 
-            id="sameAsShipping" 
+          <input
+            type="checkbox"
+            id="sameAsShipping"
             checked={sameAsShipping}
             onChange={(e) => {
               setCheckoutDetails((current) => ({
@@ -252,7 +252,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             >
               <div className="pt-6 border-t border-[#B0B0A8]/20 mt-4">
                 <h3 className="font-headline text-[18px] italic text-[#1A1A1A] mb-6">Billing Address</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col gap-2.5">
                     <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
@@ -302,7 +302,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
       </Motion.section>
 
       {/* ----------------- STEP 2: PAYMENT ----------------- */}
-      <Motion.section 
+      <Motion.section
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-20px' }}
@@ -370,7 +370,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
 
         <AnimatePresence mode="wait">
           {paymentMethod === 'card' && (
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -387,8 +387,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
 
               <div className="flex flex-col space-y-4">
                 <div className="relative">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Card Number"
                     className="w-full border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
                     defaultValue=""
@@ -399,13 +399,13 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                 </div>
 
                 <div className="flex gap-4">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="MM / YY"
                     className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
                   />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="CVC"
                     className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
                   />
@@ -415,7 +415,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           )}
 
           {paymentMethod === 'esewa' && (
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -427,7 +427,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           )}
 
           {paymentMethod === 'khalti' && (
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -439,7 +439,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           )}
 
           {paymentMethod === 'cod' && (
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}

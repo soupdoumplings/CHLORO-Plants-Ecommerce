@@ -1,5 +1,5 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { fetchPlantDetail, searchPlantNames } from '../../lib/kindwise';
@@ -216,7 +216,7 @@ const JournalPage = () => {
   const apiKeyMissing = !import.meta.env.VITE_KINDWISE_API_KEY;
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -460,7 +460,7 @@ const JournalPage = () => {
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

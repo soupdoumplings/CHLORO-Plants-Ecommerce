@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const footerColumns = [
   {
@@ -36,7 +36,7 @@ const DiscoveryFooter = () => {
         {/* Main footer grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-20 mb-20">
           {/* Brand column */}
-          <motion.div
+          <Motion.div
             custom={0}
             initial="hidden"
             whileInView="visible"
@@ -50,10 +50,10 @@ const DiscoveryFooter = () => {
             <p className="font-body text-[13px] text-[#4A4A4A]/70 leading-relaxed max-w-[240px]">
               Curating life's botanical masterworks since 2012.
             </p>
-          </motion.div>
+          </Motion.div>
 
           {/* Shop column */}
-          <motion.div
+          <Motion.div
             custom={1}
             initial="hidden"
             whileInView="visible"
@@ -76,10 +76,10 @@ const DiscoveryFooter = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </Motion.div>
 
           {/* Info column */}
-          <motion.div
+          <Motion.div
             custom={2}
             initial="hidden"
             whileInView="visible"
@@ -102,10 +102,10 @@ const DiscoveryFooter = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </Motion.div>
 
           {/* Social column */}
-          <motion.div
+          <Motion.div
             custom={3}
             initial="hidden"
             whileInView="visible"
@@ -132,11 +132,11 @@ const DiscoveryFooter = () => {
                 @petalsandpots
               </a>
             </div>
-          </motion.div>
+          </Motion.div>
         </div>
 
         {/* Bottom bar */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -160,7 +160,7 @@ const DiscoveryFooter = () => {
               Terms
             </a>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
     </footer>
   );

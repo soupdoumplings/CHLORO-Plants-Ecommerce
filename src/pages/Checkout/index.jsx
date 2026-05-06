@@ -51,7 +51,7 @@ const CheckoutPage = () => {
             className="lg:col-span-7 xl:col-span-8 w-full flex justify-end"
           >
              <div className="w-full">
-               <CheckoutForm 
+               <CheckoutForm
                  paymentMethod={paymentMethod}
                  setPaymentMethod={setPaymentMethod}
                  checkoutDetails={checkoutDetails}

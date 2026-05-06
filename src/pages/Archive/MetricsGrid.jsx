@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 
 
@@ -49,7 +49,7 @@ const MetricsGrid = ({ products, loading }) => {
       value: loading ? '...' : `${velocity}%`,
       extra: (
         <div className="w-full bg-[#EFEEE6] h-1 relative rounded-full overflow-hidden">
-           <motion.div 
+           <Motion.div
              initial={{ width: 0 }}
              animate={{ width: loading ? 0 : `${velocity}%` }}
              viewport={{ once: true }}
@@ -65,7 +65,7 @@ const MetricsGrid = ({ products, loading }) => {
   return (
     <section className="mb-16 lg:mb-24 w-full max-w-[1440px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-l border-t border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5">
       {data.map((metric, i) => (
-        <motion.div 
+        <Motion.div
           key={i}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -74,7 +74,7 @@ const MetricsGrid = ({ products, loading }) => {
           className="p-6 md:p-8 lg:p-10 group hover:bg-[#FBF9F4] transition-colors border-r border-b border-[#B1B3A9]/20"
         >
           <p className="font-label text-xs tracking-widest text-[#5E6058] uppercase mb-4">{metric.label}</p>
-          <motion.h3 
+          <Motion.h3
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -82,9 +82,9 @@ const MetricsGrid = ({ products, loading }) => {
             className={`font-headline text-4xl md:text-5xl ${metric.valueColor} mb-6 tracking-tight truncate`}
           >
             {metric.value}
-          </motion.h3>
+          </Motion.h3>
           {metric.extra}
-        </motion.div>
+        </Motion.div>
       ))}
     </section>
   );

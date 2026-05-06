@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
@@ -66,7 +66,7 @@ const DiscoveryPage = () => {
     items.sort((a, b) => {
       if (a.is_featured && !b.is_featured) return -1;
       if (!a.is_featured && b.is_featured) return 1;
-      return 0; 
+      return 0;
     });
 
     if (activeSort === 'Price: Low to High') {
@@ -78,7 +78,7 @@ const DiscoveryPage = () => {
   }, [allProducts, activeCategory, activeSort, filterParam, searchQuery]);
 
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -91,7 +91,7 @@ const DiscoveryPage = () => {
 
         {/* Active search query banner */}
         {searchQuery.trim() && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pt-10 pb-2"
@@ -105,7 +105,7 @@ const DiscoveryPage = () => {
                 {filteredProducts.length} item{filteredProducts.length !== 1 ? 's' : ''}
               </p>
             </div>
-          </motion.div>
+          </Motion.div>
         )}
 
         {/* Category filter — hidden when searching */}
@@ -131,7 +131,7 @@ const DiscoveryPage = () => {
         <Newsletter />
       </main>
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

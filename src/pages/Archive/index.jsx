@@ -64,7 +64,7 @@ const ArchivePage = () => {
       className="min-h-screen bg-[#FBF9F4] flex flex-col items-center overflow-x-hidden w-full relative"
     >
       <Navbar />
-      
+
       <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
         <ArchiveHeader />
         <BroadcastWidget />
@@ -75,7 +75,7 @@ const ArchivePage = () => {
       </main>
 
       <Footer />
-      
+
 
     </Motion.div>
   );
