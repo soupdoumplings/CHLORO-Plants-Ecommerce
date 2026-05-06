@@ -3,8 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import WateringReminderModal from '../../components/WateringReminderModal';
 import { useCart } from '../../lib/CartContext';
+import { useAuth } from '../../lib/AuthContext';
 import { parseEsewaResponse } from '../../lib/paymentUtils';
+import { supabase } from '../../supabase';
 
 const fallbackValue = 'Pending';
 
@@ -108,8 +111,12 @@ const timelineSteps = [
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const { clearBag } = useCart();
+  const { user } = useAuth();
   const [cartCleared, setCartCleared] = useState(false);
+  const [purchasedPlants, setPurchasedPlants] = useState([]);
+  const [reminderOpen, setReminderOpen] = useState(false);
   const hasClearedCart = useRef(false);
+  const orderId = searchParams.get('order_id');
 
   const transaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
 
@@ -129,6 +136,31 @@ const PaymentSuccess = () => {
       isMounted = false;
     };
   }, [clearBag]);
+
+  useEffect(() => {
+    const loadPurchasedPlants = async () => {
+      if (!user || !orderId) return;
+
+      const { data, error } = await supabase
+        .from('order_items')
+        .select('product_id, product_name, products(id, name, images, water_frequency)')
+        .eq('order_id', orderId);
+
+      if (error || !data?.length) return;
+
+      const plants = data.map((item) => ({
+        id: item.products?.id || item.product_id,
+        name: item.products?.name || item.product_name,
+        images: item.products?.images || [],
+        water_frequency: item.products?.water_frequency || 'Every 7 Days',
+      })).filter((plant) => plant.id || plant.name);
+
+      setPurchasedPlants(plants);
+      setReminderOpen(plants.length > 0);
+    };
+
+    loadPurchasedPlants();
+  }, [orderId, user]);
 
   return (
     <Motion.div
@@ -293,6 +325,14 @@ const PaymentSuccess = () => {
       </main>
 
       <Footer />
+      <WateringReminderModal
+        open={reminderOpen}
+        onClose={() => setReminderOpen(false)}
+        user={user}
+        plants={purchasedPlants}
+        defaultFrequency={purchasedPlants[0]?.water_frequency || 'Every 7 Days'}
+        orderId={orderId}
+      />
     </Motion.div>
   );
 };
