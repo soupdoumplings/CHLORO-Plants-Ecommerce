@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
 
@@ -10,11 +11,16 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectToLogin = () => {
+    navigate('/login', { state: { from: `${location.pathname}${location.search}` } });
+  };
 
   const fetchCart = async () => {
     if (!session?.user) {
-      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
-      setCartItems(guestCart);
+      setCartItems([]);
       setLoading(false);
       return;
     }
@@ -53,6 +59,11 @@ export const CartProvider = ({ children }) => {
   }, [session]);
 
   const addToBag = async (product, quantity = 1) => {
+    if (!session?.user) {
+      redirectToLogin();
+      return { success: false, requiresAuth: true, error: 'Please log in to add items to your bag.' };
+    }
+
     // Enforce cart limit
     const currentTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     if (currentTotal + quantity > CART_LIMIT) {
@@ -70,32 +81,6 @@ export const CartProvider = ({ children }) => {
         priceValue = Number(String(product.price).replace(/[^0-9.]/g, ''));
       }
 
-      if (!session?.user) {
-        // Guest cart logic
-        const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
-        const existingItem = guestCart.find(item => item.productId === product.id);
-
-        if (existingItem) {
-          if (existingItem.quantity + quantity > CART_LIMIT) {
-            return { success: false, error: `Cart limit is ${CART_LIMIT} items` };
-          }
-          existingItem.quantity += quantity;
-        } else {
-          guestCart.push({
-            id: `guest_${Date.now()}_${Math.random()}`,
-            productId: product.id,
-            name: product.name,
-            price: Number(priceValue),
-            quantity: quantity,
-            image: product.images?.[0] || product.image || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
-            variant: 'STUDIO SPECIMEN'
-          });
-        }
-        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
-        setCartItems(guestCart);
-        return { success: true };
-      }
-
       // Check if item already exists in bag
       const existingItem = cartItems.find(item => item.productId === product.id);
 
@@ -107,7 +92,7 @@ export const CartProvider = ({ children }) => {
           .from('cart_items')
           .update({ quantity: existingItem.quantity + quantity })
           .eq('id', existingItem.id);
-
+        
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -118,7 +103,7 @@ export const CartProvider = ({ children }) => {
             quantity: quantity,
             price_snapshot: priceValue
           }]);
-
+        
         if (error) throw error;
       }
 
@@ -142,13 +127,7 @@ export const CartProvider = ({ children }) => {
     if (newQty < 1) return removeFromBag(id);
 
     if (!session?.user) {
-      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
-      const itemIndex = guestCart.findIndex(item => item.id === id);
-      if (itemIndex > -1) {
-        guestCart[itemIndex].quantity = newQty;
-        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
-        setCartItems(guestCart);
-      }
+      redirectToLogin();
       return;
     }
 
@@ -167,10 +146,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromBag = async (id) => {
     if (!session?.user) {
-      let guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
-      guestCart = guestCart.filter(item => item.id !== id);
-      localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
-      setCartItems(guestCart);
+      redirectToLogin();
       return;
     }
 
@@ -189,7 +165,6 @@ export const CartProvider = ({ children }) => {
 
   const clearBag = async () => {
     if (!session?.user) {
-      localStorage.removeItem('chloro_guest_cart');
       setCartItems([]);
       return;
     }
@@ -209,12 +184,12 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      loading,
-      addToBag,
-      updateQuantity,
-      removeFromBag,
+    <CartContext.Provider value={{ 
+      cartItems, 
+      loading, 
+      addToBag, 
+      updateQuantity, 
+      removeFromBag, 
       clearBag,
       cartCount,
       CART_LIMIT

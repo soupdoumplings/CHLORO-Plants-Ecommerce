@@ -43,11 +43,11 @@ const AnimatedRoutes = () => {
         <Route path="/catalogue/:id" element={<CataloguePage />} />
         <Route path="/discovery" element={<DiscoveryPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/failure" element={<PaymentFailure />} />
 
         {/* Protected Routes */}
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 
 export const SecurityLoading = () => (
@@ -10,17 +10,21 @@ export const SecurityLoading = () => (
 
 export const ProtectedRoute = ({ children, redirectTo = '/login' }) => {
   const { session, loading } = useAuth();
+  const location = useLocation();
+  const returnTo = `${location.pathname}${location.search}`;
 
   if (loading) return <SecurityLoading />;
-  if (!session) return <Navigate to={redirectTo} replace />;
+  if (!session) return <Navigate to={redirectTo} replace state={{ from: returnTo }} />;
   return children;
 };
 
 export const AdminRoute = ({ children }) => {
   const { session, isAdmin, loading } = useAuth();
+  const location = useLocation();
+  const returnTo = `${location.pathname}${location.search}`;
 
   if (loading) return <SecurityLoading />;
-  if (!session) return <Navigate to="/login" replace />;
+  if (!session) return <Navigate to="/login" replace state={{ from: returnTo }} />;
   if (isAdmin === null) return <SecurityLoading />;
   if (!isAdmin) return <Navigate to="/discovery" replace />;
   return children;
@@ -28,11 +32,13 @@ export const AdminRoute = ({ children }) => {
 
 export const GuestRoute = ({ children, redirectTo = '/' }) => {
   const { session, isAdmin, loading } = useAuth();
+  const location = useLocation();
+  const returnTo = location.state?.from || redirectTo;
 
   if (loading) return <SecurityLoading />;
   if (session) {
     if (isAdmin === null) return <SecurityLoading />;
-    return <Navigate to={isAdmin ? '/archive' : redirectTo} replace />;
+    return <Navigate to={isAdmin ? '/archive' : returnTo} replace />;
   }
   return children;
 };
