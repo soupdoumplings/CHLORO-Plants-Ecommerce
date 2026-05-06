@@ -18,6 +18,7 @@ const AuthPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signIn, signUp, signOut, signInWithProvider } = useAuth();
+  const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => {
     return {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 
@@ -14,6 +14,7 @@ const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
   const { addToBag } = useCart();
   const [added, setAdded] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToBag = async (e) => {
     e.preventDefault();
@@ -63,31 +64,36 @@ const DiscoveryProductCard = ({ product, index }) => {
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-black/[0.04]"
           />
+
+          {/* View Product CTA - slides up from below the frame */}
+          <Motion.div
+            initial={{ opacity: 0, y: 15 }}
+            variants={{ hover: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2 z-10"
+          >
+            <button
+              type="button"
+              onClick={() => navigate(`/catalogue/${product.id}`)}
+              className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center cursor-pointer"
+            >
+              <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
+                View Details
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={handleAddToBag}
+              className="bg-[#2F4F4F] text-white px-6 py-2.5 shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
+            >
+              <span className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold">
+                {added ? 'Added' : 'Add to Bag'}
+              </span>
+            </button>
+          </Motion.div>
         </div>
       </Link>
 
-        {/* View Product CTA - slides up from below the frame */}
-        <Motion.div
-          initial={{ opacity: 0, y: 15 }}
-          variants={{ hover: { opacity: 1, y: 0 } }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2 z-10"
-        >
-          <Link to={`/catalogue/${product.id}`} className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center">
-            <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
-              View Details
-            </span>
-          </Link>
-          <button
-            type="button"
-            onClick={handleAddToBag}
-            className="bg-[#2F4F4F] text-white px-6 py-2.5 shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
-          >
-            <span className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold">
-              {added ? 'Added' : 'Add to Bag'}
-            </span>
-          </button>
-        </Motion.div>
 
         {/* Tags */}
         {product.tags && product.tags.length > 0 && (

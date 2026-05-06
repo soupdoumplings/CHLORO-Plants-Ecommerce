@@ -49,6 +49,9 @@ const CatalogueHero = () => {
 
       {/* Right Column: Visual Focus */}
       <div className="flex-1 bg-[#F5F4ED] relative min-h-[600px] md:h-auto overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1599931302353-8d693f41af90?q=80&w=2574&auto=format&fit=crop"
+          alt="Himalayan Orchid"
           className="w-full h-full object-cover transition-transform duration-[10s] hover:scale-110 brightness-[0.95]"
         />
 

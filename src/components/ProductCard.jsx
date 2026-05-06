@@ -26,7 +26,7 @@ const ProductCard = ({ product, delay = 0 }) => {
           <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500"></div>
 
           {/* Hover action */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
+          <div className="absolute bottom-2 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
               <Motion.button
                 onClick={(e) => {
                   e.preventDefault();

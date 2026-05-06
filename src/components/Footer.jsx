@@ -9,9 +9,9 @@ const Footer = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-[#0F3A3A] pt-24 pb-12 px-8 md:px-16 border-t border-[#FBF9F4]/10 relative z-10 transition-colors duration-1000 overflow-hidden"
+      className="w-full bg-[#0F3A3A] pt-10 pb-5 px-8 md:px-16 border-t border-[#FBF9F4]/10 relative z-10 transition-colors duration-1000 overflow-hidden cursor-auto"
     >
-      <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between gap-16 mb-20 relative z-10">
+      <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between gap-16 mb-8 relative z-10">
 
         {/* Brand Identification */}
         <Motion.div
@@ -19,7 +19,7 @@ const Footer = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-md space-y-8"
+          className="max-w-md space-y-4"
         >
           <div className="flex flex-col">
             <h2 className="font-headline italic text-5xl md:text-6xl text-[#FBF9F4] tracking-tight">CHLORO</h2>
@@ -43,10 +43,10 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-6"
+            className="space-y-3"
           >
             <h4 className="font-label text-[10px] uppercase tracking-[0.2em] font-bold text-[#FBF9F4]/40">Explore</h4>
-            <ul className="space-y-4 font-headline text-[17px] text-[#FBF9F4] flex flex-col items-start">
+            <ul className="space-y-2 font-headline text-[17px] text-[#FBF9F4] flex flex-col items-start">
               <Link to="/" className="hover:italic hover:text-white transition-all duration-300 block">Home</Link>
               <Link to="/discovery" className="hover:italic hover:text-white transition-all duration-300 block">The Collection</Link>
               <Link to="/journal" className="hover:italic hover:text-white transition-all duration-300 block">Editorial Journal</Link>
@@ -58,10 +58,10 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-6"
+            className="space-y-3"
           >
             <h4 className="font-label text-[10px] uppercase tracking-[0.2em] font-bold text-[#FBF9F4]/40">Services</h4>
-            <ul className="space-y-4 font-headline text-[17px] text-[#FBF9F4] flex flex-col items-start">
+            <ul className="space-y-2 font-headline text-[17px] text-[#FBF9F4] flex flex-col items-start">
               <Link to="/ai-diagnosis" className="hover:italic hover:text-white transition-all duration-300 block">AI Care Diagnosis</Link>
               <Link to="/cart" className="hover:italic hover:text-white transition-all duration-300 block">Your Bag</Link>
               <Link to="/login" className="hover:italic hover:text-white transition-all duration-300 block">Client Portal</Link>
