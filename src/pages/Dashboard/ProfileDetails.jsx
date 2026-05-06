@@ -4,12 +4,14 @@
  * and provides secure logout with redirection.
  */
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../supabase';
 import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
+import PreferenceSettings from '../../components/PreferenceSettings';
+import PlantRecommendations from '../../components/PlantRecommendations';
 
 const ProfileDetails = () => {
   // Extracting user session and signOut function from AuthContext
@@ -85,7 +87,7 @@ const ProfileDetails = () => {
 
 
   return (
-    <motion.section
+    <Motion.section
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -111,7 +113,7 @@ const ProfileDetails = () => {
         </div>
 
         {/* Curator Status Card */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -133,12 +135,12 @@ const ProfileDetails = () => {
               1,490
             </span>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
 
       {/* ── Right Column: Personal Details Form ── */}
       <div className="lg:col-span-8 xl:col-span-9">
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -216,7 +218,7 @@ const ProfileDetails = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-6 mt-4">
-            <motion.button
+            <Motion.button
               onClick={handleSaveProfile}
               disabled={isSaving}
               whileHover={{ scale: 1.01 }}
@@ -224,9 +226,9 @@ const ProfileDetails = () => {
               className={`${isSaving ? 'opacity-50' : 'opacity-100'} bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm`}
             >
               {isSaving ? 'Saving...' : 'Save Profile Changes'}
-            </motion.button>
+            </Motion.button>
 
-            <motion.button
+            <Motion.button
               onClick={handleLogout}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -236,14 +238,17 @@ const ProfileDetails = () => {
                 <span className="material-symbols-outlined text-[14px]">logout</span>
                 Sign Out
               </span>
-            </motion.button>
+            </Motion.button>
           </div>
-        </motion.div>
+        </Motion.div>
+
+        <PreferenceSettings />
+        <PlantRecommendations surface="dashboard" />
 
         {/* Tabbed Orders Section underneath Personal Details */}
         <RecentOrders />
       </div>
-    </motion.section>
+    </Motion.section>
   );
 };
 
