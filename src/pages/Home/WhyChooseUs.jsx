@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const VALUE_PROPS = [
   {
@@ -28,9 +28,9 @@ const WhyChooseUs = () => {
   return (
     <section className="pt-12 pb-32 px-12 bg-[#FBF9F4] border-t border-[#31332c]/5">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-start pt-20">
-        
+
         {/* Left Side: Editorial Image */}
-        <motion.div 
+        <Motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -38,17 +38,17 @@ const WhyChooseUs = () => {
           className="relative group lg:sticky lg:top-32"
         >
           <div className="aspect-[4/5] overflow-hidden shadow-2xl shadow-black/10">
-            <img 
-              src="/ful.jpg" 
-              alt="Botanical Care" 
+            <img
+              src="/ful.jpg"
+              alt="Botanical Care"
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             />
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* Right Side: Integrated Grid */}
         <div className="text-left py-8">
-          <motion.span 
+          <Motion.span
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -56,9 +56,9 @@ const WhyChooseUs = () => {
             className="font-label text-[11px] tracking-[0.3em] uppercase text-[#785a1a] font-bold inline-block mb-6"
           >
             The Chloro Standard
-          </motion.span>
-          
-          <motion.h2 
+          </Motion.span>
+
+          <Motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -66,12 +66,12 @@ const WhyChooseUs = () => {
             className="font-headline text-6xl md:text-7xl tracking-tight text-[#31332c] mb-20"
           >
             Why choose us??
-          </motion.h2>
+          </Motion.h2>
 
           {/* Integrated Story Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
             {VALUE_PROPS.map((prop, i) => (
-              <motion.div
+              <Motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -84,7 +84,7 @@ const WhyChooseUs = () => {
                   <h4 className="font-headline text-2xl text-[#31332c] tracking-tight">{prop.title}</h4>
                 </div>
                 <p className="font-body text-sm text-[#5e6058] leading-relaxed opacity-90 max-w-xs">{prop.desc}</p>
-              </motion.div>
+              </Motion.div>
             ))}
           </div>
         </div>

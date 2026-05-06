@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const Magnetic = ({ children, magnetism = 30 }) => {
   const ref = useRef(null);
@@ -20,7 +20,7 @@ const Magnetic = ({ children, magnetism = 30 }) => {
   const { x, y } = position;
 
   return (
-    <motion.div
+    <Motion.div
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
@@ -29,7 +29,7 @@ const Magnetic = ({ children, magnetism = 30 }) => {
       style={{ display: 'inline-block' }}
     >
       {children}
-    </motion.div>
+    </Motion.div>
   );
 };
 

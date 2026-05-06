@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 
 
@@ -33,7 +33,7 @@ const DiscoveryProductCard = ({ product, index }) => {
   };
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -48,7 +48,7 @@ const DiscoveryProductCard = ({ product, index }) => {
       <Link to={`/catalogue/${product.id}`} className="cursor-pointer block">
         {/* Image Container */}
         <div className={`${aspect} relative mb-5 overflow-hidden bg-[#EDEBE4]`}>
-          <motion.img
+          <Motion.img
             src={product.image}
             alt={product.name}
             className="h-full w-full object-cover"
@@ -57,7 +57,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           />
 
           {/* Hover overlay tinted glass */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             variants={{ hover: { opacity: 1 } }}
             transition={{ duration: 0.4 }}
@@ -67,7 +67,7 @@ const DiscoveryProductCard = ({ product, index }) => {
       </Link>
 
         {/* View Product CTA - slides up from below the frame */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 15 }}
           variants={{ hover: { opacity: 1, y: 0 } }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -87,21 +87,23 @@ const DiscoveryProductCard = ({ product, index }) => {
               {added ? 'Added' : 'Add to Bag'}
             </span>
           </button>
-        </motion.div>
+        </Motion.div>
 
-        {/* Badge */}
-        {product.badge && (
-          <motion.div
+        {/* Tags */}
+        {product.tags && product.tags.length > 0 && (
+          <Motion.div
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="absolute top-4 left-4"
+            className="absolute top-4 left-4 flex flex-col items-start gap-1.5 pointer-events-none"
           >
-            <span className="inline-block bg-[#2F4F4F] text-white font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium">
-              {product.badge}
-            </span>
-          </motion.div>
+            {product.tags.slice(0, 2).map((tag) => (
+              <span key={`${product.id}-${tag}`} className="inline-block bg-[#0D3535] text-[#FBF9F4] font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium shadow-sm max-w-[150px] truncate">
+                {tag}
+              </span>
+            ))}
+          </Motion.div>
         )}
       {/* Product Info */}
       <Link to={`/catalogue/${product.id}`} className="block">
@@ -119,7 +121,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           </span>
         </div>
       </Link>
-    </motion.div>
+    </Motion.div>
   );
 };
 

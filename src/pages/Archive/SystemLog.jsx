@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const SystemLog = () => {
   const logs = [
@@ -15,7 +15,7 @@ const SystemLog = () => {
   ];
 
   return (
-    <motion.section 
+    <Motion.section
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -24,7 +24,7 @@ const SystemLog = () => {
     >
       {/* Stock Health Insights */}
       <div className="space-y-12">
-        <motion.h3 
+        <Motion.h3
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -32,11 +32,11 @@ const SystemLog = () => {
           className="font-headline text-4xl text-[#31332C] tracking-tighter"
         >
           Stock Health
-        </motion.h3>
+        </Motion.h3>
         <div className="space-y-10">
           {healthStats.map((stat, i) => (
-            <motion.div 
-              key={i} 
+            <Motion.div
+              key={i}
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -48,7 +48,7 @@ const SystemLog = () => {
                 <span className={stat.value < 20 ? 'text-[#9F403D]' : 'text-[#31332C]'}>{stat.value}%</span>
               </div>
               <div className="w-full bg-[#E2E3D9] h-1 overflow-hidden relative">
-                 <motion.div 
+                 <Motion.div
                    initial={{ width: 0 }}
                    whileInView={{ width: `${stat.value}%` }}
                    viewport={{ once: true }}
@@ -59,13 +59,13 @@ const SystemLog = () => {
               <p className="font-body text-[10px] text-[#5E6058] uppercase tracking-widest opacity-70">
                  {stat.value < 20 ? 'Critical intervention required' : 'Optimal range maintained'}
               </p>
-            </motion.div>
+            </Motion.div>
           ))}
         </div>
       </div>
 
       {/* System Log History */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -75,8 +75,8 @@ const SystemLog = () => {
         <h3 className="font-headline text-4xl text-[#31332C] tracking-tighter">System Log</h3>
         <div className="space-y-10">
           {logs.map((log, i) => (
-            <motion.div 
-              key={i} 
+            <Motion.div
+              key={i}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -88,18 +88,18 @@ const SystemLog = () => {
                   <p className="font-body text-sm font-bold text-[#31332C] group-hover:text-[#785A1A] transition-colors uppercase tracking-tight">{log.title}</p>
                   <p className="font-body text-xs leading-relaxed text-[#5E6058] opacity-80 group-hover:opacity-100 transition-opacity">{log.desc}</p>
                </div>
-            </motion.div>
+            </Motion.div>
           ))}
-          <motion.button 
+          <Motion.button
             whileHover={{ x: 4 }}
             className="flex items-center gap-4 font-label text-xs uppercase tracking-[0.2em] text-[#785A1A] font-bold mt-12 hover:gap-6 transition-all group"
           >
              Full System Manifest
              <span className="material-symbols-outlined text-sm">east</span>
-          </motion.button>
+          </Motion.button>
         </div>
-      </motion.div>
-    </motion.section>
+      </Motion.div>
+    </Motion.section>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import CartHeader from './CartHeader';
@@ -30,7 +30,7 @@ const CartPage = () => {
   const total = subtotal + tax;
 
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -48,7 +48,7 @@ const CartPage = () => {
             <div className="flex flex-col">
               <AnimatePresence>
                 {items.length === 0 ? (
-                  <motion.div
+                  <Motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     key="empty-cart"
@@ -61,7 +61,7 @@ const CartPage = () => {
                         arrow_right_alt
                       </span>
                     </Link>
-                  </motion.div>
+                  </Motion.div>
                 ) : (
                   items.map((item) => (
                     <CartItem
@@ -80,24 +80,24 @@ const CartPage = () => {
           </div>
 
           {/* Right Column: Order Summary Sidebar */}
-          <motion.div 
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5 xl:col-span-4 w-full lg:sticky lg:top-[120px]"
           >
-             <OrderSummary 
-               subtotal={subtotal} 
-               shipping={0} 
-               tax={tax} 
-               total={total} 
+             <OrderSummary
+               subtotal={subtotal}
+               shipping={0}
+               tax={tax}
+               total={total}
              />
-          </motion.div>
+          </Motion.div>
         </div>
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

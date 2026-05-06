@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const CareSection = ({ product }) => {
   const optimalPlace = product?.optimal_place || 'Bright Indirect Light';
@@ -71,7 +71,7 @@ const CareSection = ({ product }) => {
 
   return (
     <section className="mb-32">
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
@@ -80,11 +80,11 @@ const CareSection = ({ product }) => {
       >
         <h2 className="font-headline text-5xl italic text-[#31332C]">Cultivation & Preservation</h2>
         <p className="font-label text-[11px] tracking-[0.1rem] uppercase text-[#5E6058] mt-4 md:mt-0 font-bold opacity-80">Technical Care Specifications</p>
-      </motion.div>
+      </Motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-[#B1B3A9]/10">
         {cards.map((card, i) => (
-          <motion.div 
+          <Motion.div
             key={i}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -92,16 +92,16 @@ const CareSection = ({ product }) => {
             transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
             className={`p-16 ${card.bg} border-r border-[#B1B3A9]/10 text-left group`}
           >
-            <motion.span 
+            <Motion.span
               className={`material-symbols-outlined text-[#785A1A] mb-8 text-3xl ${card.hoverEffect} transition-transform inline-block`}
             >
               {card.icon}
-            </motion.span>
+            </Motion.span>
             <h3 className="font-label text-xs tracking-[0.15rem] uppercase mb-8 font-black text-[#31332C]">{card.title}</h3>
             <p className={`font-body text-sm leading-relaxed text-[#5E6058] mb-12 opacity-90 transition-opacity group-hover:opacity-100 ${card.title === 'Hydration' ? 'italic' : ''}`}>
               {card.desc}
             </p>
-            
+
             {card.extra === null && (
               <div className="flex items-center gap-4 text-xs font-label tracking-widest uppercase text-[#456565] font-black">
                 <span className="w-2.5 h-2.5 bg-[#456565] rounded-full drop-shadow-sm"></span>
@@ -110,7 +110,7 @@ const CareSection = ({ product }) => {
             )}
 
             {card.extra === 'hydration' && (
-              <motion.div 
+              <Motion.div
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -124,21 +124,21 @@ const CareSection = ({ product }) => {
                        <span className="text-xs font-body text-[#31332C]">Frequency</span>
                        <span className="text-xs font-label uppercase text-[#785A1A] font-black tracking-widest">{waterFrequency}</span>
                     </div>
-                    <motion.button 
+                    <Motion.button
                       whileHover={{ y: -1 }}
                       whileTap={{ scale: 0.97 }}
                       className="w-full py-4 text-[10px] font-label tracking-widest uppercase border border-[#5F5E5E] text-[#5F5E5E] hover:bg-[#5F5E5E] hover:text-white transition-all font-bold"
                     >
                        Sync to Calendar
-                    </motion.button>
+                    </Motion.button>
                  </div>
-              </motion.div>
+              </Motion.div>
             )}
 
             {card.extra === 'environment' && (
               <ul className="space-y-4 font-body text-xs text-[#31332C] font-bold">
                 {getEnvironmentChecklist(optimalPlace).map((item, idx) => (
-                  <motion.li 
+                  <Motion.li
                     key={idx}
                     initial={{ opacity: 0, x: -15 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -146,13 +146,13 @@ const CareSection = ({ product }) => {
                     transition={{ duration: 0.5, delay: 0.5 + idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
                     className="flex items-center gap-3 active:text-[#785A1A] transition-colors"
                   >
-                     <span className="material-symbols-outlined scale-[0.6] bg-[#31332c] text-white rounded-full p-2 border border-[#31332c]">check</span> 
+                     <span className="material-symbols-outlined scale-[0.6] bg-[#31332c] text-white rounded-full p-2 border border-[#31332c]">check</span>
                      {item}
-                  </motion.li>
+                  </Motion.li>
                 ))}
               </ul>
             )}
-          </motion.div>
+          </Motion.div>
         ))}
       </div>
     </section>

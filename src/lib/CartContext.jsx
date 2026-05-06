@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
 
@@ -10,8 +12,14 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const fetchCart = async () => {
+  const redirectToLogin = () => {
+    navigate('/login', { state: { from: `${location.pathname}${location.search}` } });
+  };
+
+  const fetchCart = useCallback(async () => {
     if (!session?.user) {
       setCartItems([]);
       setLoading(false);
@@ -45,14 +53,17 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     fetchCart();
-  }, [session]);
+  }, [fetchCart]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) return { success: false, error: 'Not logged in' };
+    if (!session?.user) {
+      redirectToLogin();
+      return { success: false, requiresAuth: true, error: 'Please log in to add items to your bag.' };
+    }
 
     // Enforce cart limit
     const currentTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -61,7 +72,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      // Parse price: handle both raw numbers and formatted strings like "रू 50.00"
+      // Parse price: handle both raw numbers and formatted strings like "NPR 50.00"
       let priceValue = 0;
       if (typeof product.price === 'number') {
         priceValue = product.price;
@@ -82,7 +93,7 @@ export const CartProvider = ({ children }) => {
           .from('cart_items')
           .update({ quantity: existingItem.quantity + quantity })
           .eq('id', existingItem.id);
-        
+
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -93,9 +104,17 @@ export const CartProvider = ({ children }) => {
             quantity: quantity,
             price_snapshot: priceValue
           }]);
-        
+
         if (error) throw error;
       }
+
+      // Create a notification for the added item
+      await supabase.from('notifications').insert([{
+        user_id: session.user.id,
+        type: 'SYSTEM',
+        message: `You added ${quantity}x ${product.name || 'item'} to your bag.`,
+        link: '/cart'
+      }]);
 
       await fetchCart(); // Refresh cart
       return { success: true };
@@ -107,6 +126,11 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = async (id, newQty) => {
     if (newQty < 1) return removeFromBag(id);
+
+    if (!session?.user) {
+      redirectToLogin();
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -122,6 +146,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromBag = async (id) => {
+    if (!session?.user) {
+      redirectToLogin();
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -136,7 +165,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearBag = async () => {
-    if (!session?.user) return;
+    if (!session?.user) {
+      setCartItems([]);
+      return;
+    }
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -153,12 +185,12 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
-      loading, 
-      addToBag, 
-      updateQuantity, 
-      removeFromBag, 
+    <CartContext.Provider value={{
+      cartItems,
+      loading,
+      addToBag,
+      updateQuantity,
+      removeFromBag,
       clearBag,
       cartCount,
       CART_LIMIT

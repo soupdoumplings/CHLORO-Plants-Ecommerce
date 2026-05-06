@@ -4,7 +4,7 @@
  * using Framer Motion for a smooth, premium user experience.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import monsteraImg from '../../assets/products/monstera.png';
 import wateringCanImg from '../../assets/products/watering-can.png';
 import { useCart } from '../../lib/CartContext';
@@ -62,7 +62,7 @@ const RecentOrders = () => {
   const { addToBag } = useCart();
 
   return (
-    <motion.section
+    <Motion.section
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -81,7 +81,7 @@ const RecentOrders = () => {
         >
           Recent Orders
           {activeTab === 'orders' && (
-            <motion.div
+            <Motion.div
               layoutId="tab-underline"
               className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1A1A1A]"
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -98,7 +98,7 @@ const RecentOrders = () => {
         >
           Wishlist
           {activeTab === 'wishlist' && (
-            <motion.div
+            <Motion.div
               layoutId="tab-underline"
               className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1A1A1A]"
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -110,7 +110,7 @@ const RecentOrders = () => {
       {/* Tab Content */}
       <AnimatePresence mode="wait">
         {activeTab === 'orders' ? (
-          <motion.div
+          <Motion.div
             key="orders"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ const RecentOrders = () => {
             className="flex flex-col gap-0"
           >
             {ordersData.map((order, idx) => (
-              <motion.div
+              <Motion.div
                 key={order.id}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -165,17 +165,17 @@ const RecentOrders = () => {
                 </div>
 
                 {/* Action Link */}
-                <button 
+                <button
                   onClick={() => setSelectedAction({ order, action: order.action })}
                   className={`font-label text-[9px] tracking-[0.15em] uppercase font-semibold shrink-0 transition-colors duration-300 ${order.actionColor}`}
                 >
                   {order.action}
                 </button>
-              </motion.div>
+              </Motion.div>
             ))}
-          </motion.div>
+          </Motion.div>
         ) : (
-          <motion.div
+          <Motion.div
             key="wishlist"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -184,7 +184,7 @@ const RecentOrders = () => {
             className="flex flex-col gap-0"
           >
             {wishlistData.map((item, idx) => (
-              <motion.div
+              <Motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -215,15 +215,15 @@ const RecentOrders = () => {
                   </p>
                 </div>
 
-                <button 
+                <button
                   onClick={() => addToBag(item)}
                   className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold shrink-0 text-[#C5A059] hover:text-[#785A1A] transition-colors duration-300"
                 >
                   ADD TO BAG
                 </button>
-              </motion.div>
+              </Motion.div>
             ))}
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
 
@@ -231,40 +231,40 @@ const RecentOrders = () => {
       <AnimatePresence>
         {selectedAction && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedAction(null)}
               className="absolute inset-0 bg-[#0F3A3A]/40 backdrop-blur-sm"
             />
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-[#FBF9F4] p-8 max-w-md w-full shadow-xl relative z-10 border border-[#B0B0A8]/20"
             >
-              <button 
+              <button
                 onClick={() => setSelectedAction(null)}
                 className="absolute top-4 right-4 text-[#B0B0A8] hover:text-[#1A1A1A] material-symbols-outlined text-[20px]"
               >
                 close
               </button>
-              
+
               {selectedAction.action === 'REVIEW' && (
                 <div>
                   <h3 className="font-headline text-[24px] text-[#1A1A1A] mb-2">Write a Review</h3>
                   <p className="font-label text-[10px] tracking-widest uppercase text-[#6B6B6B] mb-6">
                     {selectedAction.order.name}
                   </p>
-                  <textarea 
+                  <textarea
                     className="w-full bg-white border border-[#B0B0A8]/30 p-4 font-label text-[12px] text-[#1A1A1A] outline-none focus:border-[#2F4F4F] transition-colors resize-none h-32 mb-4 placeholder:text-[#B0B0A8]"
                     placeholder="Share your thoughts about this item..."
                   ></textarea>
                   <div className="flex gap-2 text-[#C5A059] mb-6 text-xl">
                     ★ ★ ★ ★ ☆
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedAction(null)}
                     className="w-full bg-[#2F4F4F] text-white py-3 font-label text-[10px] tracking-[0.2em] uppercase hover:bg-[#1A2F2F] transition-colors"
                   >
@@ -272,17 +272,17 @@ const RecentOrders = () => {
                   </button>
                 </div>
               )}
-              
+
               {selectedAction.action === 'TRACK' && (
                 <div>
                   <h3 className="font-headline text-[24px] text-[#1A1A1A] mb-2">Track Package</h3>
                   <p className="font-label text-[10px] tracking-widest uppercase text-[#6B6B6B] mb-8">
                     {selectedAction.order.orderRef} • Estimated Delivery: Tomorrow
                   </p>
-                  
+
                   <div className="flex flex-col gap-6 mb-8 relative ml-2">
                     <div className="absolute left-[13px] top-2 bottom-2 w-[1px] bg-[#B0B0A8]/50"></div>
-                    
+
                     <div className="flex gap-5 items-start relative z-10">
                       <div className="w-7 h-7 rounded-full bg-[#2F4F4F] text-white flex items-center justify-center material-symbols-outlined text-[14px] shrink-0">check</div>
                       <div>
@@ -290,7 +290,7 @@ const RecentOrders = () => {
                         <p className="font-label text-[9px] text-[#6B6B6B] mt-0.5">Mar 10, 09:41 AM</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-5 items-start relative z-10">
                       <div className="w-7 h-7 rounded-full bg-[#FBD185] text-[#785A1A] flex items-center justify-center material-symbols-outlined text-[14px] shrink-0">local_shipping</div>
                       <div>
@@ -298,7 +298,7 @@ const RecentOrders = () => {
                         <p className="font-label text-[9px] text-[#6B6B6B] mt-0.5">Package arrived at local sorting facility</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-5 items-start relative z-10 opacity-40">
                       <div className="w-7 h-7 rounded-full bg-[#EDEBE4] text-[#B0B0A8] flex items-center justify-center material-symbols-outlined text-[14px] shrink-0">home</div>
                       <div>
@@ -307,8 +307,8 @@ const RecentOrders = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     onClick={() => setSelectedAction(null)}
                     className="w-full border border-[#B0B0A8] text-[#1A1A1A] py-3 font-label text-[10px] tracking-[0.2em] uppercase hover:bg-[#EDEBE4]/50 transition-colors"
                   >
@@ -316,11 +316,11 @@ const RecentOrders = () => {
                   </button>
                 </div>
               )}
-            </motion.div>
+            </Motion.div>
           </div>
         )}
       </AnimatePresence>
-    </motion.section>
+    </Motion.section>
   );
 };
 

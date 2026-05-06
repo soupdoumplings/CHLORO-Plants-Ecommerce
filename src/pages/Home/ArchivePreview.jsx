@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../supabase';
@@ -43,7 +43,7 @@ const Archive = () => {
     <section className="py-32 px-12 bg-[#fbf9f4]">
         <div className="flex justify-between items-end mb-20">
           <div className="max-w-2xl text-left">
-            <motion.h2 
+            <Motion.h2
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -51,8 +51,8 @@ const Archive = () => {
               className="font-headline text-5xl md:text-6xl mb-8 leading-tight text-[#31332c]"
             >
               Personalized Archive Recommendations
-            </motion.h2>
-            <motion.p 
+            </Motion.h2>
+            <Motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -60,25 +60,25 @@ const Archive = () => {
               className="font-body text-[#5e6058] leading-relaxed text-lg tracking-wide opacity-90 mb-4"
             >
               Curated by our proprietary growth algorithms, these specimens are selected based on your local micro-climate in the Kathmandu Valley.
-            </motion.p>
+            </Motion.p>
           </div>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ x: 4 }}
           >
-            <Link 
+            <Link
               to="/catalogue"
-              className="font-label text-[10px] uppercase font-bold tracking-[0.25em] border-b border-[#31332c] pb-1.5 mb-2 hover:opacity-50 transition-all text-[#31332c] flex items-center gap-3 shrink-0" 
+              className="font-label text-[10px] uppercase font-bold tracking-[0.25em] border-b border-[#31332c] pb-1.5 mb-2 hover:opacity-50 transition-all text-[#31332c] flex items-center gap-3 shrink-0"
             >
-               View Full Collection 
+               View Full Collection
                <span className="material-symbols-outlined text-xs">arrow_forward</span>
             </Link>
-          </motion.div>
+          </Motion.div>
         </div>
-        
+
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
             {[0, 1, 2].map((i) => (

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 
@@ -6,7 +7,7 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(null); // null means role is currently being fetched
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           setIsAdmin(false);
         }
-      } catch (err) {
+      } catch {
         setIsAdmin(false);
       }
     };
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         await fetchRole(currentUser);
       } catch (err) {
         console.error('User metadata hydrate error:', err);
+        setIsAdmin(false);
       }
     };
 
@@ -55,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      setLoading(false); // instantly unblock global loading
 
       if (session?.user) {
         hydrateUserMeta(session.user);
@@ -65,16 +67,20 @@ export const AuthProvider = ({ children }) => {
     }).catch((err) => {
       console.error('Session init error:', err);
       setLoading(false);
+      setIsAdmin(false);
     });
 
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        setLoading(false); // ensure global loading is false
 
         if (session?.user) {
+          if (event === 'SIGNED_IN') {
+            setIsAdmin(null); // Re-fetch role on new login
+          }
           hydrateUserMeta(session.user);
         } else {
           setIsAdmin(false);
@@ -97,7 +103,7 @@ export const AuthProvider = ({ children }) => {
       }
     });
     if (error) throw error;
-    
+
     if (data?.user) {
       // Attempt to immediately create their user profile row, failing silently if already exists
       const baseUserRow = {

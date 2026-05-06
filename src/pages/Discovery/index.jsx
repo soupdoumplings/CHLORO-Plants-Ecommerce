@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
@@ -9,24 +9,11 @@ import Newsletter from './Newsletter';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
 
-const categoryMap = {
-  'All Objects': null,
-  'Rare Plants': ['Rare Foliage', 'Succulents', 'Large Scale', 'Fresh Cut'],
-  'Ceramics': ['Studio Ceramics'],
-  'Tools': ['Heirloom Tools', 'Copperware'],
-  'Care': ['Living Ecosystem'],
-};
-
-const HOME_CATEGORY_PLANTS = {
-  'New Arrivals': ['Peace Lily', 'Lavender'],
-  'Low-Maintenance': ['Monstera Albo'],
-  'Pet-Friendly': ['Money Tree', 'Orchid'],
-  'Gifts': ['salsa'],
-};
 
 const DiscoveryPage = () => {
   const [searchParams] = useSearchParams();
   const filterParam = searchParams.get('filter');
+  const searchQuery = searchParams.get('q') || '';
   const [activeCategory, setActiveCategory] = useState('All Objects');
   const [activeSort, setActiveSort] = useState('Latest');
   const [allProducts, setAllProducts] = useState([]);
@@ -42,7 +29,8 @@ const DiscoveryPage = () => {
             price: `रू ${Number(p.price).toFixed(2)}`,
             rawPrice: Number(p.price),
             image: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80',
-            category: 'Rare Foliage',
+            category: p.category || 'Indoor Plants',
+            tags: p.tags || [],
             is_featured: p.is_featured || false,
             season: p.season || 'All Year'
         })));
@@ -54,23 +42,31 @@ const DiscoveryPage = () => {
   const filteredProducts = useMemo(() => {
     let items = [...allProducts];
 
-    // Priority 1: Filter from Home Page Categories (via URL param)
-    if (filterParam && HOME_CATEGORY_PLANTS[filterParam]) {
-      const allowedNames = HOME_CATEGORY_PLANTS[filterParam];
-      items = items.filter(p => allowedNames.some(name => p.name.toLowerCase().includes(name.toLowerCase())));
+    // Priority 0: Live search query from navbar (?q=)
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      items = items.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.category && p.category.toLowerCase().includes(q))
+      );
+      return items;
     }
 
-    // Priority 2: Filter from Discovery Page Tabs
-    const allowed = categoryMap[activeCategory];
-    if (allowed) {
-      items = items.filter((p) => allowed.includes(p.category));
+    // Priority 1: Filter by Tags (from Homepage links like ?filter=Pet-Friendly)
+    if (filterParam) {
+      items = items.filter(p => p.tags && p.tags.includes(filterParam));
+    }
+
+    // Priority 2: Filter by Primary Category (Tabs)
+    if (activeCategory !== 'All Objects') {
+      items = items.filter((p) => p.category === activeCategory);
     }
 
     // Default top-level sort: Featured first
     items.sort((a, b) => {
       if (a.is_featured && !b.is_featured) return -1;
       if (!a.is_featured && b.is_featured) return 1;
-      return 0; 
+      return 0;
     });
 
     if (activeSort === 'Price: Low to High') {
@@ -79,10 +75,10 @@ const DiscoveryPage = () => {
       items.sort((a, b) => b.rawPrice - a.rawPrice);
     }
     return items;
-  }, [allProducts, activeCategory, activeSort, filterParam]);
+  }, [allProducts, activeCategory, activeSort, filterParam, searchQuery]);
 
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -92,25 +88,50 @@ const DiscoveryPage = () => {
       <Navbar />
       <main className="flex-grow">
         <DiscoveryHero />
-        <CategoryFilter
-          activeCategory={activeCategory}
-          onCategoryChange={(cat) => {
-            setActiveCategory(cat);
-            if (filterParam) {
-              const newParams = new URLSearchParams(searchParams);
-              newParams.delete('filter');
-              window.history.replaceState({}, '', `${window.location.pathname}?${newParams.toString()}`);
-            }
-          }}
-          activeSort={activeSort}
-          onSortChange={setActiveSort}
-          productCount={filteredProducts.length}
-        />
+
+        {/* Active search query banner */}
+        {searchQuery.trim() && (
+          <Motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pt-10 pb-2"
+          >
+            <div className="flex items-center justify-between border-b border-[#1D241F]/10 pb-5">
+              <div>
+                <p className="font-label text-[9px] uppercase tracking-[0.25em] text-[#1D241F]/40">Search Results</p>
+                <h2 className="font-headline text-[32px] text-[#1D241F] mt-1">"{searchQuery}"</h2>
+              </div>
+              <p className="font-label text-[10px] uppercase tracking-[0.15em] text-[#1D241F]/50">
+                {filteredProducts.length} item{filteredProducts.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </Motion.div>
+        )}
+
+        {/* Category filter — hidden when searching */}
+        {!searchQuery.trim() && (
+          <CategoryFilter
+            categories={['All Objects', ...new Set(allProducts.map(p => p.category).filter(Boolean))]}
+            activeCategory={activeCategory}
+            onCategoryChange={(cat) => {
+              setActiveCategory(cat);
+              if (filterParam) {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('filter');
+                window.history.replaceState({}, '', `${window.location.pathname}?${newParams.toString()}`);
+              }
+            }}
+            activeSort={activeSort}
+            onSortChange={setActiveSort}
+            productCount={filteredProducts.length}
+          />
+        )}
+
         <ProductGrid products={filteredProducts} />
         <Newsletter />
       </main>
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

@@ -12,13 +12,18 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
-import { AdminRoute, GuestRoute, ProtectedRoute } from './components/Security';
+import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import PaymentFailure from './pages/Checkout/PaymentFailure';
+import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
+import { NotificationProvider } from './lib/NotificationContext';
+import { GeoLocationProvider } from './lib/GeoLocationProvider';
 
 const HomeRouteWrapper = () => {
-  const { isAdmin } = useAuth();
+  const { session, isAdmin } = useAuth();
+  if (session && isAdmin === null) return <SecurityLoading />;
   return isAdmin ? <Navigate to="/archive" replace /> : <HomePage />;
 };
 
@@ -31,17 +36,21 @@ const AnimatedRoutes = () => {
         <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
         <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
-        
-        {/* Protected Routes */}
+
+        {/* Public Routes */}
         <Route path="/" element={<HomeRouteWrapper />} />
+        <Route path="/catalogue" element={<CataloguePage />} />
+        <Route path="/catalogue/:id" element={<CataloguePage />} />
+        <Route path="/discovery" element={<DiscoveryPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/failure" element={<PaymentFailure />} />
+
+        {/* Protected Routes */}
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
-        <Route path="/catalogue" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
-        <Route path="/catalogue/:id" element={<ProtectedRoute><CataloguePage /></ProtectedRoute>} />
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
-        <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
-        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
-        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
@@ -51,17 +60,23 @@ const AnimatedRoutes = () => {
 };
 
 import CustomCursor from './components/CustomCursor';
+import ChatbotWidget from './components/ChatbotWidget';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <CartProvider>
-          <CustomCursor />
-          <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-            <AnimatedRoutes />
-          </div>
-        </CartProvider>
+        <NotificationProvider>
+          <GeoLocationProvider>
+            <CartProvider>
+              <CustomCursor />
+              <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+                <AnimatedRoutes />
+                <ChatbotWidget />
+              </div>
+            </CartProvider>
+          </GeoLocationProvider>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );

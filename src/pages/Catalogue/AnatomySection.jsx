@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const AnatomySection = ({ product }) => {
   const name = product?.name || 'This Specimen';
@@ -34,20 +34,20 @@ const AnatomySection = ({ product }) => {
   return (
     <section className="mb-32 grid grid-cols-1 md:grid-cols-4 gap-12 max-w-[1440px] mx-auto px-12 group">
       {/* Anatomy Visual Feature */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="md:col-span-2 relative aspect-square overflow-hidden shadow-2xl shadow-black/10 transition-all duration-700 hover:scale-[1.02]"
       >
-        <img 
-          src={heroImage} 
-          alt={`${name} Anatomy`} 
-          className="w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110" 
+        <img
+          src={heroImage}
+          alt={`${name} Anatomy`}
+          className="w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-[#456565]/10 mix-blend-multiply opacity-30"></div>
-        <motion.div 
+        <Motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -55,11 +55,11 @@ const AnatomySection = ({ product }) => {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
         >
              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/70 border border-white/20 px-8 py-3 backdrop-blur-md pointer-events-none">{name} Anatomy</span>
-        </motion.div>
-      </motion.div>
+        </Motion.div>
+      </Motion.div>
 
       {/* Detail Block 1 */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -73,10 +73,10 @@ const AnatomySection = ({ product }) => {
              {details[0].description}
           </p>
         </div>
-      </motion.div>
+      </Motion.div>
 
       {/* Detail Block 2 */}
-      <motion.div 
+      <Motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -90,7 +90,7 @@ const AnatomySection = ({ product }) => {
              {details[1].description}
           </p>
         </div>
-      </motion.div>
+      </Motion.div>
     </section>
   );
 };

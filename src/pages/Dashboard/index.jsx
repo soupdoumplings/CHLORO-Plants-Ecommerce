@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProfileHeader from './ProfileHeader';
@@ -7,7 +7,7 @@ import ProfileDetails from './ProfileDetails';
 
 const DashboardPage = () => {
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -22,7 +22,7 @@ const DashboardPage = () => {
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

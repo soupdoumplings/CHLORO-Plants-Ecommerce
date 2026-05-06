@@ -8,4 +8,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api/khalti': {
+        target: 'https://a.khalti.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/khalti/, '')
+      }
+    }
+  }
 })

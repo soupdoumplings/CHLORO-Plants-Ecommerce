@@ -2,7 +2,7 @@
  * CHLORO — Admin Inventory CRUD Component
  */
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 
@@ -36,7 +36,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
   };
 
   return (
-    <motion.section
+    <Motion.section
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -47,14 +47,14 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
               className="absolute inset-0 bg-[#31332C]/40 backdrop-blur-sm"
             />
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -84,12 +84,12 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -103,7 +103,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Lowland</button>
           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Equipment</button>
         </div>
-      </motion.div>
+      </Motion.div>
 
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left">
@@ -137,7 +137,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
               // State 3: Dynamically render each specimen from the database
               <AnimatePresence>
                 {holdings.map((item, i) => (
-                  <motion.tr
+                  <Motion.tr
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -184,14 +184,14 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                         <button onClick={() => confirmDelete(item.id)} className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">delete</button>
                       </div>
                     </td>
-                  </motion.tr>
+                  </Motion.tr>
                 ))}
               </AnimatePresence>
             )}
           </tbody>
         </table>
       </div>
-    </motion.section>
+    </Motion.section>
   );
 };
 

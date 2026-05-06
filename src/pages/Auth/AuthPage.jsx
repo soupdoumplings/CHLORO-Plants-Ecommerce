@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Phone, Leaf } from 'lucide-react';
 import { FaGoogle, FaApple } from 'react-icons/fa';
@@ -18,7 +18,6 @@ const AuthPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signIn, signUp, signOut, signInWithProvider } = useAuth();
-  const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => {
     return {
@@ -37,7 +36,6 @@ const AuthPage = () => {
     try {
       if (isLogin) {
         await signIn(email, password);
-        navigate('/');
       } else {
         if (!isPasswordStrong) {
           throw new Error('Password must be 8+ characters and include a special character.');
@@ -48,7 +46,7 @@ const AuthPage = () => {
         await signUp(email, password, fullName, phone);
         try {
           await signOut();
-        } catch (err) {
+        } catch {
           // Keep UX stable even if signout fails after signup.
         }
         setIsLogin(true);
@@ -76,14 +74,14 @@ const AuthPage = () => {
   };
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="flex h-screen overflow-hidden bg-[#fbf9f4]"
     >
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
@@ -105,7 +103,7 @@ const AuthPage = () => {
             "Nature does not hurry, yet everything is accomplished."
           </p>
         </div>
-      </motion.div>
+      </Motion.div>
 
       <div className="relative flex h-screen w-full flex-col overflow-y-auto bg-[#fbf9f4] lg:w-[45%]">
         <button
@@ -127,7 +125,7 @@ const AuthPage = () => {
                   Sign In
                 </span>
                 {isLogin && (
-                  <motion.div
+                  <Motion.div
                     layoutId="tab-indicator"
                     className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -139,7 +137,7 @@ const AuthPage = () => {
                   Create Account
                 </span>
                 {!isLogin && (
-                  <motion.div
+                  <Motion.div
                     layoutId="tab-indicator"
                     className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -150,7 +148,7 @@ const AuthPage = () => {
 
             <AnimatePresence mode="wait">
               {isLogin ? (
-                <motion.form
+                <Motion.form
                   key="login"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -197,7 +195,7 @@ const AuthPage = () => {
                     </div>
                   </div>
 
-                  <motion.button
+                  <Motion.button
                     whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
@@ -205,7 +203,7 @@ const AuthPage = () => {
                     className="w-full bg-[#2F4F4F] py-4 font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-[#e0fffe] shadow-lg shadow-[#2F4F4F]/20 transition-all duration-300 hover:bg-[#1a3333] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? 'Processing...' : 'Enter Portfolio'}
-                  </motion.button>
+                  </Motion.button>
 
                   <div className="my-4 flex items-center gap-4">
                     <div className="h-px flex-1 bg-[#2F4F4F]/8" />
@@ -231,9 +229,9 @@ const AuthPage = () => {
                       SIGNIN WITH APPLE
                     </button>
                   </div>
-                </motion.form>
+                </Motion.form>
               ) : (
-                <motion.form
+                <Motion.form
                   key="signup"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -328,7 +326,7 @@ const AuthPage = () => {
                     </div>
                   </div>
 
-                  <motion.button
+                  <Motion.button
                     whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
@@ -336,8 +334,8 @@ const AuthPage = () => {
                     className="w-full bg-[#2F4F4F] py-4 font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-[#e0fffe] shadow-lg shadow-[#2F4F4F]/20 transition-all duration-300 hover:bg-[#1a3333] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? 'Processing...' : 'Create Account'}
-                  </motion.button>
-                </motion.form>
+                  </Motion.button>
+                </Motion.form>
               )}
             </AnimatePresence>
 
@@ -349,7 +347,7 @@ const AuthPage = () => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 
