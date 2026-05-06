@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { useCart } from '../lib/CartContext';
@@ -20,11 +20,11 @@ const timeAgo = (dateStr) => {
 
 const getIcon = (type) => {
   switch (type) {
-    case 'PLANT_TIP': return '🌿';
-    case 'DIAGNOSIS': return '🔍';
-    case 'SALE': return '🏷️';
+    case 'PLANT_TIP': return 'local_florist';
+    case 'DIAGNOSIS': return 'psychiatry';
+    case 'SALE': return 'sell';
     case 'SYSTEM':
-    default: return '🔔';
+    default: return 'notifications';
   }
 };
 
@@ -37,11 +37,13 @@ const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef(null);
   
-  const isHome = location.pathname === '/';
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Close search on route change
-  useEffect(() => { setSearchOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    const closeSearch = window.setTimeout(() => setSearchOpen(false), 0);
+    return () => window.clearTimeout(closeSearch);
+  }, [location.pathname]);
 
   // Escape key closes search
   useEffect(() => {
@@ -79,7 +81,7 @@ const Navbar = () => {
 
   return (
     <>
-      <motion.nav
+      <Motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -126,14 +128,14 @@ const Navbar = () => {
         {/* AI Diagnosis Center */}
         {!isAdmin && (
           <Link to="/ai-diagnosis" className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 cursor-pointer group">
-            <motion.div
+            <Motion.div
               whileHover={{ scale: 1.05, backgroundColor: '#FBF9F4' }}
               className={`w-10 h-10 border ${border} flex items-center justify-center transition-all duration-500 rounded-sm bg-transparent group-hover:bg-[#FBF9F4]`}
             >
               <span className={`material-symbols-outlined ${text} group-hover:text-[#0F3A3A] transition-colors text-[18px]`}>
                 psychiatry
               </span>
-            </motion.div>
+            </Motion.div>
             <div className="flex flex-col justify-center">
               <span className={`font-label text-[8px] uppercase tracking-[0.2em] ${textDim} font-bold leading-none mb-1`}>AI Powered</span>
               <span className={`font-headline italic text-[15px] ${text} leading-none`}>AI Diagnosis</span>
@@ -144,7 +146,7 @@ const Navbar = () => {
         {/* Utilities */}
         <div className="flex items-center gap-6">
           {!isAdmin && (
-            <motion.button
+            <Motion.button
               onClick={() => setSearchOpen(true)}
               whileHover={{ borderColor: 'rgba(251,249,244,0.6)' }}
               className={`hidden lg:flex items-center gap-2 border ${border} px-3 py-1.5 bg-transparent transition-all group`}
@@ -154,12 +156,10 @@ const Navbar = () => {
                 Search Catalogue...
               </span>
               <span className={`material-symbols-outlined text-sm ${textDim} group-hover:text-[#628141] transition-colors`}>search</span>
-            </motion.button>
+            </Motion.button>
           )}
 
           <div className="flex items-center gap-4">
-            {!isAdmin && (
-              <>
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button 
@@ -170,7 +170,7 @@ const Navbar = () => {
                       notifications
                       <AnimatePresence>
                         {unreadCount > 0 && (
-                          <motion.span
+                          <Motion.span
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0 }}
@@ -178,14 +178,14 @@ const Navbar = () => {
                             className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#F58700] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
                           >
                             {unreadCount > 9 ? '9+' : unreadCount}
-                          </motion.span>
+                          </Motion.span>
                         )}
                       </AnimatePresence>
                     </button>
                     
                     <AnimatePresence>
                       {showNotifications && (
-                        <motion.div
+                        <Motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
@@ -216,9 +216,9 @@ const Navbar = () => {
                                   onClick={() => !notif.is_read && markAsRead(notif.id)}
                                   className={`p-4 border-b border-[#FBF9F4]/10 last:border-b-0 flex gap-3 transition-colors ${!notif.is_read ? 'bg-[#FBF9F4]/5 cursor-pointer hover:bg-[#FBF9F4]/10' : 'bg-transparent'}`}
                                 >
-                                  <div className="text-xl flex-shrink-0 mt-0.5">
+                                  <span className="material-symbols-outlined text-[20px] text-[#c6e9e9] flex-shrink-0 mt-0.5">
                                     {getIcon(notif.type)}
-                                  </div>
+                                  </span>
                                   <div className="flex-1 min-w-0">
                                     <p className={`text-sm mb-1 ${!notif.is_read ? 'text-[#FBF9F4] font-medium' : 'text-[#FBF9F4]/70 font-normal'}`}>
                                       {notif.message}
@@ -252,30 +252,30 @@ const Navbar = () => {
                               </span>
                             </div>
                           )}
-                        </motion.div>
+                        </Motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                 )}
 
-                <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
-                  shopping_bag
-                  <AnimatePresence>
-                    {cartCount > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: 'spring', stiffness: 500 }}
-                        className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
-                      >
-                        {cartCount}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </Link>
-              </>
-            )}
+                {!isAdmin && (
+                  <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
+                    shopping_bag
+                    <AnimatePresence>
+                      {cartCount > 0 && (
+                        <Motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          transition={{ type: 'spring', stiffness: 500 }}
+                          className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                        >
+                          {cartCount}
+                        </Motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Link>
+                )}
             
             {!user ? (
               <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
@@ -297,7 +297,7 @@ const Navbar = () => {
             )}
           </div>
         </div>
-      </motion.nav>
+      </Motion.nav>
 
       {/* Search Overlay — rendered outside nav so it covers full screen */}
       <AnimatePresence>

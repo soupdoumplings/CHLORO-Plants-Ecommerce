@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../lib/CartContext';
+import { useAuth } from '../../lib/AuthContext';
+import { supabase } from '../../supabase';
 import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl } from '../../lib/paymentUtils';
 
 const paymentLabels = {
@@ -11,9 +13,17 @@ const paymentLabels = {
   cod: { text: 'Complete Order', color: '#2F4F4F' }
 };
 
-const CheckoutSummary = ({ paymentMethod }) => {
+const formatAddress = (address) => {
+  return [address?.addressLine, address?.city, address?.postalCode]
+    .map((part) => String(part || '').trim())
+    .filter(Boolean)
+    .join(', ');
+};
+
+const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
+  const { user } = useAuth();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,12 +44,60 @@ const CheckoutSummary = ({ paymentMethod }) => {
       return;
     }
 
+    if (paymentMethod === 'card') {
+      setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
+      return;
+    }
+
+    const customerName = `${checkoutDetails.firstName || ''} ${checkoutDetails.lastName || ''}`.trim()
+      || user?.user_metadata?.full_name
+      || user?.email?.split('@')?.[0]
+      || 'Customer';
+    const customerEmail = checkoutDetails.email?.trim() || user?.email || '';
+    const customerPhone = checkoutDetails.phone?.trim();
+    const shippingAddress = formatAddress(checkoutDetails.shippingAddress);
+
+    if (!customerEmail || !customerPhone || !shippingAddress) {
+      setError('Please complete your email, phone, and shipping address.');
+      return;
+    }
+
     setProcessing(true);
 
     const transactionId = generateTransactionId();
     const baseUrl = getBaseUrl();
 
     try {
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          customer_email: customerEmail,
+          shipping_address: shippingAddress,
+          total_amount: total,
+          status: 'pending',
+          payment_method: paymentMethod,
+          payment_status: 'pending',
+          payment_reference: transactionId,
+        })
+        .select('id')
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        quantity: item.quantity,
+        price_at_time: item.price,
+        product_name: item.name,
+      }));
+
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) throw itemsError;
+
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
           totalAmount: total,
@@ -48,7 +106,7 @@ const CheckoutSummary = ({ paymentMethod }) => {
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success`,
+          successUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
           failureUrl: `${baseUrl}/payment/failure`,
         });
       } else if (paymentMethod === 'khalti') {
@@ -57,7 +115,7 @@ const CheckoutSummary = ({ paymentMethod }) => {
             amount: total * 100, // Convert to paisa
             purchaseOrderId: transactionId,
             purchaseOrderName: `Petals & Pots Order ${transactionId}`,
-            returnUrl: `${baseUrl}/payment/success`,
+            returnUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
             websiteUrl: baseUrl,
           });
 
@@ -73,16 +131,11 @@ const CheckoutSummary = ({ paymentMethod }) => {
         }
       } else if (paymentMethod === 'cod') {
         await clearBag();
-        navigate(`/payment/success?method=cod&order_id=${transactionId}&amount=${total}`);
-      } else {
-        setTimeout(() => {
-          setProcessing(false);
-          setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
-        }, 1500);
+        navigate(`/payment/success?method=cod&order_id=${order.id}&ref=${transactionId}&amount=${total}`);
       }
     } catch (err) {
       console.error('Payment error:', err);
-      setError('Payment failed. Please try again.');
+      setError(err.message || 'Payment failed. Please try again.');
       setProcessing(false);
     }
   };
@@ -90,7 +143,7 @@ const CheckoutSummary = ({ paymentMethod }) => {
   const currentPayment = paymentLabels[paymentMethod] || { text: 'Select Payment Method', color: '#B0B0A8' };
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -116,11 +169,11 @@ const CheckoutSummary = ({ paymentMethod }) => {
                     {item.name}
                   </h4>
                   <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] mt-2 max-w-[100px] leading-relaxed">
-                    {item.variant} × {item.quantity}
+                    {item.variant} x {item.quantity}
                   </p>
                 </div>
                 <p className="font-headline text-[15px] text-[#1A1A1A] tracking-tight mt-auto">
-                  रू {(item.price * item.quantity).toFixed(2)}
+                  NPR {(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
             </div>
@@ -131,17 +184,17 @@ const CheckoutSummary = ({ paymentMethod }) => {
       <div className="space-y-5 mb-10 border-b border-[#B0B0A8]/20 pb-10">
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
           <span>Subtotal</span>
-          <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
+          <span className="text-[#1A1A1A]">NPR {subtotal.toFixed(2)}</span>
         </div>
         
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
           <span>Shipping <span className="text-[#6B6B6B]/70 capitalize tracking-normal text-[10px] font-medium ml-1">(Editorial Rate)</span></span>
-          <span className="text-[#1A1A1A]">रू {shipping.toFixed(2)}</span>
+          <span className="text-[#1A1A1A]">NPR {shipping.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
           <span>Taxes</span>
-          <span className="text-[#1A1A1A]">रू 0.00</span>
+          <span className="text-[#1A1A1A]">NPR 0.00</span>
         </div>
       </div>
 
@@ -150,12 +203,12 @@ const CheckoutSummary = ({ paymentMethod }) => {
           Total
         </span>
         <span className="font-headline text-[24px] lg:text-[28px] italic leading-none text-[#1A1A1A]">
-          रू {total.toFixed(2)}
+          NPR {total.toFixed(2)}
         </span>
       </div>
 
       {error && (
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-[#FAF2F2] border-l-2 border-[#D94F4F] py-3.5 px-4 flex items-center gap-3 mb-6"
@@ -164,7 +217,7 @@ const CheckoutSummary = ({ paymentMethod }) => {
           <p className="font-label text-[9px] tracking-[0.05em] text-[#9F403D] font-medium leading-snug pt-[1px]">
             {error}
           </p>
-        </motion.div>
+        </Motion.div>
       )}
 
       <button 
@@ -179,10 +232,10 @@ const CheckoutSummary = ({ paymentMethod }) => {
       <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] text-center w-full">
         {paymentMethod === 'esewa' && 'SECURE TRANSACTION VIA ESEWA'}
         {paymentMethod === 'khalti' && 'SECURE TRANSACTION VIA KHALTI'}
-        {paymentMethod === 'cod' && 'PAY ON DELIVERY — NO ADVANCE REQUIRED'}
+        {paymentMethod === 'cod' && 'PAY ON DELIVERY - NO ADVANCE REQUIRED'}
         {paymentMethod === 'card' && 'SECURE ENCRYPTED TRANSACTION BY STRIPE'}
       </p>
-    </motion.div>
+    </Motion.div>
   );
 };
 

@@ -114,7 +114,7 @@ const OrderHistory = () => {
                 </span>
               </div>
               <div className="col-span-2 text-right font-headline text-[16px] text-[#1A1A1A]">
-                रू {order.amount.toFixed(2)}
+                NPR {order.amount.toFixed(2)}
               </div>
               <div className="col-span-2 lg:col-span-1 flex justify-end">
                 <span className={`font-label text-[8px] tracking-[0.15em] uppercase px-2.5 py-1.5 rounded-sm ${order.color}`}>

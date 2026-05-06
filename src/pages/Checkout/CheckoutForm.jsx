@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useGeoLocation } from '../../lib/useGeoLocation';
 
@@ -27,30 +27,57 @@ const getDetectedLocationLabel = (detectedLocation) => {
     || 'your current area';
 };
 
-const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
-  const [sameAsShipping, setSameAsShipping] = useState(true);
+const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setCheckoutDetails }) => {
   const { location, loading: locating, error: locationError, isSupported, requestLocation } = useGeoLocation();
-  const [shippingAddress, setShippingAddress] = useState(() => getAddressFields(location));
-  const [billingAddress, setBillingAddress] = useState(() => getAddressFields(location));
   const hasRequestedLocation = useRef(false);
+  const sameAsShipping = checkoutDetails.sameAsShipping;
+  const shippingAddress = checkoutDetails.shippingAddress;
+  const billingAddress = checkoutDetails.billingAddress;
+
+  const updateDetails = (patch) => {
+    setCheckoutDetails((current) => ({ ...current, ...patch }));
+  };
+
+  const updateAddress = (addressType, field, value) => {
+    setCheckoutDetails((current) => {
+      const nextAddress = { ...current[addressType], [field]: value };
+      const nextDetails = { ...current, [addressType]: nextAddress };
+
+      if (addressType === 'shippingAddress' && current.sameAsShipping) {
+        nextDetails.billingAddress = nextAddress;
+      }
+
+      return nextDetails;
+    });
+  };
 
   const fillAddressFromLocation = useCallback((detectedLocation) => {
     if (!detectedLocation?.address) return;
 
     const detectedAddress = getAddressFields(detectedLocation);
 
-    setShippingAddress((current) => ({
-      addressLine: current.addressLine || detectedAddress.addressLine,
-      city: current.city || detectedAddress.city,
-      postalCode: current.postalCode || detectedAddress.postalCode,
-    }));
+    setCheckoutDetails((current) => {
+      const nextShippingAddress = {
+        addressLine: current.shippingAddress.addressLine || detectedAddress.addressLine,
+        city: current.shippingAddress.city || detectedAddress.city,
+        postalCode: current.shippingAddress.postalCode || detectedAddress.postalCode,
+      };
 
-    setBillingAddress((current) => ({
-      addressLine: sameAsShipping ? detectedAddress.addressLine : current.addressLine || detectedAddress.addressLine,
-      city: sameAsShipping ? detectedAddress.city : current.city || detectedAddress.city,
-      postalCode: sameAsShipping ? detectedAddress.postalCode : current.postalCode || detectedAddress.postalCode,
-    }));
-  }, [sameAsShipping]);
+      const nextBillingAddress = current.sameAsShipping
+        ? nextShippingAddress
+        : {
+          addressLine: current.billingAddress.addressLine || detectedAddress.addressLine,
+          city: current.billingAddress.city || detectedAddress.city,
+          postalCode: current.billingAddress.postalCode || detectedAddress.postalCode,
+        };
+
+      return {
+        ...current,
+        shippingAddress: nextShippingAddress,
+        billingAddress: nextBillingAddress,
+      };
+    });
+  }, [setCheckoutDetails]);
 
   useEffect(() => {
     if (!location && !hasRequestedLocation.current && isSupported) {
@@ -67,14 +94,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
   };
 
   const handleShippingChange = (field, value) => {
-    setShippingAddress((current) => ({ ...current, [field]: value }));
-    if (sameAsShipping) {
-      setBillingAddress((current) => ({ ...current, [field]: value }));
-    }
+    updateAddress('shippingAddress', field, value);
   };
 
   const handleBillingChange = (field, value) => {
-    setBillingAddress((current) => ({ ...current, [field]: value }));
+    updateAddress('billingAddress', field, value);
   };
 
   return (
@@ -128,6 +152,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <input 
               type="email" 
               placeholder="julian@example.com"
+              value={checkoutDetails.email}
+              onChange={(e) => updateDetails({ email: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -136,6 +162,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <input 
               type="tel" 
               placeholder="+977 98..."
+              value={checkoutDetails.phone}
+              onChange={(e) => updateDetails({ phone: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -146,6 +174,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
             <input 
               type="text" 
+              value={checkoutDetails.firstName}
+              onChange={(e) => updateDetails({ firstName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -153,6 +183,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
             <input 
               type="text" 
+              value={checkoutDetails.lastName}
+              onChange={(e) => updateDetails({ lastName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -196,8 +228,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
             id="sameAsShipping" 
             checked={sameAsShipping}
             onChange={(e) => {
-              setSameAsShipping(e.target.checked);
-              if (e.target.checked) setBillingAddress(shippingAddress);
+              setCheckoutDetails((current) => ({
+                ...current,
+                sameAsShipping: e.target.checked,
+                billingAddress: e.target.checked ? current.shippingAddress : current.billingAddress,
+              }));
             }}
             className="w-4 h-4 accent-[#1A1A1A] border-[#B0B0A8]/40 bg-transparent cursor-pointer"
           />
@@ -328,7 +363,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod }) => {
               </div>
             </div>
             <div className={`relative z-10 transition-opacity ${paymentMethod === 'cod' ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}>
-              <svg viewBox="0 0 40 40" className="w-8 h-8"><circle cx="20" cy="20" r="18" fill="#2F4F4F"/><text x="20" y="26" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold" fontFamily="Arial">₹</text></svg>
+              <svg viewBox="0 0 40 40" className="w-8 h-8"><circle cx="20" cy="20" r="18" fill="#2F4F4F"/><text x="20" y="25" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">COD</text></svg>
             </div>
           </label>
         </div>
