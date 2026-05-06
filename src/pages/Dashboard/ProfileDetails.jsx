@@ -10,6 +10,8 @@ import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../supabase';
 import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
+import PreferenceSettings from '../../components/PreferenceSettings';
+import PlantRecommendations from '../../components/PlantRecommendations';
 
 const ProfileDetails = () => {
   // Extracting user session and signOut function from AuthContext
@@ -239,6 +241,9 @@ const ProfileDetails = () => {
             </Motion.button>
           </div>
         </Motion.div>
+
+        <PreferenceSettings />
+        <PlantRecommendations surface="dashboard" />
 
         {/* Tabbed Orders Section underneath Personal Details */}
         <RecentOrders />

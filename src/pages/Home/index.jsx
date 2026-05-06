@@ -8,6 +8,7 @@ import ArchivePreview from './ArchivePreview';
 import VisualBreak from './VisualBreak';
 import CategoryShelf from './CategoryShelf';
 import WhyChooseUs from './WhyChooseUs';
+import PlantRecommendations from '../../components/PlantRecommendations';
 
 const HomePage = () => {
   return (
@@ -22,6 +23,7 @@ const HomePage = () => {
 
       <main className="w-full flex-grow">
         <Hero />
+        <PlantRecommendations surface="home" />
         <ArchivePreview />
         <CategoryShelf />
         <Philosophy />

@@ -20,6 +20,8 @@ import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { NotificationProvider } from './lib/NotificationContext';
 import { GeoLocationProvider } from './lib/GeoLocationProvider';
+import { PlantPreferencesProvider } from './lib/PlantPreferencesContext';
+import PreferenceOnboarding from './components/PreferenceOnboarding';
 
 const HomeRouteWrapper = () => {
   const { session, isAdmin } = useAuth();
@@ -66,17 +68,20 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <NotificationProvider>
-          <GeoLocationProvider>
-            <CartProvider>
-              <CustomCursor />
-              <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-                <AnimatedRoutes />
-                <ChatbotWidget />
-              </div>
-            </CartProvider>
-          </GeoLocationProvider>
-        </NotificationProvider>
+        <PlantPreferencesProvider>
+          <NotificationProvider>
+            <GeoLocationProvider>
+              <CartProvider>
+                <CustomCursor />
+                <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+                  <AnimatedRoutes />
+                  <ChatbotWidget />
+                  <PreferenceOnboarding />
+                </div>
+              </CartProvider>
+            </GeoLocationProvider>
+          </NotificationProvider>
+        </PlantPreferencesProvider>
       </AuthProvider>
     </Router>
   );
