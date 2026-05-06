@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Hero from './Hero';
@@ -8,10 +8,11 @@ import ArchivePreview from './ArchivePreview';
 import VisualBreak from './VisualBreak';
 import CategoryShelf from './CategoryShelf';
 import WhyChooseUs from './WhyChooseUs';
+import PlantRecommendations from '../../components/PlantRecommendations';
 
 const HomePage = () => {
   return (
-    <motion.div 
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -22,6 +23,7 @@ const HomePage = () => {
       
       <main className="w-full flex-grow">
         <Hero />
+        <PlantRecommendations surface="home" />
         <ArchivePreview />
         <CategoryShelf />
         <Philosophy />
@@ -30,7 +32,7 @@ const HomePage = () => {
       </main>
 
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 
