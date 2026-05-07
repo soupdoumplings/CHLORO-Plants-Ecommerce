@@ -94,7 +94,7 @@ const DiscoveryPage = () => {
           <Motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pt-10 pb-2"
+            className="w-full page-shell page-gutter pt-10 pb-2"
           >
             <div className="flex items-center justify-between border-b border-[#1D241F]/10 pb-5">
               <div>

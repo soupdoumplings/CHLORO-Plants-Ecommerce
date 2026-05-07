@@ -12,7 +12,7 @@ const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCatego
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 py-10"
+      className="w-full page-shell page-gutter py-10"
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         {/* Category Pills */}

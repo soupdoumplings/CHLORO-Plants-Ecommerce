@@ -31,8 +31,8 @@ const columnVariants = {
 
 const DiscoveryFooter = () => {
   return (
-    <footer className="w-full bg-[#F3F1EA] border-t border-[#B0B0A8]/15 pt-20 pb-14 px-10 lg:px-14">
-      <div className="max-w-[1440px] mx-auto">
+    <footer className="w-full bg-[#F3F1EA] border-t border-[#B0B0A8]/15 pt-20 pb-14 page-gutter">
+      <div className="page-shell">
         {/* Main footer grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-20 mb-20">
           {/* Brand column */}

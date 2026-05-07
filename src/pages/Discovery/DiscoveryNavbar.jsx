@@ -12,7 +12,7 @@ const DiscoveryNavbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-[72px] bg-[#FBF9F4] border-b border-[#31332C]/8 z-50 flex items-center justify-between px-10 lg:px-14">
+    <nav className="fixed top-0 left-0 right-0 h-[72px] bg-[#FBF9F4] border-b border-[#31332C]/8 z-50 flex items-center justify-between page-gutter">
       {/* Left: Brand + Nav Links */}
       <div className="flex items-center gap-10">
         <Link

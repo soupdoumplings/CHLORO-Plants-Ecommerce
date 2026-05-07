@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
+import { useWishlist } from '../../lib/WishlistContext';
 
 
 const aspectMap = {
@@ -13,6 +14,7 @@ const aspectMap = {
 const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
   const { addToBag } = useCart();
+  const wishlist = useWishlist();
   const [added, setAdded] = useState(false);
   const navigate = useNavigate();
 
@@ -32,6 +34,14 @@ const DiscoveryProductCard = ({ product, index }) => {
       console.error('Add to bag failed:', err);
     }
   };
+
+  const handleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await wishlist.toggleWishlist(product);
+  };
+
+  const saved = wishlist.isWishlisted(product.id);
 
   return (
     <Motion.div
@@ -64,6 +74,19 @@ const DiscoveryProductCard = ({ product, index }) => {
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-black/[0.04]"
           />
+
+          <button
+            type="button"
+            onClick={handleWishlist}
+            className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center border transition-colors ${
+              saved
+                ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
+                : 'border-white/75 bg-white/85 text-[#0F3A3A] hover:bg-white'
+            }`}
+            aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+          >
+            <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
+          </button>
 
           {/* View Product CTA - slides up from below the frame */}
           <Motion.div
@@ -133,7 +156,7 @@ const DiscoveryProductCard = ({ product, index }) => {
 
 const ProductGrid = ({ products }) => {
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-24">
+    <div className="w-full page-shell page-gutter pb-24">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
         {products.map((product, i) => (
           <DiscoveryProductCard key={product.id} product={product} index={i} />
