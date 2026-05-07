@@ -33,13 +33,24 @@ export const AuthProvider = ({ children }) => {
       if (!currentUser) return;
       const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).single();
       if (!data) {
-        const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'User';
-        await supabase.from('users').insert([{
+        const name = currentUser.user_metadata?.full_name
+          || currentUser.user_metadata?.name
+          || currentUser.email?.split('@')[0]
+          || currentUser.phone
+          || 'User';
+        const baseRow = {
           id: currentUser.id,
-          email: currentUser.email,
+          email: currentUser.email || `${currentUser.phone || currentUser.id}@phone.chloro.local`,
           name: name,
           role: 'USER'
-        }]);
+        };
+        const phoneRow = currentUser.phone || currentUser.user_metadata?.phone
+          ? { ...baseRow, phone: currentUser.phone || currentUser.user_metadata?.phone }
+          : baseRow;
+        const { error: insertError } = await supabase.from('users').insert([phoneRow]);
+        if (insertError && phoneRow.phone) {
+          await supabase.from('users').insert([baseRow]);
+        }
       }
     };
 
@@ -92,13 +103,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (email, password, fullName, phone = '') => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const normalizedPhone = String(phone || '').trim();
+
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
         data: {
-          full_name: fullName,
-          phone,
+          full_name: String(fullName || '').trim(),
+          phone: normalizedPhone,
         }
       }
     });
@@ -108,14 +122,14 @@ export const AuthProvider = ({ children }) => {
       // Attempt to immediately create their user profile row, failing silently if already exists
       const baseUserRow = {
         id: data.user.id,
-        email: email,
-        name: fullName,
+        email: normalizedEmail,
+        name: String(fullName || '').trim(),
         role: 'USER'
       };
-      const userRow = phone ? { ...baseUserRow, phone } : baseUserRow;
+      const userRow = normalizedPhone ? { ...baseUserRow, phone: normalizedPhone } : baseUserRow;
       let { error: dbError } = await supabase.from('users').insert([userRow]);
       // Backward-compatible fallback if the users table doesn't have a phone column yet.
-      if (dbError && phone) {
+      if (dbError && normalizedPhone) {
         const fallback = await supabase.from('users').insert([baseUserRow]);
         dbError = fallback.error;
       }
@@ -131,6 +145,36 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     });
+    if (error) throw error;
+    return data;
+  };
+
+  const signInWithPhone = async (phone) => {
+    const normalizedPhone = String(phone || '').replace(/[^\d+]/g, '');
+    if (!normalizedPhone || normalizedPhone.length < 7) {
+      throw new Error('Enter a valid phone number with country code.');
+    }
+
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone: normalizedPhone,
+      options: {
+        shouldCreateUser: true,
+        data: { phone: normalizedPhone },
+      },
+    });
+
+    if (error) throw error;
+    return data;
+  };
+
+  const verifyPhoneOtp = async (phone, token) => {
+    const normalizedPhone = String(phone || '').replace(/[^\d+]/g, '');
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: normalizedPhone,
+      token: String(token || '').trim(),
+      type: 'sms',
+    });
+
     if (error) throw error;
     return data;
   };
@@ -152,7 +196,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp }}>
       {children}
     </AuthContext.Provider>
   );

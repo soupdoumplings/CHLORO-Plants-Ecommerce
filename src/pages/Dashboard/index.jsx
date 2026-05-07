@@ -16,7 +16,7 @@ const DashboardPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-20 mt-[72px] lg:mt-[90px]">
+      <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[72px] lg:mt-[90px]">
         <ProfileHeader />
         <ProfileDetails />
       </main>

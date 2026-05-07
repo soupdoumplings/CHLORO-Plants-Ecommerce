@@ -4,7 +4,7 @@ import { motion as Motion, useSpring, useMotionValue } from 'framer-motion';
 const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isHidden, setIsHidden] = useState(true);
-  const [isOverHeaderFooter, setIsOverHeaderFooter] = useState(false);
+  const [isOverDarkSurface, setIsOverDarkSurface] = useState(false);
   const isHiddenRef = useRef(isHidden);
 
   const cursorSize = isHovered ? 40 : 12;
@@ -40,8 +40,8 @@ const CustomCursor = () => {
 
     // Event delegation is much cheaper than binding to 100+ elements
     const handleMouseOver = (e) => {
-      const isNavOrFooter = e.target.closest('nav, footer, header');
-      setIsOverHeaderFooter(!!isNavOrFooter);
+      const isDarkSurface = e.target.closest('nav, footer, header, [data-cursor-theme="light"]');
+      setIsOverDarkSurface(!!isDarkSurface);
       const isInteractable = e.target.closest('button, a, input, select, .cursor-pointer, [role="button"]');
       setIsHovered(!!isInteractable);
     };
@@ -72,14 +72,18 @@ const CustomCursor = () => {
         y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
-        backgroundColor: isHovered ? 'rgba(49, 51, 44, 0.1)' : 'transparent',
-        borderColor: isHovered ? 'transparent' : 'rgba(49, 51, 44, 0.6)',
+        backgroundColor: isHovered
+          ? isOverDarkSurface ? 'rgba(251, 249, 244, 0.16)' : 'rgba(49, 51, 44, 0.1)'
+          : 'transparent',
+        borderColor: isHovered
+          ? isOverDarkSurface ? 'rgba(251, 249, 244, 0.35)' : 'transparent'
+          : isOverDarkSurface ? 'rgba(251, 249, 244, 0.78)' : 'rgba(49, 51, 44, 0.62)',
         borderWidth: '1px',
-        opacity: (isHidden || isOverHeaderFooter) ? 0 : 1,
+        opacity: isHidden ? 0 : 1,
       }}
       initial={{ opacity: 0 }}
-      animate={{ opacity: (isHidden || isOverHeaderFooter) ? 0 : 1 }}
-      transition={{ opacity: { duration: 0.2 }, width: { duration: 0.2 }, height: { duration: 0.2 } }}
+      animate={{ opacity: isHidden ? 0 : 1, scale: isHovered ? 1 : 1 }}
+      transition={{ opacity: { duration: 0.15 }, width: { duration: 0.18 }, height: { duration: 0.18 } }}
     />
   );
 };

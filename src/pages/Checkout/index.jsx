@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import CheckoutHeader from './CheckoutHeader';
 import CheckoutForm from './CheckoutForm';
 import CheckoutSummary from './CheckoutSummary';
-import OrderHistory from './OrderHistory';
 import { useAuth } from '../../lib/AuthContext';
+import { getCustomerProfile, profileToCheckoutDetails } from '../../lib/customerProfile';
 
 const CheckoutPage = () => {
   const { user } = useAuth();
@@ -20,15 +20,46 @@ const CheckoutPage = () => {
     shippingAddress: {
       addressLine: '',
       city: '',
+      country: 'Nepal',
       postalCode: '',
     },
     billingAddress: {
       addressLine: '',
       city: '',
+      country: 'Nepal',
       postalCode: '',
     },
     sameAsShipping: true,
   });
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSavedBilling = async () => {
+      if (!user) return;
+
+      try {
+        const result = await getCustomerProfile(user);
+        if (!active || !result.schemaReady) return;
+        setCheckoutDetails((current) => ({
+          ...current,
+          ...profileToCheckoutDetails({
+            user,
+            profile: result.profile,
+            billing: result.billing,
+          }),
+        }));
+      } catch (err) {
+        console.warn('Could not load saved checkout details:', err.message);
+      }
+    };
+
+    loadSavedBilling();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   return (
     <Motion.div
@@ -40,7 +71,7 @@ const CheckoutPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-20 mt-[82px] lg:mt-[100px]">
+      <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[82px] lg:mt-[100px]">
         <CheckoutHeader />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 xl:gap-32 items-start relative">
@@ -70,13 +101,6 @@ const CheckoutPage = () => {
           </Motion.div>
         </div>
       </main>
-
-      {/* Member Archive Section */}
-      {user && (
-        <section className="bg-white mt-12 w-full">
-           <OrderHistory />
-        </section>
-      )}
 
       <Footer />
     </Motion.div>

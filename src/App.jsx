@@ -12,16 +12,21 @@ import DashboardPage from './pages/Dashboard';
 import AuthPage from './pages/Auth/AuthPage';
 import AiDiagnosisPage from './pages/AiDiagnosis';
 import JournalPage from './pages/Journal';
+import MyPlantsPage from './pages/MyPlants';
 import PaymentSuccess from './pages/Checkout/PaymentSuccess';
 import PaymentFailure from './pages/Checkout/PaymentFailure';
+import OrdersPage from './pages/Orders';
+import WishlistPage from './pages/Wishlist';
 import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
+import { WishlistProvider } from './lib/WishlistContext';
 import { NotificationProvider } from './lib/NotificationContext';
 import { GeoLocationProvider } from './lib/GeoLocationProvider';
 import { PlantPreferencesProvider } from './lib/PlantPreferencesContext';
 import PreferenceOnboarding from './components/PreferenceOnboarding';
+import ProfileOnboarding from './components/ProfileOnboarding';
 
 const HomeRouteWrapper = () => {
   const { session, isAdmin } = useAuth();
@@ -54,6 +59,9 @@ const AnimatedRoutes = () => {
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+        <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
+        <Route path="/my-plants" element={<ProtectedRoute><MyPlantsPage /></ProtectedRoute>} />
         <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
       </Routes>
@@ -71,14 +79,17 @@ function App() {
         <PlantPreferencesProvider>
           <NotificationProvider>
             <GeoLocationProvider>
-              <CartProvider>
-                <CustomCursor />
-                <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
-                  <AnimatedRoutes />
-                  <ChatbotWidget />
-                  <PreferenceOnboarding />
-                </div>
-              </CartProvider>
+              <WishlistProvider>
+                <CartProvider>
+                  <CustomCursor />
+                  <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
+                    <AnimatedRoutes />
+                    <ChatbotWidget />
+                    <PreferenceOnboarding />
+                    <ProfileOnboarding />
+                  </div>
+                </CartProvider>
+              </WishlistProvider>
             </GeoLocationProvider>
           </NotificationProvider>
         </PlantPreferencesProvider>

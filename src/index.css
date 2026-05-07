@@ -90,3 +90,25 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 }
+
+.page-gutter {
+  padding-inline: clamp(1.25rem, 7vw, 9rem);
+}
+
+.page-gutter-tight {
+  padding-inline: clamp(1.25rem, 3vw, 3rem);
+}
+
+.page-shell {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -85,7 +85,7 @@ const Navbar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-12 transition-all duration-500 cursor-auto`}
+        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between page-gutter-tight transition-all duration-500 cursor-auto`}
       >
         <div className="flex items-center gap-12">
           {/* Branding */}
