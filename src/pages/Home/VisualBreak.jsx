@@ -30,7 +30,7 @@ const TOOLS = [
 
 const Toolkit = () => {
   return (
-    <section className="py-32 px-12 bg-[#fbf9f4]">
+    <section className="py-32 page-gutter bg-[#fbf9f4]">
         <Motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

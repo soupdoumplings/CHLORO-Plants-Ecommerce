@@ -30,8 +30,8 @@ const CATEGORIES = [
 
 const CategoryShelf = () => {
   return (
-    <section className="w-full py-32 px-12 bg-[#FBF9F4]">
-      <div className="max-w-[1440px] mx-auto">
+    <section className="w-full py-32 page-gutter bg-[#FBF9F4]">
+      <div className="page-shell">
         <div className="space-y-4 mb-20 text-left">
           <Motion.span
             initial={{ opacity: 0, y: 15 }}

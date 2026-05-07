@@ -6,7 +6,7 @@ const CatalogueHero = () => {
   return (
     <section className="relative w-full min-h-[80vh] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
       {/* Left Column: Identity */}
-      <div className="w-full md:w-[410px] flex flex-col items-start px-12 pt-10 gap-8 text-left">
+      <div className="w-full md:w-[410px] flex flex-col items-start pt-10 gap-8 text-left">
         <div className="space-y-4">
           <span className="font-sans text-[10px] tracking-[0.32em] uppercase text-[#785A1A]">
             Specimen No. 1042

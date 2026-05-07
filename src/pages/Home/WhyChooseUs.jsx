@@ -26,8 +26,8 @@ const VALUE_PROPS = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="pt-12 pb-32 px-12 bg-[#FBF9F4] border-t border-[#31332c]/5">
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-start pt-20">
+    <section className="pt-12 pb-32 page-gutter bg-[#FBF9F4] border-t border-[#31332c]/5">
+      <div className="page-shell grid grid-cols-1 lg:grid-cols-2 gap-24 items-start pt-20">
 
         {/* Left Side: Editorial Image */}
         <Motion.div

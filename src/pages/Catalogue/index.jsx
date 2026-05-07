@@ -90,7 +90,7 @@ const CataloguePage = () => {
     >
       <Navbar />
 
-      <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[81px] px-6 md:px-12 pt-12">
+      <main className="w-full page-shell flex-grow mt-[81px] page-gutter pt-12">
         <FicusHero product={product} />
         <PlantRoomViewer modelUrl={product.model_url} plantName={product.name} />
         <CareSection product={product} />

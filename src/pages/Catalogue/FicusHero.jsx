@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
+import { useWishlist } from '../../lib/WishlistContext';
 
 const FicusHero = ({ product }) => {
   const { addToBag } = useCart();
+  const wishlist = useWishlist();
   const [added, setAdded] = useState(false);
   const name = product?.name || 'Unknown Specimen';
   const scientificName = product?.description || '';
   const info = product?.info || 'No description available for this specimen.';
   const provenance = product?.provenance || 'Origin unknown';
-  const price = product?.price ? `रू ${Number(product.price).toLocaleString()}` : 'Price on request';
+  const price = product?.price ? `NPR ${Number(product.price).toLocaleString('en-NP')}` : 'Price on request';
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80';
@@ -34,6 +36,8 @@ const FicusHero = ({ product }) => {
       console.error('Add to bag failed:', err);
     }
   };
+
+  const saved = wishlist.isWishlisted(product?.id);
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-32 pt-16">
@@ -100,19 +104,33 @@ const FicusHero = ({ product }) => {
               <p className="font-body text-sm italic text-[#31332C]">{provenance}</p>
             </div>
 
-            <div className="pt-12 border-t border-[#B1B3A9]/20 flex justify-between items-end">
+            <div className="pt-12 border-t border-[#B1B3A9]/20 flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-end">
               <div>
                 <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Investment</p>
                 <p className="font-headline text-4xl text-[#31332C]">{price}</p>
               </div>
-              <Motion.button
-                whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleAddToBag}
-                className="bg-[#5F5E5E] text-[#FAF7F6] px-12 py-5 font-label text-[11px] tracking-[0.2rem] uppercase hover:bg-[#31332C] transition-all shadow-2xl shadow-black/5 font-bold w-[200px]"
-              >
-                  {added ? 'Added' : 'Add to Bag'}
-              </Motion.button>
+              <div className="flex w-full gap-3 sm:w-auto">
+                <Motion.button
+                  whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleAddToBag}
+                  className="flex-1 bg-[#5F5E5E] px-8 py-5 font-label text-[11px] font-bold uppercase tracking-[0.2rem] text-[#FAF7F6] shadow-2xl shadow-black/5 transition-all hover:bg-[#31332C] sm:w-[190px] sm:flex-none"
+                >
+                    {added ? 'Added' : 'Add to Bag'}
+                </Motion.button>
+                <button
+                  type="button"
+                  onClick={() => wishlist.toggleWishlist(product)}
+                  className={`flex h-[58px] w-[58px] items-center justify-center border transition-colors ${
+                    saved
+                      ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
+                      : 'border-[#5F5E5E]/30 text-[#0F3A3A] hover:border-[#0F3A3A]'
+                  }`}
+                  aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                  <span className="material-symbols-outlined text-[22px]">{saved ? 'favorite' : 'favorite_border'}</span>
+                </button>
+              </div>
             </div>
           </Motion.div>
       </Motion.div>

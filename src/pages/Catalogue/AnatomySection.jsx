@@ -32,7 +32,7 @@ const AnatomySection = ({ product }) => {
   const details = getAnatomyDetails();
 
   return (
-    <section className="mb-32 grid grid-cols-1 md:grid-cols-4 gap-12 max-w-[1440px] mx-auto px-12 group">
+    <section className="mb-32 grid grid-cols-1 md:grid-cols-4 gap-12 page-shell group">
       {/* Anatomy Visual Feature */}
       <Motion.div
         initial={{ opacity: 0, scale: 0.95 }}

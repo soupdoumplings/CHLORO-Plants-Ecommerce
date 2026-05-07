@@ -4,7 +4,7 @@ import { motion as Motion } from 'framer-motion';
 const Editorial = () => {
   return (
     <section className="bg-[#f5f4ed] py-32 overflow-hidden border-y border-[#31332c]/5">
-      <div className="max-w-[1440px] mx-auto px-12 editorial-grid items-center gap-16 md:gap-24">
+      <div className="page-shell page-gutter editorial-grid items-center gap-16 md:gap-20">
         <Motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -60,7 +60,7 @@ const Editorial = () => {
           transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="col-span-12 md:col-span-7 relative group"
         >
-          <div className="aspect-[16/10] relative translate-x-12 md:translate-x-32 overflow-hidden shadow-2xl shadow-black/10">
+          <div className="aspect-[16/10] relative overflow-hidden shadow-2xl shadow-black/10">
             <img
               src="/lof.jpg"
               alt="Wildflower Heritage"
@@ -72,7 +72,7 @@ const Editorial = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute -bottom-16 -left-12 bg-white p-14 max-w-sm hidden lg:block shadow-2xl shadow-black/5 border border-[#31332c]/5"
+            className="absolute -bottom-16 -left-8 bg-white p-14 max-w-sm hidden lg:block shadow-2xl shadow-black/5 border border-[#31332c]/5"
           >
             <p className="font-headline italic text-2xl mb-6 text-[#785a1a] leading-relaxed tracking-tight">"We believe every home should be a sanctuary of wild Himalayan soul."</p>
             <p className="font-label text-[10px] uppercase tracking-[0.3em] text-[#797c73] font-bold">— The Founder</p>

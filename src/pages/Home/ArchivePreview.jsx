@@ -30,62 +30,76 @@ const Archive = () => {
     fetchFeatured();
   }, []);
 
-  // Normalize DB product shape to what ProductCard expects
   const normalizeProduct = (item) => ({
     id: item.id,
     name: item.name,
-    price: parseFloat(item.price).toLocaleString('en-US'),
-    category: item.description || 'Himalayan Specimen',
+    price: Number(item.price || 0).toLocaleString('en-NP', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+    category: item.category || item.description || 'Botanical Specimen',
     image: item.images?.[0] || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
   });
 
   return (
-    <section className="py-32 px-12 bg-[#fbf9f4]">
-        <div className="flex justify-between items-end mb-20">
-          <div className="max-w-2xl text-left">
+    <section className="pt-20 md:pt-24 pb-24 md:pb-28 page-gutter-tight bg-[#fbf9f4]">
+      <div className="page-shell">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end mb-12 md:mb-14">
+          <div className="lg:col-span-8 max-w-[760px] text-left">
+            <Motion.span
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="font-label text-[10px] tracking-[0.26em] uppercase text-[#785A1A] font-bold inline-block mb-6"
+            >
+              Fresh From The Shop
+            </Motion.span>
             <Motion.h2
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-headline text-5xl md:text-6xl mb-8 leading-tight text-[#31332c]"
+              className="font-headline text-[46px] md:text-[66px] xl:text-[76px] leading-[0.94] tracking-tight text-[#31332c]"
             >
-              Personalized Archive Recommendations
+              More plants ready to take home.
             </Motion.h2>
+          </div>
+          <div className="lg:col-span-4 flex flex-col md:flex-row lg:flex-col xl:flex-row md:items-center lg:items-start xl:items-center justify-between gap-6">
             <Motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="font-body text-[#5e6058] leading-relaxed text-lg tracking-wide opacity-90 mb-4"
+              className="font-body text-[#5e6058] leading-relaxed text-[15px] max-w-[390px]"
             >
-              Curated by our proprietary growth algorithms, these specimens are selected based on your local micro-climate in the Kathmandu Valley.
+              Browse recent arrivals and active listings from the collection.
             </Motion.p>
-          </div>
-          <Motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ x: 4 }}
-          >
-            <Link
-              to="/catalogue"
-              className="font-label text-[10px] uppercase font-bold tracking-[0.25em] border-b border-[#31332c] pb-1.5 mb-2 hover:opacity-50 transition-all text-[#31332c] flex items-center gap-3 shrink-0"
+            <Motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ x: 4 }}
             >
-               View Full Collection
-               <span className="material-symbols-outlined text-xs">arrow_forward</span>
-            </Link>
-          </Motion.div>
+              <Link
+                to="/discovery"
+                className="font-label text-[10px] uppercase font-bold tracking-[0.22em] border-b border-[#31332c] pb-1.5 hover:opacity-60 transition-all text-[#31332c] flex items-center gap-3 shrink-0"
+              >
+                Shop All Products
+                <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+              </Link>
+            </Motion.div>
+          </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
             {[0, 1, 2].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-[#e8e9e0] h-[420px] w-full mb-6 rounded-sm" />
-                <div className="bg-[#e8e9e0] h-4 w-3/4 mb-3 rounded" />
-                <div className="bg-[#e8e9e0] h-3 w-1/2 rounded" />
+                <div className="bg-[#e8e9e0] h-[420px] w-full mb-6" />
+                <div className="bg-[#e8e9e0] h-4 w-3/4 mb-3" />
+                <div className="bg-[#e8e9e0] h-3 w-1/2" />
               </div>
             ))}
           </div>
@@ -94,13 +108,14 @@ const Archive = () => {
             No products found. Add plants from the admin panel.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
             {products.map((p, i) => (
               <ProductCard key={p.id} product={normalizeProduct(p)} delay={i * 0.15} />
             ))}
           </div>
         )}
-      </section>
+      </div>
+    </section>
   );
 };
 

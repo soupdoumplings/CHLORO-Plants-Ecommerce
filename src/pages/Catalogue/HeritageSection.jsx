@@ -30,7 +30,7 @@ const HeritageSection = ({ product }) => {
   };
 
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center mb-32 bg-[#F5F4ED] px-12 py-32 rounded-sm mx-auto max-w-[1440px] drop-shadow-sm group">
+    <section className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center mb-32 bg-[#F5F4ED] p-12 lg:p-16 rounded-sm page-shell drop-shadow-sm group">
       {/* Visual Component */}
       <Motion.div
         initial={{ opacity: 0, scale: 0.95 }}
