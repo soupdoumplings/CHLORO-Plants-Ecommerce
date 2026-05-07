@@ -1,0 +1,158 @@
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase';
+import { useAuth } from './AuthContext';
+
+const WishlistContext = createContext({});
+
+const fallbackImage = 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg';
+
+const normalizeWishlistItem = (item) => {
+  const product = item.products || item.product || {};
+  return {
+    id: item.id,
+    productId: item.product_id,
+    createdAt: item.created_at,
+    product: {
+      ...product,
+      id: product.id || item.product_id,
+      name: product.name || 'Saved item',
+      rawPrice: Number(product.rawPrice || product.price || 0),
+      price: Number(product.price || product.rawPrice || 0),
+      displayPrice: `NPR ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      image: product.images?.[0] || product.image || fallbackImage,
+      category: product.category || 'Indoor Plants',
+    },
+  };
+};
+
+export const WishlistProvider = ({ children }) => {
+  const { session } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const redirectToLogin = useCallback(() => {
+    navigate('/login', { state: { from: `${location.pathname}${location.search}` } });
+  }, [location.pathname, location.search, navigate]);
+
+  const fetchWishlist = useCallback(async () => {
+    if (!session?.user) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('wishlist')
+        .select('id, product_id, created_at, products(*)')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+
+      if (fetchError) throw fetchError;
+      setItems((data || []).map(normalizeWishlistItem));
+    } catch (err) {
+      setError(err.message || 'Could not load wishlist.');
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    fetchWishlist();
+  }, [fetchWishlist]);
+
+  const productIds = useMemo(() => new Set(items.map((item) => String(item.productId))), [items]);
+
+  const isWishlisted = useCallback((productId) => productIds.has(String(productId)), [productIds]);
+
+  const addToWishlist = useCallback(async (product) => {
+    if (!session?.user) {
+      redirectToLogin();
+      return { success: false, requiresAuth: true };
+    }
+
+    const productId = product?.id || product?.productId;
+    if (!productId) return { success: false, error: 'Missing product id.' };
+
+    try {
+      const { error: insertError } = await supabase
+        .from('wishlist')
+        .upsert({
+          user_id: session.user.id,
+          product_id: productId,
+        }, { onConflict: 'user_id,product_id' });
+
+      if (insertError) throw insertError;
+      await fetchWishlist();
+      return { success: true };
+    } catch (err) {
+      setError(err.message || 'Could not save wishlist item.');
+      return { success: false, error: err.message };
+    }
+  }, [fetchWishlist, redirectToLogin, session]);
+
+  const removeFromWishlist = useCallback(async (productId) => {
+    if (!session?.user) {
+      redirectToLogin();
+      return { success: false, requiresAuth: true };
+    }
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('wishlist')
+        .delete()
+        .eq('user_id', session.user.id)
+        .eq('product_id', productId);
+
+      if (deleteError) throw deleteError;
+      setItems((current) => current.filter((item) => String(item.productId) !== String(productId)));
+      return { success: true };
+    } catch (err) {
+      setError(err.message || 'Could not remove wishlist item.');
+      return { success: false, error: err.message };
+    }
+  }, [redirectToLogin, session]);
+
+  const toggleWishlist = useCallback(async (product) => {
+    const productId = product?.id || product?.productId;
+    if (!productId) return { success: false, error: 'Missing product id.' };
+
+    if (isWishlisted(productId)) {
+      return removeFromWishlist(productId);
+    }
+    return addToWishlist(product);
+  }, [addToWishlist, isWishlisted, removeFromWishlist]);
+
+  const value = useMemo(() => ({
+    items,
+    products: items.map((item) => item.product),
+    count: items.length,
+    loading,
+    error,
+    isWishlisted,
+    addToWishlist,
+    removeFromWishlist,
+    toggleWishlist,
+    refreshWishlist: fetchWishlist,
+  }), [addToWishlist, error, fetchWishlist, isWishlisted, items, loading, removeFromWishlist, toggleWishlist]);
+
+  return (
+    <WishlistContext.Provider value={value}>
+      {children}
+    </WishlistContext.Provider>
+  );
+};
+
+export const useWishlist = () => useContext(WishlistContext);

@@ -46,7 +46,7 @@ const ShopPage = () => {
     >
       <Navbar />
 
-      <main className="w-full max-w-[1440px] px-12 pt-32 pb-48">
+      <main className="w-full page-shell page-gutter pt-32 pb-48">
         <header className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
            <div className="text-left space-y-6 max-w-2xl">
               <Motion.span

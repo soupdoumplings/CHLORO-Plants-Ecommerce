@@ -39,7 +39,7 @@ const OrderHistory = () => {
 
   return (
     <div className="w-full pt-20 pb-24 border-t border-[#B0B0A8]/20 bg-white">
-      <div className="max-w-[1440px] mx-auto px-10 lg:px-14">
+      <div className="page-shell page-gutter">
 
         {/* Header & Toggles */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">

@@ -5,6 +5,7 @@ import { useGeoLocation } from '../../lib/useGeoLocation';
 const emptyAddress = {
   addressLine: '',
   city: '',
+  country: 'Nepal',
   postalCode: '',
 };
 
@@ -14,6 +15,7 @@ const getAddressFields = (detectedLocation) => {
   return {
     addressLine: detectedLocation.address.addressLine || '',
     city: detectedLocation.address.city || '',
+    country: detectedLocation.address.country || 'Nepal',
     postalCode: detectedLocation.address.postalCode || '',
   };
 };
@@ -61,6 +63,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         addressLine: current.shippingAddress.addressLine || detectedAddress.addressLine,
         city: current.shippingAddress.city || detectedAddress.city,
         postalCode: current.shippingAddress.postalCode || detectedAddress.postalCode,
+        country: current.shippingAddress.country || detectedAddress.country,
       };
 
       const nextBillingAddress = current.sameAsShipping
@@ -68,6 +71,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         : {
           addressLine: current.billingAddress.addressLine || detectedAddress.addressLine,
           city: current.billingAddress.city || detectedAddress.city,
+          country: current.billingAddress.country || detectedAddress.country,
           postalCode: current.billingAddress.postalCode || detectedAddress.postalCode,
         };
 
@@ -151,6 +155,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Email Address</label>
             <input
               type="email"
+              name="email"
+              autoComplete="email"
               placeholder="julian@example.com"
               value={checkoutDetails.email}
               onChange={(e) => updateDetails({ email: e.target.value })}
@@ -161,6 +167,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Phone Number</label>
             <input
               type="tel"
+              name="tel"
+              autoComplete="tel"
               placeholder="+977 98..."
               value={checkoutDetails.phone}
               onChange={(e) => updateDetails({ phone: e.target.value })}
@@ -174,6 +182,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
             <input
               type="text"
+              name="given-name"
+              autoComplete="given-name"
               value={checkoutDetails.firstName}
               onChange={(e) => updateDetails({ firstName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -183,6 +193,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
             <input
               type="text"
+              name="family-name"
+              autoComplete="family-name"
               value={checkoutDetails.lastName}
               onChange={(e) => updateDetails({ lastName: e.target.value })}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -194,6 +206,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Shipping Address</label>
           <input
             type="text"
+            name="shipping street-address"
+            autoComplete="shipping street-address"
             placeholder="Street name and house number"
             value={shippingAddress.addressLine}
             onChange={(e) => handleShippingChange('addressLine', e.target.value)}
@@ -201,13 +215,26 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2.5">
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
             <input
               type="text"
+              name="shipping address-level2"
+              autoComplete="shipping address-level2"
               value={shippingAddress.city}
               onChange={(e) => handleShippingChange('city', e.target.value)}
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Country</label>
+            <input
+              type="text"
+              name="shipping country-name"
+              autoComplete="shipping country-name"
+              value={shippingAddress.country}
+              onChange={(e) => handleShippingChange('country', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
             />
           </div>
@@ -215,6 +242,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
             <input
               type="text"
+              name="shipping postal-code"
+              autoComplete="shipping postal-code"
               value={shippingAddress.postalCode}
               onChange={(e) => handleShippingChange('postalCode', e.target.value)}
               className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
@@ -269,19 +298,31 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                   <input
                     type="text"
                     placeholder="Street name and house number"
+                    autoComplete="billing street-address"
                     value={billingAddress.addressLine}
                     onChange={(e) => handleBillingChange('addressLine', e.target.value)}
                     className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex flex-col gap-2.5">
                     <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
                     <input
                       type="text"
+                      autoComplete="billing address-level2"
                       value={billingAddress.city}
                       onChange={(e) => handleBillingChange('city', e.target.value)}
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Country</label>
+                    <input
+                      type="text"
+                      autoComplete="billing country-name"
+                      value={billingAddress.country}
+                      onChange={(e) => handleBillingChange('country', e.target.value)}
                       className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
                     />
                   </div>
@@ -289,6 +330,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                     <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
                     <input
                       type="text"
+                      autoComplete="billing postal-code"
                       value={billingAddress.postalCode}
                       onChange={(e) => handleBillingChange('postalCode', e.target.value)}
                       className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"

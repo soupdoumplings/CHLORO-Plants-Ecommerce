@@ -162,6 +162,51 @@ const PaymentSuccess = () => {
     loadPurchasedPlants();
   }, [orderId, user]);
 
+  useEffect(() => {
+    const reconcilePayment = async () => {
+      if (!user || !orderId) return;
+
+      const method = searchParams.get('method');
+      const isCod = method === 'cod';
+      const nextPaymentStatus = isCod ? 'pending' : 'completed';
+      const nextOrderStatus = isCod ? 'processing' : 'processing';
+      const reference = transaction.transactionCode === fallbackValue ? null : transaction.transactionCode;
+
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({
+          payment_status: nextPaymentStatus,
+          status: nextOrderStatus,
+          payment_reference: reference,
+        })
+        .eq('id', orderId)
+        .eq('user_id', user.id);
+
+      if (orderError) {
+        console.warn('Could not reconcile order payment status:', orderError.message);
+      }
+
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .update({
+          status: nextPaymentStatus,
+          reference,
+          paid_at: nextPaymentStatus === 'completed' ? new Date().toISOString() : null,
+          metadata: {
+            success_callback: Object.fromEntries(searchParams.entries()),
+          },
+        })
+        .eq('order_id', orderId)
+        .eq('user_id', user.id);
+
+      if (paymentError) {
+        console.warn('Could not reconcile payment row:', paymentError.message);
+      }
+    };
+
+    reconcilePayment();
+  }, [orderId, searchParams, transaction.transactionCode, user]);
+
   return (
     <Motion.div
       initial={{ opacity: 0 }}
@@ -172,7 +217,7 @@ const PaymentSuccess = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 pt-16 lg:pt-24 pb-24 mt-[82px]">
+      <main className="flex-grow w-full page-shell page-gutter pt-16 lg:pt-24 pb-24 mt-[82px]">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch">
           <Motion.div
             initial={{ opacity: 0, y: 28 }}

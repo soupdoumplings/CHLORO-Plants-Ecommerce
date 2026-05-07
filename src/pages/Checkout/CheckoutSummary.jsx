@@ -5,6 +5,7 @@ import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../supabase';
 import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl } from '../../lib/paymentUtils';
+import { saveCheckoutBillingDetails } from '../../lib/customerProfile';
 
 const paymentLabels = {
   card: { text: 'Pay Securely', color: '#1A1A1A' },
@@ -14,11 +15,35 @@ const paymentLabels = {
 };
 
 const formatAddress = (address) => {
-  return [address?.addressLine, address?.city, address?.postalCode]
+  return [address?.addressLine, address?.city, address?.country, address?.postalCode]
     .map((part) => String(part || '').trim())
     .filter(Boolean)
     .join(', ');
 };
+
+const getInputValue = (selector) => document.querySelector(selector)?.value?.trim() || '';
+
+const mergeVisibleCheckoutValues = (checkoutDetails) => ({
+  ...checkoutDetails,
+  email: checkoutDetails.email?.trim() || getInputValue('input[autocomplete="email"]'),
+  phone: checkoutDetails.phone?.trim() || getInputValue('input[autocomplete="tel"]'),
+  firstName: checkoutDetails.firstName?.trim() || getInputValue('input[autocomplete="given-name"]'),
+  lastName: checkoutDetails.lastName?.trim() || getInputValue('input[autocomplete="family-name"]'),
+  shippingAddress: {
+    ...checkoutDetails.shippingAddress,
+    addressLine: checkoutDetails.shippingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="shipping street-address"]'),
+    city: checkoutDetails.shippingAddress?.city?.trim() || getInputValue('input[autocomplete="shipping address-level2"]'),
+    country: checkoutDetails.shippingAddress?.country?.trim() || getInputValue('input[autocomplete="shipping country-name"]'),
+    postalCode: checkoutDetails.shippingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="shipping postal-code"]'),
+  },
+  billingAddress: {
+    ...checkoutDetails.billingAddress,
+    addressLine: checkoutDetails.billingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="billing street-address"]'),
+    city: checkoutDetails.billingAddress?.city?.trim() || getInputValue('input[autocomplete="billing address-level2"]'),
+    country: checkoutDetails.billingAddress?.country?.trim() || getInputValue('input[autocomplete="billing country-name"]'),
+    postalCode: checkoutDetails.billingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="billing postal-code"]'),
+  },
+});
 
 const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
@@ -49,16 +74,18 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       return;
     }
 
-    const customerName = `${checkoutDetails.firstName || ''} ${checkoutDetails.lastName || ''}`.trim()
+    const visibleCheckoutDetails = mergeVisibleCheckoutValues(checkoutDetails);
+
+    const customerName = `${visibleCheckoutDetails.firstName || ''} ${visibleCheckoutDetails.lastName || ''}`.trim()
       || user?.user_metadata?.full_name
       || user?.email?.split('@')?.[0]
       || 'Customer';
-    const customerEmail = checkoutDetails.email?.trim() || user?.email || '';
-    const customerPhone = checkoutDetails.phone?.trim();
-    const shippingAddress = formatAddress(checkoutDetails.shippingAddress);
+    const customerEmail = visibleCheckoutDetails.email?.trim() || user?.email || '';
+    const customerPhone = visibleCheckoutDetails.phone?.trim();
+    const shippingAddress = formatAddress(visibleCheckoutDetails.shippingAddress);
 
-    if (!customerEmail || !customerPhone || !shippingAddress) {
-      setError('Please complete your email, phone, and shipping address.');
+    if (!customerEmail || !customerPhone || !visibleCheckoutDetails.shippingAddress?.addressLine || !visibleCheckoutDetails.shippingAddress?.city || !visibleCheckoutDetails.shippingAddress?.country) {
+      setError('Please complete your email, phone, address, city, and country.');
       return;
     }
 
@@ -86,6 +113,24 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
         .single();
 
       if (orderError) throw orderError;
+
+      await saveCheckoutBillingDetails({ user, checkoutDetails: visibleCheckoutDetails });
+
+      const { error: paymentInsertError } = await supabase.from('payments').insert({
+        order_id: order.id,
+        user_id: user.id,
+        amount: total,
+        provider: paymentMethod,
+        status: 'pending',
+        reference: transactionId,
+        metadata: {
+          checkout_source: 'web',
+        },
+      });
+
+      if (paymentInsertError) {
+        console.warn('Payment record was not inserted:', paymentInsertError.message);
+      }
 
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,

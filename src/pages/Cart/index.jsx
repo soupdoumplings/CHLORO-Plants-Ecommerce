@@ -39,7 +39,7 @@ const CartPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-32">
+      <main className="flex-grow w-full page-shell page-gutter pb-32">
         <CartHeader />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 mt-12 lg:mt-16 items-start relative">
