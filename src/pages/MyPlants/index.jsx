@@ -72,7 +72,7 @@ const MyPlantsPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 pt-16 lg:pt-24 pb-24 mt-[82px]">
+      <main className="flex-grow w-full page-shell page-gutter pt-16 lg:pt-24 pb-24 mt-[82px]">
         <div className="mb-12">
           <p className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold mb-4">
             Personal Care Calendar

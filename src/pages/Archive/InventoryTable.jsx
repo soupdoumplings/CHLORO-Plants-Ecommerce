@@ -41,7 +41,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="mb-24 px-12 max-w-[1440px] mx-auto w-full relative"
+      className="mb-24 page-shell w-full relative"
     >
       {/* Custom Delete Modal */}
       <AnimatePresence>

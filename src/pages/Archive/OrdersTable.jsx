@@ -3,6 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { supabase } from '../../supabase';
 
 const statusOptions = ['pending', 'processing', 'shipping', 'delivered', 'cancelled'];
+const paymentOptions = ['pending', 'completed', 'failed', 'refunded', 'cancelled'];
 
 const statusStyles = {
   pending: 'bg-[#FBD185]/35 text-[#785A1A]',
@@ -30,6 +31,7 @@ const formatDate = (value) => {
 
 const OrdersTable = ({ orders, loading, onRefresh }) => {
   const [updatingId, setUpdatingId] = useState('');
+  const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredOrders = useMemo(() => {
@@ -56,13 +58,45 @@ const OrdersTable = ({ orders, loading, onRefresh }) => {
     }
   };
 
+  const handlePaymentStatusChange = async (orderId, nextStatus) => {
+    setUpdatingPaymentId(orderId);
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_status: nextStatus })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .update({
+          status: nextStatus,
+          paid_at: nextStatus === 'completed' ? new Date().toISOString() : null,
+        })
+        .eq('order_id', orderId);
+
+      if (paymentError) {
+        console.warn('Payment row update skipped:', paymentError.message);
+      }
+
+      if (onRefresh) await onRefresh();
+    } catch (err) {
+      console.error('Payment status update failed:', err.message);
+      alert('Failed to update payment status.');
+    } finally {
+      setUpdatingPaymentId('');
+    }
+  };
+
   return (
     <Motion.section
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="mb-24 px-12 max-w-[1440px] mx-auto w-full"
+      className="mb-24 page-shell w-full"
     >
       <div className="mb-10 flex flex-col gap-5 border-b border-[#B1B3A9]/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -160,6 +194,24 @@ const OrdersTable = ({ orders, loading, onRefresh }) => {
                       className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
                     >
                       {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col gap-2">
+                    <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
+                      Payment Status
+                    </span>
+                    <select
+                      value={order.payment_status || 'pending'}
+                      disabled={updatingPaymentId === order.id}
+                      onChange={(event) => handlePaymentStatusChange(order.id, event.target.value)}
+                      className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
+                    >
+                      {paymentOptions.map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>

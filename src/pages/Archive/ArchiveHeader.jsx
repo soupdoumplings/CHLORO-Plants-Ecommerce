@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const ArchiveHeader = () => {
   return (
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 w-full max-w-[1440px] mx-auto mb-10 lg:mb-20">
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 w-full page-shell mb-10 lg:mb-20">
       {/* Primary Context */}
       <Motion.div
         initial={{ opacity: 0, y: 30 }}

@@ -137,7 +137,7 @@ const ManageInventory = () => {
     >
       <Navbar />
 
-      <main className="w-full max-w-[1920px] mx-auto flex-grow pt-[140px] px-6 md:px-12 pb-32">
+      <main className="w-full page-shell flex-grow pt-[140px] page-gutter pb-32">
         <div className="max-w-6xl mx-auto w-full">
 
            {/* Header Section */}

@@ -64,13 +64,13 @@ const ArchivePage = () => {
       className="min-h-screen bg-[#FBF9F4] flex flex-col items-center overflow-x-hidden w-full relative"
     >
       <Navbar />
-      <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
+      <main className="w-full page-shell flex-grow mt-[82px] page-gutter pt-16">
         <ArchiveHeader />
         <BroadcastWidget />
-        <MetricsGrid products={products} loading={loading} />
+        <MetricsGrid products={products} orders={orders} loading={loading || ordersLoading} />
         <OrdersTable orders={orders} loading={ordersLoading} onRefresh={fetchOrders} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
-        <SystemLog />
+        <SystemLog orders={orders} loading={ordersLoading} />
       </main>
 
       <Footer />
