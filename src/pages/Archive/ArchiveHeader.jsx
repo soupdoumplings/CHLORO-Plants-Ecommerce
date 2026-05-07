@@ -13,6 +13,7 @@ const ArchiveHeader = () => {
       </div>
 
       {/* Primary Actions */}
+<<<<<<< Updated upstream
       <div className="flex gap-4 items-center">
         <Link to="/admin/add-plant" className="bg-[#5F5E5E] text-[#FAF7F6] px-8 py-3 font-label text-[12px] tracking-[1.2px] uppercase flex items-center gap-2 hover:bg-[#31332C] transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-lg shadow-black/5">
            <span className="w-2 h-2 bg-[#FAF7F6] rounded-full"></span>
@@ -22,6 +23,33 @@ const ArchiveHeader = () => {
            Generate Report
         </button>
       </div>
+=======
+      <motion.div 
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+           <div className="flex flex-wrap gap-4">
+               <Link 
+                 to="/admin/promotions"
+                 className="flex items-center gap-3 bg-white border border-[#B1B3A9]/40 text-[#31332C] px-8 py-3.5 font-label text-[10px] tracking-[0.2em] uppercase hover:bg-[#F5F4ED] transition-all shadow-sm"
+               >
+                  <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+                  Scheduled Discounts
+               </Link>
+               <Link 
+                 to="/admin/add-plant"
+                 className="flex items-center gap-3 bg-[#5F5E5E] text-[#FAF7F6] px-8 py-3.5 font-label text-[10px] tracking-[0.2em] uppercase hover:bg-[#31332C] transition-all shadow-lg"
+               >
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  Add Plant for Sale
+               </Link>
+               <button className="bg-[#EFEEE6] text-[#31332C]/60 px-8 py-3.5 font-label text-[10px] tracking-[0.2em] uppercase hover:bg-[#E2E3D9] hover:text-[#31332C] transition-all">
+                  Generate Report
+               </button>
+           </div>
+      </motion.div>
+>>>>>>> Stashed changes
     </div>
   );
 };
