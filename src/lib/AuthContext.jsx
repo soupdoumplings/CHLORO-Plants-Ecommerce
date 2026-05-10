@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null); // null means role is currently being fetched
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -89,11 +90,13 @@ export const AuthProvider = ({ children }) => {
         setLoading(false); // ensure global loading is false
 
         if (session?.user) {
+          setIsPasswordRecovery(event === 'PASSWORD_RECOVERY');
           if (event === 'SIGNED_IN') {
             setIsAdmin(null); // Re-fetch role on new login
           }
           hydrateUserMeta(session.user);
         } else {
+          setIsPasswordRecovery(false);
           setIsAdmin(false);
         }
       }
@@ -167,17 +170,27 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const sendPasswordResetEmail = async (email) => {
+  const sendPasswordResetOtp = async (email) => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       throw new Error('Enter a valid email address.');
     }
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo: `${window.location.origin}/login?recovery=1`,
+    const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
+    if (error) throw error;
+    return data;
+  };
+
+  const verifyEmailOtp = async (email, token, type = 'email') => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: normalizedEmail,
+      token: String(token || '').trim(),
+      type,
     });
 
     if (error) throw error;
+    if (type === 'recovery') setIsPasswordRecovery(true);
     return data;
   };
 
@@ -187,6 +200,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
+    setIsPasswordRecovery(false);
     return data;
   };
 
@@ -219,7 +233,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, sendPasswordResetEmail, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, isPasswordRecovery, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

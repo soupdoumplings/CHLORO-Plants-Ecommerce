@@ -31,13 +31,12 @@ export const AdminRoute = ({ children }) => {
 };
 
 export const GuestRoute = ({ children, redirectTo = '/' }) => {
-  const { session, isAdmin, loading } = useAuth();
+  const { session, isAdmin, isPasswordRecovery, loading } = useAuth();
   const location = useLocation();
   const returnTo = location.state?.from || redirectTo;
-  const isRecoveryRoute = new URLSearchParams(location.search).get('recovery') === '1';
 
   if (loading) return <SecurityLoading />;
-  if (isRecoveryRoute) return children;
+  if (session && isPasswordRecovery) return children;
   if (session) {
     if (isAdmin === null) return <SecurityLoading />;
     return <Navigate to={isAdmin ? '/archive' : returnTo} replace />;

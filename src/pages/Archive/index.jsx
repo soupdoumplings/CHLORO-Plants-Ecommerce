@@ -16,6 +16,7 @@ const ArchivePage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState('');
 
   const fetchProducts = async () => {
     try {
@@ -37,6 +38,7 @@ const ArchivePage = () => {
   const fetchOrders = async () => {
     try {
       setOrdersLoading(true);
+      setOrdersError('');
       const { data, error } = await supabase
         .from('orders')
         .select('*, order_items(*)')
@@ -46,6 +48,8 @@ const ArchivePage = () => {
       setOrders(data || []);
     } catch (err) {
       console.error('Error fetching orders:', err.message);
+      setOrders([]);
+      setOrdersError(err.message || 'Could not load customer orders.');
     } finally {
       setOrdersLoading(false);
     }
@@ -69,7 +73,7 @@ const ArchivePage = () => {
         <ArchiveHeader />
         <BroadcastWidget />
         <MetricsGrid products={products} orders={orders} loading={loading || ordersLoading} />
-        <OrdersTable orders={orders} loading={ordersLoading} onRefresh={fetchOrders} />
+        <OrdersTable orders={orders} loading={ordersLoading} error={ordersError} onRefresh={fetchOrders} />
         <StockInfoBar products={products} loading={loading} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
         <SystemLog orders={orders} loading={ordersLoading} />
