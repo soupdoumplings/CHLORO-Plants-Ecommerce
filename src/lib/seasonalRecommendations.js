@@ -1,9 +1,11 @@
 import { supabase } from '../supabase';
 import { DEFAULT_PLANT_PREFERENCES, scorePlantForPreferences } from './plantPreferences';
+import { fallbackCatalogImage } from './localImages';
 
-const fallbackImage = 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg';
+const fallbackImage = fallbackCatalogImage;
 const CACHE_PREFIX = 'chloro-seasonal-recommendations';
 const CACHE_TTL_MS = 1000 * 60 * 60 * 12;
+const useSeasonalEdge = import.meta.env.VITE_ENABLE_SEASONAL_EDGE === 'true';
 
 export const FALLBACK_REGION = 'Kathmandu';
 
@@ -252,40 +254,43 @@ export const fetchSeasonalRecommendations = async ({
 
   if (cached) return { ...cached, source: `${cached.source}:local-cache` };
 
-  try {
-    const { data, error } = await supabase.functions.invoke('get_seasonal_plants', {
-      body: {
-        location,
-        region,
-        month,
-        limit,
-        preferences,
-        signals,
-      },
-    });
+  if (useSeasonalEdge) {
+    try {
+      const { data, error } = await supabase.functions.invoke('get_seasonal_plants', {
+        body: {
+          location,
+          region,
+          month,
+          limit,
+          preferences,
+          signals,
+        },
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const value = {
-      plants: applySignalsToPlants({ plants: data?.plants || [], signals, limit }),
-      region: data?.region || region,
-      season: data?.season || getSeasonForMonth(month),
-      source: data?.source || 'edge',
-    };
+      const value = {
+        plants: applySignalsToPlants({ plants: data?.plants || [], signals, limit }),
+        region: data?.region || region,
+        season: data?.season || getSeasonForMonth(month),
+        source: data?.source || 'edge',
+      };
 
-    writeLocalCache(cacheKey, value);
-    return value;
-  } catch (edgeError) {
-    console.warn('Seasonal Edge Function unavailable, using product fallback:', edgeError);
-    const plants = await fetchProductsFallback({ preferences, location, month, limit, signals });
-    const value = {
-      plants,
-      region,
-      season: getSeasonForMonth(month),
-      source: 'client-fallback',
-    };
-
-    writeLocalCache(cacheKey, value);
-    return value;
+      writeLocalCache(cacheKey, value);
+      return value;
+    } catch (edgeError) {
+      console.warn('Seasonal Edge Function unavailable, using product fallback:', edgeError);
+    }
   }
+
+  const plants = await fetchProductsFallback({ preferences, location, month, limit, signals });
+  const value = {
+    plants,
+    region,
+    season: getSeasonForMonth(month),
+    source: 'client-fallback',
+  };
+
+  writeLocalCache(cacheKey, value);
+  return value;
 };

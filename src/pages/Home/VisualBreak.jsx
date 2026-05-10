@@ -1,30 +1,31 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
+import { productAssetImages } from '../../lib/localImages';
 
 const TOOLS = [
   {
     name: "Heritage Shears",
     price: "3,200",
     desc: "Stainless Steel & Oak",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAuB-QhTd_q-IRZwSeToy52XwJTA3n2uKCHxJKIA7ssUtNEtMCtRZatZGk2uCF9aQpxbtl_6Kh-5UXQvaRiHvsGxCuRkkxEHqJKR_OqVQnQqJOTJz9JLBmENA18kqTswrEfx2ctNyhatPqzZBsA9crJcfTAPudbRoeNy9TaxbT_FbnmjQ1rUXFSaMrRzTMwrdNnaLT44gYvITwmUwyiZlQjAC8lNlg6H8JoK1yPNv_PxMHh5fRSEWpdoAIQm4svqRKcVSosMaXOPu7M"
+    image: productAssetImages.scissors
   },
   {
     name: "Copper Mist Vessel",
     price: "5,800",
     desc: "Polished Finish",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAlvbpVIN_VUxTcamiWMHhSDDlbE4iMDm4bi9KRGRL2KHlVHWX8NKBOIfqnocmn50zO_5sFIU60N-CSij9jFyZ9gjm2Ak06ygo_VwY7Ucfe0PMBBdiHa1kHSyDEnBIqSBFFuENIFtJl3v-96hGKYtvg-wLvrwQ5V4WiRetLrWgjTFhOEHS27Pp1Tn37R_B00-9J36ZGa8axkGsX4cIAcyLfp75kQioSyNVDHaJQLCFJiXIGq0qAYe0FpmOOy4OofEa1__CJNiq-kVh7"
+    image: productAssetImages.vessel
   },
   {
     name: "Organic Hemp Bind",
     price: "850",
     desc: "Hand-woven in Nepal",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmHaEZjUsIdgYwAvIsJQXftqd_bePfAmCiIdkZOMlWoFsQVRoeVD1cXPccPvlhGje69X307W2A0uEoCEycIhssS_czzNHo5F_RM7tN-zdZJbTd7wJVWTpPBCTS0Hjr7z4LePPhbO63TV-hu20Vl-ouWd-lq9LFL61wGcHR9-_uBYq1-qp81VffCLKQnEmSas5cyVp_UHyPrkInQyYShMENO4BcA91-Wb5EPv3mqx_8AFRt7FHZa3Zo-AX3dNeqSCoP7mCNM1-SDv_3"
+    image: productAssetImages.terrarium
   },
   {
     name: "Analog Soil Probe",
     price: "1,500",
     desc: "Brass Components",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD3eJ_xT9kufITOvFfjgKrex-E79O9g4cOUrr1nEjLvm6gzyVh_XXNGQKNc5UC6csm95Mt2-XHE6OUynFj2WIbVxO0pxzqJLzMI26VA5V55WnuHQW7Hkjsd2Ley0ZNZXMboIRaeyW696LkLzJZdnoB2dVRy-bs5f9hDcE5nxBqrVXnolOJt2VyOdhMmyi36i4yXYwdsih2pFebu4JjNNF1A_vVHz39FcBWs0flLGdsHU_-mdWnn0fqA7CrxwgZ38txhH3_V9qKBkpz0"
+    image: productAssetImages.wateringCan
   }
 ];
 

@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
+import { publicPlantImages } from '../../lib/localImages';
 
 const ManageInventory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +74,7 @@ const ManageInventory = () => {
 
     const productImages = imageUrl.trim()
       ? [imageUrl.trim()]
-      : ["https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80"];
+      : [publicPlantImages.orchid];
 
     const productTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
 
@@ -240,7 +241,7 @@ const ManageInventory = () => {
 
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Image URL</label>
-                     <input type="url" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://images.unsplash.com/photo-..." className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[15px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <input type="url" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="Paste a direct image URL" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[15px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                      <p className="font-body text-[11px] text-[#5E6058]/60">Paste a direct image URL. This will be the hero image on the catalogue page.</p>
                   </div>
 

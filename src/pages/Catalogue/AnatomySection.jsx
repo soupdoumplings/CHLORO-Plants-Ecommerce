@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
+import { fallbackHeroImage } from '../../lib/localImages';
 
 const AnatomySection = ({ product }) => {
   const name = product?.name || 'This Specimen';
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
-    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAD-JWKExkplCQ2jokkSuAYmb3pq9UPsFzyeTCtNuCP51EgPyF8Hh-klVZFU5bCIoC16DCtwDp0Zcs7uhjNrLg0e_I7fWuA3JTIR4ARgq55L7j2nk_ZOYYYoU2j34w4pqIa-XiizoqFzXnD-G2XPtPzVdgXBDxuOrHqa4w0CjWvqyaZG1qthuL-lhKF3iaP86ZTJYss3ZmJFXJ80nI6RaVjMIF6gPjOvDjjzBL9FQp7O3wJvTnmuspNugg1K1jKsnxF5u8VY7bhJwSt';
+    : fallbackHeroImage;
 
   // Generate anatomy details from plant data
   const getAnatomyDetails = () => {

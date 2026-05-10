@@ -7,8 +7,9 @@ import Footer from '../../components/Footer';
 import { analyzePlantImage, preparePlantImage } from '../../lib/gemini';
 import { useCart } from '../../lib/CartContext';
 import { useGeoLocation } from '../../lib/useGeoLocation';
+import { fallbackHeroImage } from '../../lib/localImages';
 
-const placeholderLeaf = 'https://images.unsplash.com/photo-1614594075920-b4842c4f6f86?auto=format&fit=crop&q=80&w=900';
+const placeholderLeaf = fallbackHeroImage;
 
 const severityCopy = {
   low: 'Observation',

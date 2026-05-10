@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
+import { fallbackHeroImage } from '../../lib/localImages';
 
 const HeritageSection = ({ product }) => {
   const name = product?.name || 'This Specimen';
@@ -12,7 +13,7 @@ const HeritageSection = ({ product }) => {
     ? product.images[1]
     : product?.images && product.images.length > 0
       ? product.images[0]
-      : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCQb0IBHuXj7YIxS_N3NxonDg-QG5st_Cm_DbZEX-a9x_8j-aiN3wuZ-sJfWKdA_0WREZM7GA5qU1NpkY6TNzwMK7lCnFU_KqorA-vaRQoMbV4y8WaX69jjkQiHhUs_MdUAhDJPc4KC_ikXujcg0AGD4pc4AZ7shZ2GqjZUTaaFQA68S6ICADID8TzJqVsAJxmhrIW1Wz00bruN0hZERUvp9xFDRxlzeGeJkuCfoqUROEm8wOm_thw9zQizs-FANcK61zMvUJ2ZKSyy';
+      : fallbackHeroImage;
 
   // Generate heritage narrative from product data
   const getHeritageNarrative = () => {

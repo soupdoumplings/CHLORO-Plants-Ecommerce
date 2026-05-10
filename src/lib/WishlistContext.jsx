@@ -3,10 +3,11 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
+import { fallbackCatalogImage } from './localImages';
 
 const WishlistContext = createContext({});
 
-const fallbackImage = 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg';
+const fallbackImage = fallbackCatalogImage;
 
 const normalizeWishlistItem = (item) => {
   const product = item.products || item.product || {};

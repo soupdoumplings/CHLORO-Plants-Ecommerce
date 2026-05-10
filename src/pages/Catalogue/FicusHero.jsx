@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
+import { fallbackHeroImage } from '../../lib/localImages';
 
 const FicusHero = ({ product }) => {
   const { addToBag } = useCart();
@@ -14,7 +15,7 @@ const FicusHero = ({ product }) => {
   const price = product?.price ? `रू ${Number(product.price).toLocaleString('en-NP')}` : 'Price on request';
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
-    : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80';
+    : fallbackHeroImage;
   const curatorQuote = product?.curator_quote || `"A rare specimen that demands patience and a refined understanding of its natural rhythms."`;
 
   // Split the name into two lines if it has multiple words

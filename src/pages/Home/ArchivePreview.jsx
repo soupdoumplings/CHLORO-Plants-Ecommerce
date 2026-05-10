@@ -3,6 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../supabase';
+import { fallbackCatalogImage } from '../../lib/localImages';
 
 const Archive = () => {
   const [products, setProducts] = useState([]);
@@ -38,7 +39,7 @@ const Archive = () => {
       maximumFractionDigits: 2,
     }),
     category: item.category || item.description || 'Botanical Specimen',
-    image: item.images?.[0] || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
+    image: item.images?.[0] || fallbackCatalogImage,
   });
 
   return (

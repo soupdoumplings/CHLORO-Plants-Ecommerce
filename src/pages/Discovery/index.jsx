@@ -8,6 +8,7 @@ import ProductGrid from './ProductGrid';
 import Newsletter from './Newsletter';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
+import { fallbackCatalogImage } from '../../lib/localImages';
 
 
 const DiscoveryPage = () => {
@@ -28,7 +29,7 @@ const DiscoveryPage = () => {
             name: p.name,
             price: `रू ${Number(p.price).toFixed(2)}`,
             rawPrice: Number(p.price),
-            image: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80',
+            image: p.images && p.images.length > 0 ? p.images[0] : fallbackCatalogImage,
             category: p.category || 'Indoor Plants',
             tags: p.tags || [],
             is_featured: p.is_featured || false,

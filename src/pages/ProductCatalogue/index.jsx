@@ -8,8 +8,9 @@ import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 import { supabase } from '../../supabase';
 import heroImage from '../../assets/discovery-hero.png';
+import { fallbackCatalogImage } from '../../lib/localImages';
 
-const fallbackImage = 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg';
+const fallbackImage = fallbackCatalogImage;
 
 const filters = ['All', 'Plants', 'Care', 'Gifts'];
 const sorts = ['Latest', 'Price: Low', 'Price: High'];

@@ -6,7 +6,7 @@ import terracottaBenchBg from '../../../assets/bg (4).png';
 import lampCornerBg from '../../../assets/bg (5).png';
 
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
-const MODEL_VIEWER_SRC = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+const MODEL_VIEWER_SRC = '/vendor/model-viewer.min.js';
 const DEFAULT_CAMERA_ORBIT = '25deg 72deg 4m';
 const DEFAULT_FIELD_OF_VIEW = '11deg';
 const DEFAULT_MODEL_OFFSETS = { x: 0, y: 0 };

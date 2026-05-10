@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
+import { fallbackCatalogImage } from '../../lib/localImages';
 
 const InventoryTable = ({ products, loading, onRefresh }) => {
   const [holdings, setHoldings] = useState([]);
@@ -147,7 +148,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                   >
                     <td className="py-8 px-4 flex items-center gap-6">
                       <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                        <img src={item.images?.[0] || "https://images.unsplash.com/photo-1616046229478-9901c5536a45"} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.images?.[0] || fallbackCatalogImage} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div>
                         <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
