@@ -11,3 +11,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder'
 
 // Creating a single global client for the entire CHLORO application
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Connection verification log
+if (supabase) {
+  console.log('supabase connected')
+}

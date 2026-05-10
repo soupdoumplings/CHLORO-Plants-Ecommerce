@@ -1,214 +1,85 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import WateringReminderModal from '../../components/WateringReminderModal';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { parseEsewaResponse } from '../../lib/paymentUtils';
-import { supabase } from '../../supabase';
-
-const fallbackValue = 'Pending';
-
-const methodLabels = {
-  cod: 'Cash on Delivery',
-  esewa: 'eSewa',
-  khalti: 'Khalti',
-};
-
-const formatAmount = (amount) => {
-  if (amount === undefined || amount === null || amount === '' || amount === fallbackValue) {
-    return fallbackValue;
-  }
-
-  const normalized = Number(String(amount).replace(/,/g, ''));
-  if (Number.isNaN(normalized)) return String(amount);
-
-  return `रू ${normalized.toLocaleString('en-NP', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-};
-
-const getTransactionFromParams = (searchParams) => {
-  const esewaData = searchParams.get('data');
-  const khaltiPidx = searchParams.get('pidx');
-  const codOrderId = searchParams.get('order_id');
-  const method = searchParams.get('method');
-
-  if (esewaData) {
-    const parsed = parseEsewaResponse(esewaData);
-
-    if (parsed) {
-      return {
-        method: methodLabels.esewa,
-        transactionCode: parsed.transaction_code || parsed.transaction_uuid || fallbackValue,
-        orderReference: parsed.transaction_uuid || parsed.product_code || fallbackValue,
-        amount: parsed.total_amount || fallbackValue,
-        status: parsed.status || 'Complete',
-      };
-    }
-  }
-
-  if (khaltiPidx) {
-    const callbackAmount = searchParams.get('amount');
-    const amountInNpr = callbackAmount ? Number(callbackAmount) / 100 : fallbackValue;
-
-    return {
-      method: methodLabels.khalti,
-      transactionCode: searchParams.get('transaction_id') || khaltiPidx,
-      orderReference: searchParams.get('purchase_order_id') || fallbackValue,
-      amount: amountInNpr,
-      status: searchParams.get('status') || 'Complete',
-    };
-  }
-
-  if (method === 'cod' && codOrderId) {
-    return {
-      method: methodLabels.cod,
-      transactionCode: codOrderId,
-      orderReference: codOrderId,
-      amount: searchParams.get('amount') || fallbackValue,
-      status: 'Confirmed',
-    };
-  }
-
-  return {
-    method: 'Payment',
-    transactionCode: fallbackValue,
-    orderReference: fallbackValue,
-    amount: fallbackValue,
-    status: 'Confirmed',
-  };
-};
-
-const detailRows = (transaction) => [
-  ['Order Reference', transaction.orderReference],
-  ['Transaction ID', transaction.transactionCode],
-  ['Payment Method', transaction.method],
-  ['Amount', formatAmount(transaction.amount)],
-];
-
-const timelineSteps = [
-  {
-    icon: 'inventory_2',
-    title: 'Order received',
-    copy: 'Your botanical selection has entered our fulfilment queue.',
-  },
-  {
-    icon: 'local_florist',
-    title: 'Specimen check',
-    copy: 'Each item is inspected, cleaned, and packed for a safe handoff.',
-  },
-  {
-    icon: 'local_shipping',
-    title: 'Delivery update',
-    copy: 'Tracking or delivery details will be shared once dispatch begins.',
-  },
-];
+import { markVoucherAsUsed, checkAndAwardVoucher } from '../../lib/voucherUtils';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const { clearBag } = useCart();
-  const { user } = useAuth();
-  const [cartCleared, setCartCleared] = useState(false);
-  const [purchasedPlants, setPurchasedPlants] = useState([]);
-  const [reminderOpen, setReminderOpen] = useState(false);
-  const hasClearedCart = useRef(false);
-  const orderId = searchParams.get('order_id');
-
-  const transaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
+  const { session } = useAuth();
+  const [transactionData, setTransactionData] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [hasCleared, setHasCleared] = useState(false);
+  const [newVoucher, setNewVoucher] = useState(null);
 
   useEffect(() => {
-    let isMounted = true;
+    // Determine which payment gateway returned
+    const esewaData = searchParams.get('data');
+    const khaltiPidx = searchParams.get('pidx');
+    const codOrderId = searchParams.get('order_id');
+    const method = searchParams.get('method');
 
-    const clearPurchasedItems = async () => {
-      if (hasClearedCart.current) return;
-      hasClearedCart.current = true;
-      await clearBag();
-      if (isMounted) setCartCleared(true);
-    };
+    if (esewaData) {
+      const parsed = parseEsewaResponse(esewaData);
+      if (parsed) {
+        setTransactionData({
+          transactionCode: parsed.transaction_code || parsed.transaction_uuid,
+          amount: parsed.total_amount,
+          status: parsed.status || 'COMPLETE',
+          productCode: parsed.product_code,
+        });
+        setPaymentMethod('eSewa');
+      }
+    } else if (khaltiPidx) {
+      setTransactionData({
+        transactionCode: khaltiPidx,
+        amount: searchParams.get('amount') || '—',
+        status: searchParams.get('transaction_id') ? 'Completed' : 'Completed',
+        productCode: searchParams.get('purchase_order_id') || '—',
+      });
+      setPaymentMethod('Khalti');
+    } else if (method === 'cod' && codOrderId) {
+      setTransactionData({
+        transactionCode: codOrderId,
+        amount: searchParams.get('amount') || '—',
+        status: 'CONFIRMED',
+        productCode: 'COD',
+      });
+      setPaymentMethod('Cash on Delivery');
+    }
 
-    clearPurchasedItems();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [clearBag]);
-
-  useEffect(() => {
-    const loadPurchasedPlants = async () => {
-      if (!user || !orderId) return;
-
-      const { data, error } = await supabase
-        .from('order_items')
-        .select('product_id, product_name, products(id, name, images, water_frequency)')
-        .eq('order_id', orderId);
-
-      if (error || !data?.length) return;
-
-      const plants = data.map((item) => ({
-        id: item.products?.id || item.product_id,
-        name: item.products?.name || item.product_name,
-        images: item.products?.images || [],
-        water_frequency: item.products?.water_frequency || 'Every 7 Days',
-      })).filter((plant) => plant.id || plant.name);
-
-      setPurchasedPlants(plants);
-      setReminderOpen(plants.length > 0);
-    };
-
-    loadPurchasedPlants();
-  }, [orderId, user]);
-
-  useEffect(() => {
-    const reconcilePayment = async () => {
-      if (!user || !orderId) return;
-
-      const method = searchParams.get('method');
-      const isCod = method === 'cod';
-      const nextPaymentStatus = isCod ? 'pending' : 'completed';
-      const nextOrderStatus = isCod ? 'processing' : 'processing';
-      const reference = transaction.transactionCode === fallbackValue ? null : transaction.transactionCode;
-
-      const { error: orderError } = await supabase
-        .from('orders')
-        .update({
-          payment_status: nextPaymentStatus,
-          status: nextOrderStatus,
-          payment_reference: reference,
-        })
-        .eq('id', orderId)
-        .eq('user_id', user.id);
-
-      if (orderError) {
-        console.warn('Could not reconcile order payment status:', orderError.message);
+    // Process Voucher Logic
+    const processVouchers = async () => {
+      const appliedVoucherCode = searchParams.get('voucher_code');
+      if (appliedVoucherCode) {
+        await markVoucherAsUsed(appliedVoucherCode);
       }
 
-      const { error: paymentError } = await supabase
-        .from('payments')
-        .update({
-          status: nextPaymentStatus,
-          reference,
-          paid_at: nextPaymentStatus === 'completed' ? new Date().toISOString() : null,
-          metadata: {
-            success_callback: Object.fromEntries(searchParams.entries()),
-          },
-        })
-        .eq('order_id', orderId)
-        .eq('user_id', user.id);
-
-      if (paymentError) {
-        console.warn('Could not reconcile payment row:', paymentError.message);
+      if (cartItems.length > 0) {
+        const totalQty = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+        const awardedCode = await checkAndAwardVoucher(session?.user?.id, totalQty);
+        if (awardedCode) {
+          setNewVoucher(awardedCode);
+        }
       }
     };
 
-    reconcilePayment();
-  }, [orderId, searchParams, transaction.transactionCode, user]);
+    // Clear the cart once
+    if (!hasCleared) {
+      processVouchers().then(() => {
+        clearBag();
+        setHasCleared(true);
+      });
+    }
+  }, [searchParams, cartItems, session]);
 
   return (
-    <Motion.div
+    <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -217,168 +88,156 @@ const PaymentSuccess = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full page-shell page-gutter pt-16 lg:pt-24 pb-24 mt-[82px]">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch">
-          <Motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 bg-white border border-[#B0B0A8]/20 shadow-sm px-6 py-8 sm:p-10 lg:p-14 flex flex-col justify-between min-h-[640px]"
+      <main className="flex-grow flex items-center justify-center px-6 py-20 mt-[82px] lg:mt-[100px]">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-[560px] w-full text-center"
+        >
+          {/* Animated Checkmark */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="w-24 h-24 mx-auto mb-10 rounded-full bg-[#2F4F4F] flex items-center justify-center"
           >
-            <div>
-              <Motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="w-20 h-20 bg-[#0F3A3A] text-[#FBF9F4] flex items-center justify-center mb-10 shadow-sm"
-                aria-hidden="true"
-              >
-                <Motion.span
-                  initial={{ scale: 0.4, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.35, delay: 0.55 }}
-                  className="material-symbols-outlined text-[38px]"
-                >
-                  check
-                </Motion.span>
-              </Motion.div>
-
-              <Motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.35 }}
-                className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold mb-5"
-              >
-                Payment Successful
-              </Motion.p>
-
-              <Motion.h1
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="font-headline text-[clamp(2.5rem,7vw,5.75rem)] leading-[0.9] text-[#1A1A1A] mb-8 max-w-[760px]"
-              >
-                Your order is safely rooted.
-              </Motion.h1>
-
-              <Motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.6 }}
-                className="font-body text-[15px] sm:text-[16px] leading-relaxed text-[#5E6058] max-w-[560px] mb-10"
-              >
-                We have confirmed your order through {transaction.method}. A receipt and fulfilment
-                update will be sent shortly, and your bag has been cleared for your next curation.
-              </Motion.p>
-
-              <Motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.75 }}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#B0B0A8]/20 border border-[#B0B0A8]/20 mb-10"
-              >
-                {detailRows(transaction).map(([label, value]) => (
-                  <div key={label} className="bg-[#FBF9F4] p-5 min-h-[96px] flex flex-col justify-between">
-                    <span className="font-label text-[8px] tracking-[0.18em] uppercase text-[#6B6B6B] font-bold">
-                      {label}
-                    </span>
-                    <span className="font-headline text-[20px] text-[#1A1A1A] leading-tight break-words">
-                      {value}
-                    </span>
-                  </div>
-                ))}
-              </Motion.div>
-            </div>
-
-            <Motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.9 }}
-              className="flex flex-col sm:flex-row gap-3"
+            <motion.svg 
+              width="40" height="40" viewBox="0 0 40 40" 
+              fill="none"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
             >
-              <Link
-                to="/discovery"
-                className="bg-[#0F3A3A] text-[#FBF9F4] px-7 py-4 font-label text-[10px] tracking-[0.18em] uppercase font-bold hover:bg-[#1A2F2F] transition-colors text-center"
-              >
-                Continue Shopping
-              </Link>
-              <Link
-                to="/dashboard"
-                className="border border-[#1A1A1A] text-[#1A1A1A] px-7 py-4 font-label text-[10px] tracking-[0.18em] uppercase font-bold hover:bg-[#1A1A1A] hover:text-white transition-colors text-center"
-              >
-                View Dashboard
-              </Link>
-            </Motion.div>
-          </Motion.div>
-
-          <Motion.aside
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 flex flex-col gap-6"
-          >
-            <div className="relative min-h-[340px] lg:min-h-[430px] overflow-hidden bg-[#EDEBE4] border border-[#B0B0A8]/20">
-              <img
-                src="/orchid.jpg"
-                alt="Botanical arrangement prepared for delivery"
-                className="absolute inset-0 w-full h-full object-cover"
+              <motion.path 
+                d="M10 20L17 27L30 14" 
+                stroke="white" 
+                strokeWidth="3" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.6, delay: 1 }}
               />
-              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 bg-gradient-to-t from-[#0F3A3A]/95 via-[#0F3A3A]/55 to-transparent">
-                <p className="font-label text-[9px] tracking-[0.2em] uppercase text-[#C6E9E9] font-bold mb-2">
-                  Receipt Status
-                </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="bg-[#C6E9E9] text-[#244545] px-3 py-1.5 font-label text-[9px] tracking-[0.14em] uppercase font-bold">
-                    {transaction.status}
-                  </span>
-                  <span className="font-body text-[13px] text-[#FBF9F4]/80">
-                    {cartCleared ? 'Bag cleared' : 'Finalising receipt'}
+            </motion.svg>
+          </motion.div>
+
+          {/* Title */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="font-label text-[9px] tracking-[0.2em] uppercase text-[#C5A059] font-medium mb-4"
+          >
+            Order Confirmed
+          </motion.p>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="font-headline text-[clamp(2rem,4.5vw,3.5rem)] leading-[0.95] tracking-tight text-[#1A1A1A] mb-6"
+          >
+            Thank you for your curation.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="font-body text-[15px] text-[#6B6B6B] leading-relaxed mb-12 max-w-[420px] mx-auto"
+          >
+            Your order has been placed successfully{paymentMethod ? ` via ${paymentMethod}` : ''}. 
+            You will receive a confirmation email shortly.
+          </motion.p>
+
+          {/* Transaction Details Card */}
+          {transactionData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 1.1 }}
+              className="bg-white border border-[#B0B0A8]/20 p-8 mb-12 text-left shadow-sm"
+            >
+              <h3 className="font-label text-[9px] tracking-[0.2em] uppercase text-[#4A4A4A] font-bold mb-6">
+                Transaction Details
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-[#B0B0A8]/10 pb-3">
+                  <span className="font-label text-[9px] tracking-[0.1em] uppercase text-[#6B6B6B] font-medium">Transaction ID</span>
+                  <span className="font-body text-[13px] text-[#1A1A1A] font-medium">{transactionData.transactionCode}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-[#B0B0A8]/10 pb-3">
+                  <span className="font-label text-[9px] tracking-[0.1em] uppercase text-[#6B6B6B] font-medium">Amount</span>
+                  <span className="font-headline text-[16px] text-[#1A1A1A]">रू {transactionData.amount}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-[#B0B0A8]/10 pb-3">
+                  <span className="font-label text-[9px] tracking-[0.1em] uppercase text-[#6B6B6B] font-medium">Status</span>
+                  <span className="font-label text-[9px] tracking-[0.12em] uppercase bg-[#D2E7E4] text-[#2F4F4F] px-3 py-1.5 font-bold">
+                    {transactionData.status}
                   </span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-label text-[9px] tracking-[0.1em] uppercase text-[#6B6B6B] font-medium">Payment Method</span>
+                  <span className="font-body text-[13px] text-[#1A1A1A] font-medium">{paymentMethod}</span>
+                </div>
               </div>
-            </div>
+            </motion.div>
+          )}
 
-            <div className="bg-[#F3F1EA] border border-[#B0B0A8]/20 p-6 sm:p-8">
-              <h2 className="font-headline text-[28px] italic text-[#1A1A1A] mb-7">
-                What happens next
-              </h2>
-              <div className="space-y-7">
-                {timelineSteps.map((step, index) => (
-                  <div key={step.title} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <span className="material-symbols-outlined w-10 h-10 bg-white border border-[#B0B0A8]/20 text-[#0F3A3A] flex items-center justify-center text-[20px] shrink-0">
-                        {step.icon}
-                      </span>
-                      {index < timelineSteps.length - 1 && (
-                        <span className="w-px h-full min-h-[34px] bg-[#B0B0A8]/30 mt-3" />
-                      )}
-                    </div>
-                    <div className="pt-1">
-                      <h3 className="font-label text-[10px] tracking-[0.15em] uppercase text-[#1A1A1A] font-bold mb-2">
-                        {step.title}
-                      </h3>
-                      <p className="font-body text-[13px] leading-relaxed text-[#5E6058]">
-                        {step.copy}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+          {/* New Voucher Reward Card */}
+          {newVoucher && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+              className="bg-[#F3F8F2] border border-[#60BB46]/30 p-8 mb-12 text-center shadow-sm relative overflow-hidden"
+            >
+              <div className="absolute -right-4 -top-4 text-[#60BB46]/10 material-symbols-outlined" style={{ fontSize: '100px' }}>
+                loyalty
               </div>
-            </div>
-          </Motion.aside>
-        </section>
+              <h3 className="font-headline text-[22px] text-[#2C5E1D] mb-2 relative z-10">
+                You've earned a reward!
+              </h3>
+              <p className="font-body text-[#4A4A4A] text-[14px] mb-6 relative z-10">
+                Congratulations on your growing collection! Here is a special voucher for your next purchase.
+              </p>
+              <div className="bg-white border-2 border-dashed border-[#60BB46] py-4 px-6 inline-block rounded-md relative z-10">
+                <span className="font-label text-[14px] tracking-[0.2em] font-bold text-[#1A1A1A]">
+                  {newVoucher}
+                </span>
+              </div>
+              <p className="font-label text-[9px] tracking-[0.1em] uppercase text-[#6B6B6B] mt-4 relative z-10">
+                Save it for your next order
+              </p>
+            </motion.div>
+          )}
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link
+              to="/discovery"
+              className="bg-[#2F4F4F] text-white px-10 py-4 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A2F2F] transition-all duration-300 text-center"
+            >
+              Continue Shopping
+            </Link>
+            <Link
+              to="/dashboard"
+              className="border-2 border-[#1A1A1A] text-[#1A1A1A] px-10 py-4 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] hover:text-white transition-all duration-300 text-center"
+            >
+              View Dashboard
+            </Link>
+          </motion.div>
+        </motion.div>
       </main>
 
       <Footer />
-      <WateringReminderModal
-        open={reminderOpen}
-        onClose={() => setReminderOpen(false)}
-        user={user}
-        plants={purchasedPlants}
-        defaultFrequency={purchasedPlants[0]?.water_frequency || 'Every 7 Days'}
-        orderId={orderId}
-      />
-    </Motion.div>
+    </motion.div>
   );
 };
 

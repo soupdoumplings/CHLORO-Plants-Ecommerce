@@ -1,6 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const pageVariants = {
   initial: {
@@ -31,7 +30,7 @@ const pageVariants = {
 
 const PageTransition = ({ children, className = '' }) => {
   return (
-    <Motion.div
+    <motion.div
       variants={pageVariants}
       initial="initial"
       animate="animate"
@@ -39,7 +38,7 @@ const PageTransition = ({ children, className = '' }) => {
       className={className}
     >
       {children}
-    </Motion.div>
+    </motion.div>
   );
 };
 

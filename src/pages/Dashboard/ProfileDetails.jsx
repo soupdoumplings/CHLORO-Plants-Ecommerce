@@ -1,299 +1,249 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
+/**
+ * CHLORO — Admin Profile & Account Management
+ * Displays user profile data from Supabase Auth metadata
+ * and provides secure logout with redirection.
+ */
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
+import { supabase } from '../../supabase';
 import profileImg from '../../assets/profile-photo.png';
 import RecentOrders from './RecentOrders';
-import PreferenceSettings from '../../components/PreferenceSettings';
-import PlantRecommendations from '../../components/PlantRecommendations';
-import {
-  emptyBillingDetails,
-  emptyCustomerProfile,
-  formatAddress,
-  getAuthFullName,
-  getCustomerProfile,
-  upsertCustomerProfile,
-} from '../../lib/customerProfile';
-
-const inputClass = 'border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none transition-colors focus:border-[#1A1A1A]';
-
-const Field = ({ label, children }) => (
-  <div className="flex flex-col gap-2.5">
-    <label className="font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">
-      {label}
-    </label>
-    {children}
-  </div>
-);
 
 const ProfileDetails = () => {
+  // Extracting user session and signOut function from AuthContext
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-  const [avatar, setAvatar] = useState(user?.user_metadata?.avatar_url || profileImg);
-  const [profile, setProfile] = useState(emptyCustomerProfile);
-  const [billing, setBilling] = useState(emptyBillingDetails);
-  const [loading, setLoading] = useState(true);
+
+  const [localName, setLocalName] = useState(user?.user_metadata?.full_name || '');
+  const [localAvatar, setLocalAvatar] = useState(user?.user_metadata?.avatar_url || profileImg);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    let active = true;
-
-    const loadProfile = async () => {
-      if (!user) return;
-      setLoading(true);
-      setError('');
-
-      try {
-        const result = await getCustomerProfile(user);
-        if (!active) return;
-        const nextProfile = {
-          ...emptyCustomerProfile,
-          full_name: getAuthFullName(user),
-          username: user.email?.split('@')?.[0] || '',
-          phone: user.user_metadata?.phone || '',
-          ...(result.profile || {}),
-        };
-        const nextBilling = {
-          ...emptyBillingDetails,
-          full_name: nextProfile.full_name,
-          email: user.email || '',
-          phone: nextProfile.phone,
-          address_line: nextProfile.address_line,
-          city: nextProfile.city,
-          country: nextProfile.country || 'Nepal',
-          postal_code: nextProfile.postal_code,
-          ...(result.billing || {}),
-        };
-        setProfile(nextProfile);
-        setBilling(nextBilling);
-      } catch (err) {
-        setError(err.message || 'Could not load your saved details.');
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    loadProfile();
-
-    return () => {
-      active = false;
-    };
+    if (user?.user_metadata?.full_name) setLocalName(user.user_metadata.full_name);
+    if (user?.user_metadata?.avatar_url) setLocalAvatar(user.user_metadata.avatar_url);
   }, [user]);
 
-  useEffect(() => {
-    if (user?.user_metadata?.avatar_url) setAvatar(user.user_metadata.avatar_url);
-  }, [user]);
+  const email = user?.email || '';
 
-  const updateProfile = (field, value) => {
-    setProfile((current) => ({ ...current, [field]: value }));
-    if (['full_name', 'phone', 'address_line', 'city', 'country', 'postal_code'].includes(field)) {
-      setBilling((current) => ({
-        ...current,
-        [field === 'address_line' ? 'address_line' : field]: value,
-        full_name: field === 'full_name' ? value : current.full_name,
-        phone: field === 'phone' ? value : current.phone,
-      }));
-    }
-  };
-
+  // Secure logout handler with error handling and redirection
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/login');
+      navigate('/login'); // Redirect to login page after logout
     } catch (err) {
-      setError(err.message || 'Logout failed.');
+      console.error('Logout failed:', err);
     }
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > 360) {
-          height = Math.round((height * 360) / width);
-          width = 360;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        setAvatar(canvas.toDataURL('image/jpeg', 0.65));
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > 300) { height = Math.round((height * 300) / width); width = 300; }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          setLocalAvatar(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.src = reader.result;
       };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveProfile = async () => {
     if (!user) return;
     setIsSaving(true);
-    setError('');
-    setMessage('');
-
     try {
-      await upsertCustomerProfile({
-        user,
-        profile: {
-          ...profile,
-          avatar_url: avatar,
-        },
-        billing: {
-          ...billing,
-          full_name: profile.full_name,
-          phone: profile.phone,
-          email: user.email || billing.email,
-          address_line: billing.address_line || profile.address_line,
-          city: billing.city || profile.city,
-          country: billing.country || profile.country,
-          postal_code: billing.postal_code || profile.postal_code,
-        },
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: localName, avatar_url: localAvatar }
       });
-      setMessage('Profile and billing details saved.');
+      if (error) throw error;
+      
+      // Update users table silently if exists
+      await supabase.from('users').update({ name: localName }).eq('id', user.id);
     } catch (err) {
-      setError(err.message || 'Could not save profile.');
+      console.error('Error saving profile:', err.message);
     } finally {
       setIsSaving(false);
     }
   };
 
+
   return (
-    <Motion.section
+    <motion.section
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-20"
+      className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start"
     >
-      <div className="flex flex-col gap-8 lg:col-span-4 xl:col-span-3">
-        <div className="group relative aspect-[4/5] w-full overflow-hidden bg-[#EDEBE4]">
+      {/* ── Left Column: Photo + Curator Status ── */}
+      <div className="lg:col-span-4 xl:col-span-3 flex flex-col gap-8">
+        {/* Profile Photo */}
+        <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#EDEBE4] group">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-          <img src={avatar} alt="Member profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center bg-white/85 shadow-sm backdrop-blur-sm transition-colors hover:bg-white"
-            aria-label="Upload profile photo"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#4A4A4A]">photo_camera</span>
+          <img
+            src={localAvatar}
+            alt="Member profile"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          />
+          {/* Camera overlay button */}
+          <button onClick={handleImageClick} className="absolute bottom-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all duration-300 group/btn">
+            <span className="material-symbols-outlined text-[18px] text-[#4A4A4A] group-hover/btn:text-[#1A1A1A] transition-colors">
+              photo_camera
+            </span>
           </button>
         </div>
 
-        <div className="bg-[#EDEBE4] p-7 lg:p-8">
-          <h3 className="mb-4 font-headline text-[22px] leading-snug text-[#1A1A1A]">Saved Checkout</h3>
-          <p className="mb-6 font-body text-[12px] leading-relaxed text-[#6B6B6B]">
-            These details are reused during checkout so returning customers do not retype billing information.
+        {/* Curator Status Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-[#EDEBE4] p-7 lg:p-8 w-full"
+        >
+          <h3 className="font-headline text-[20px] text-[#1A1A1A] mb-4 leading-snug">
+            Curator Status
+          </h3>
+          <p className="font-body text-[12px] text-[#6B6B6B] leading-relaxed mb-6">
+            You have been part of Chloro for two seasons. Your botanical collection has reached{' '}
+            <span className="text-[#1A1A1A] font-medium">'Lite Bloom'</span> status.
           </p>
-          <div className="border-t border-[#B0B0A8]/25 pt-4">
-            <p className="font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#6B6B6B]">Default address</p>
-            <p className="mt-2 font-body text-sm leading-6 text-[#31332C]">
-              {formatAddress({
-                address_line: profile.address_line,
-                city: profile.city,
-                country: profile.country,
-                postal_code: profile.postal_code,
-              }) || 'Not saved yet'}
-            </p>
+          <div className="flex justify-between items-center pt-4 border-t border-[#B0B0A8]/20">
+            <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-semibold">
+              Points
+            </span>
+            <span className="font-headline text-[18px] text-[#C5A059] tracking-tight">
+              1,490
+            </span>
           </div>
-          <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
-            My Orders
-            <span className="material-symbols-outlined text-[16px]">east</span>
-          </Link>
-        </div>
+        </motion.div>
       </div>
 
+      {/* ── Right Column: Personal Details Form ── */}
       <div className="lg:col-span-8 xl:col-span-9">
-        <Motion.div
+        <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="border border-[#B0B0A8]/15 bg-white p-8 shadow-sm lg:p-12 xl:p-14"
+          className="bg-white p-8 lg:p-12 xl:p-14 border border-[#B0B0A8]/15 shadow-sm"
         >
-          <div className="mb-9 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="font-headline text-[30px] leading-none text-[#1A1A1A] lg:text-[34px]">Profile & Billing</h2>
-              <p className="mt-3 font-body text-[13px] text-[#6B6B6B]">
-                Edit saved account and checkout details.
-              </p>
+          <h2 className="font-headline text-[28px] lg:text-[32px] text-[#1A1A1A] mb-2 leading-none">
+            Personal Details
+          </h2>
+          <p className="font-body text-[13px] text-[#6B6B6B] mb-10">
+            Update your identity and botanical preferences.
+          </p>
+
+          {/* Form Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Full Name */}
+            <div className="flex flex-col gap-2.5">
+              <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={localName}
+                onChange={(e) => setLocalName(e.target.value)}
+                className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+              />
             </div>
-            <Link to="/wishlist" className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#785A1A] underline underline-offset-4">
-              Open Wishlist
-            </Link>
+
+            {/* Email Address */}
+            <div className="flex flex-col gap-2.5">
+              <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+                Email Address
+              </label>
+              <input
+                type="email"
+                defaultValue={email}
+                className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+                disabled
+              />
+            </div>
+
+            {/* Location */}
+            <div className="flex flex-col gap-2.5">
+              <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+                Location
+              </label>
+              <input
+                type="text"
+                defaultValue="London, United Kingdom"
+                className="border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+              />
+            </div>
+
+            {/* Botanical Interest */}
+            <div className="flex flex-col gap-2.5">
+              <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+                Botanical Interest
+              </label>
+              <div className="relative">
+                <select
+                  defaultValue="tropical"
+                  className="w-full appearance-none border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors cursor-pointer pr-8"
+                >
+                  <option value="tropical">Tropical &amp; Lush</option>
+                  <option value="arid">Arid &amp; Sculptural</option>
+                  <option value="temperate">Temperate &amp; Seasonal</option>
+                  <option value="rare">Rare Specimens</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-1 top-1/2 -translate-y-1/2 text-[16px] text-[#B0B0A8] pointer-events-none">
+                  expand_more
+                </span>
+              </div>
+            </div>
           </div>
 
-          {loading ? (
-            <div className="py-10 font-label text-[10px] uppercase tracking-[0.2em] text-[#5E6058]">Loading profile...</div>
-          ) : (
-            <>
-              <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-                <Field label="Full Name">
-                  <input type="text" value={profile.full_name || ''} onChange={(e) => updateProfile('full_name', e.target.value)} className={inputClass} autoComplete="name" />
-                </Field>
-                <Field label="Username">
-                  <input type="text" value={profile.username || ''} onChange={(e) => updateProfile('username', e.target.value)} className={inputClass} autoComplete="username" />
-                </Field>
-                <Field label="Email Address">
-                  <input type="email" value={user?.email || billing.email || ''} className={`${inputClass} opacity-65`} disabled />
-                </Field>
-                <Field label="Phone Number">
-                  <input type="tel" value={profile.phone || ''} onChange={(e) => updateProfile('phone', e.target.value)} className={inputClass} autoComplete="tel" />
-                </Field>
-                <Field label="Address">
-                  <input type="text" value={profile.address_line || ''} onChange={(e) => updateProfile('address_line', e.target.value)} className={inputClass} autoComplete="shipping street-address" />
-                </Field>
-                <Field label="City">
-                  <input type="text" value={profile.city || ''} onChange={(e) => updateProfile('city', e.target.value)} className={inputClass} autoComplete="shipping address-level2" />
-                </Field>
-                <Field label="Country">
-                  <input type="text" value={profile.country || ''} onChange={(e) => updateProfile('country', e.target.value)} className={inputClass} autoComplete="shipping country-name" />
-                </Field>
-                <Field label="Postal Code">
-                  <input type="text" value={profile.postal_code || ''} onChange={(e) => updateProfile('postal_code', e.target.value)} className={inputClass} autoComplete="shipping postal-code" />
-                </Field>
-              </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-6 mt-4">
+            <motion.button
+              onClick={handleSaveProfile}
+              disabled={isSaving}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className={`${isSaving ? 'opacity-50' : 'opacity-100'} bg-[#4A4A4A] text-[#F9F7F2] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] transition-all duration-300 shadow-sm`}
+            >
+              {isSaving ? 'Saving...' : 'Save Profile Changes'}
+            </motion.button>
 
-              {(message || error) && (
-                <div className={`mb-6 border px-4 py-3 font-body text-[13px] ${error ? 'border-[#D94F4F]/20 bg-[#FAF2F2] text-[#9F403D]' : 'border-[#C6E9E9] bg-[#C6E9E9]/25 text-[#244545]'}`}>
-                  {error || message}
-                </div>
-              )}
+            <motion.button
+              onClick={handleLogout}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="border border-[#B0B0A8]/40 text-[#6B6B6B] py-4 px-10 font-label text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-[#1A1A1A] hover:text-[#F9F7F2] hover:border-[#1A1A1A] transition-all duration-300"
+            >
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[14px]">logout</span>
+                Sign Out
+              </span>
+            </motion.button>
+          </div>
+        </motion.div>
 
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Motion.button
-                  onClick={handleSaveProfile}
-                  disabled={isSaving}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="bg-[#4A4A4A] px-8 py-4 font-label text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F9F7F2] shadow-sm transition-colors hover:bg-[#1A1A1A] disabled:opacity-50"
-                >
-                  {isSaving ? 'Saving...' : 'Save Details'}
-                </Motion.button>
-                <Motion.button
-                  onClick={handleLogout}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="border border-[#B0B0A8]/40 px-8 py-4 font-label text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F7F2]"
-                >
-                  Sign Out
-                </Motion.button>
-              </div>
-            </>
-          )}
-        </Motion.div>
-
-        <PreferenceSettings />
-        <PlantRecommendations surface="dashboard" />
+        {/* Tabbed Orders Section underneath Personal Details */}
         <RecentOrders />
       </div>
-    </Motion.section>
+    </motion.section>
   );
 };
 

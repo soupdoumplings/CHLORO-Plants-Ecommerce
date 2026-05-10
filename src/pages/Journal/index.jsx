@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion as Motion } from 'framer-motion';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { fetchPlantDetail, searchPlantNames } from '../../lib/kindwise';
@@ -7,21 +7,21 @@ import { fetchPlantDetail, searchPlantNames } from '../../lib/kindwise';
 const topicCards = [
   {
     title: 'Watering',
-    description: 'Moisture notes translated into calm, usable care rhythm.',
+    description: 'Personalized watering range from Kindwise so users know how dry or wet a plant likes to stay.',
     entries: 'Live API Data',
     icon: 'water_drop',
     featured: false,
   },
   {
     title: 'Humidity',
-    description: 'Atmosphere guidance for rooms, balconies, and seasonal shifts.',
+    description: 'Simple humidity guidance generated from plant moisture preference to help prevent crispy leaves.',
     entries: 'Smart Estimate',
     icon: 'humidity_percentage',
     featured: false,
   },
   {
     title: 'Propagation',
-    description: 'Propagation methods shaped into a neat studio reference.',
+    description: 'Shows how to multiply your plant (cuttings, seeds, division) when the data exists.',
     entries: 'Care Ready',
     icon: 'compost',
     featured: true,
@@ -42,8 +42,6 @@ const quickAnswers = [
     a: 'Humidity in this page is a practical estimate based on watering preference to keep guidance easy for users.',
   },
 ];
-
-const editorialSearches = ['monstera', 'orchid', 'ficus', 'aloe vera'];
 
 const mapMoisture = (value) => {
   if (value <= 1) return 'Dry';
@@ -218,52 +216,37 @@ const JournalPage = () => {
   const apiKeyMissing = !import.meta.env.VITE_KINDWISE_API_KEY;
 
   return (
-    <Motion.div
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="min-h-screen bg-[#F7F3EA] text-[#11110E]"
+      className="min-h-screen bg-[#F4F2EC] text-[#1D241F]"
     >
       <Navbar />
 
-      <main className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-5 pb-20 pt-[116px] lg:grid-cols-[320px_1fr] lg:px-10">
-        <aside className="h-fit pr-0 lg:sticky lg:top-[112px] lg:border-r lg:border-[#11110E]/10 lg:pr-8">
+      <main className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-8 px-5 pb-12 pt-[114px] lg:grid-cols-[250px_1fr] lg:px-8">
+        <aside className="pr-6 lg:border-r lg:border-[#1D241F]/10">
           <div className="space-y-2">
-            <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#8A6A21]">CHLORO Journal</p>
-            <p className="font-headline text-[42px] leading-[0.88] text-[#11110E]">The Botanical Index</p>
-            <p className="max-w-[260px] font-body text-[13px] leading-relaxed text-[#6E6A60]">
-              Live plant intelligence, edited into a quiet care reference.
-            </p>
+            <p className="font-headline text-[24px] text-[#1D241F]">Plant Wiki Journal</p>
+            <p className="font-label text-[10px] uppercase tracking-[0.2em] text-[#1D241F]/45">Kindwise Plant.id Live Data</p>
           </div>
 
           <div className="mt-10">
-            <label className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Search plant name</label>
-            <div className="mt-3 flex items-center gap-2 border border-[#11110E]/15 bg-[#FFFEFA] px-4 py-3">
-              <span className="material-symbols-outlined text-[18px] text-[#11110E]/65">search</span>
+            <label className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">Search plant name</label>
+            <div className="mt-3 flex items-center gap-2 border border-[#1D241F]/15 bg-[#F8F6F1] px-3 py-2">
+              <span className="material-symbols-outlined text-[18px] text-[#1D241F]/65">search</span>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Try: aloe vera"
-                className="w-full bg-transparent font-body text-[13px] text-[#11110E] outline-none placeholder:text-[#11110E]/35"
+                className="w-full bg-transparent font-body text-[13px] text-[#1D241F] outline-none placeholder:text-[#1D241F]/40"
               />
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {editorialSearches.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => setQuery(item)}
-                  className="border border-[#11110E]/12 bg-[#EFEAE0] px-3 py-2 text-left font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#6E6A60] transition-colors hover:border-[#11110E] hover:bg-[#FFFEFA]"
-                >
-                  {item}
-                </button>
-              ))}
             </div>
           </div>
 
           <div className="mt-8 space-y-2">
-            <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Matches</p>
+            <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">Matches</p>
             <div className="max-h-[380px] space-y-2 overflow-auto pr-1">
               {visibleResults.map((item) => {
                 const active = item.access_token === selectedToken;
@@ -271,65 +254,60 @@ const JournalPage = () => {
                   <button
                     key={item.access_token}
                     onClick={() => setSelectedToken(item.access_token)}
-                    className={`w-full border px-4 py-3 text-left transition-colors duration-300 ${
+                    className={`w-full border px-3 py-2 text-left transition-colors ${
                       active
-                        ? 'border-[#11110E] bg-[#11110E] text-[#F7F3EA]'
-                        : 'border-[#11110E]/12 bg-[#FFFEFA] text-[#11110E] hover:border-[#11110E]/40'
+                        ? 'border-[#1E5B5B] bg-[#1E5B5B] text-[#F4F2EC]'
+                        : 'border-[#1D241F]/12 bg-[#F8F6F1] text-[#1D241F] hover:border-[#1D241F]/30'
                     }`}
                   >
-                    <p className="font-headline text-[24px] leading-none">{item.entity_name}</p>
+                    <p className="font-headline text-[20px] leading-none">{item.entity_name}</p>
                     <p className={`mt-1 font-label text-[9px] uppercase tracking-[0.15em] ${active ? 'text-[#F4F2EC]/75' : 'text-[#1D241F]/45'}`}>
-                      indexed by {item.matched_in_type || 'name'}
+                      match: {item.matched_in_type || 'name'}
                     </p>
                   </button>
                 );
               })}
 
               {!searchLoading && !visibleResults.length && (
-                <p className="font-body text-[12px] text-[#11110E]/60">No items found.</p>
+                <p className="font-body text-[12px] text-[#1D241F]/60">No items found.</p>
               )}
             </div>
           </div>
 
-          <div className="mt-8 border border-[#11110E]/12 bg-[#FFFEFA] p-5">
-            <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Status</p>
+          <div className="mt-8 border border-[#1D241F]/12 bg-[#F8F6F1] p-4">
+            <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">Status</p>
             {apiKeyMissing && (
               <p className="mt-2 font-body text-[12px] leading-5 text-[#9F403D]">
                 Missing `VITE_KINDWISE_API_KEY` in `.env`.
               </p>
             )}
-            {!apiKeyMissing && searchLoading && <p className="mt-2 font-body text-[12px] text-[#11110E]/65">Searching Kindwise...</p>}
-            {!apiKeyMissing && detailLoading && <p className="mt-2 font-body text-[12px] text-[#11110E]/65">Loading care details...</p>}
+            {!apiKeyMissing && searchLoading && <p className="mt-2 font-body text-[12px] text-[#1D241F]/65">Searching Kindwise...</p>}
+            {!apiKeyMissing && detailLoading && <p className="mt-2 font-body text-[12px] text-[#1D241F]/65">Loading care details...</p>}
             {searchError && <p className="mt-2 font-body text-[12px] text-[#9F403D]">{searchError}</p>}
             {detailError && <p className="mt-2 font-body text-[12px] text-[#9F403D]">{detailError}</p>}
           </div>
         </aside>
 
-        <section className="space-y-16">
-          <Motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="border-b border-[#11110E]/15 pb-7"
-          >
-            <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#8A6A21]">Dynamic Plant Wiki</p>
-            <h1 className="mt-5 max-w-[980px] font-headline text-[62px] leading-[0.84] text-[#11110E] md:text-[104px]">{selected.title}</h1>
-            <p className="mt-5 font-body text-[15px] text-[#6E6A60]">{selected.commonNames}</p>
-          </Motion.div>
+        <section className="space-y-14 lg:space-y-18">
+          <div className="border-b border-[#1D241F]/15 pb-5">
+            <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#1D241F]/45">Dynamic Plant Wiki</p>
+            <h1 className="mt-4 font-headline text-[48px] leading-[0.92] text-[#1D241F] md:text-[70px]">{selected.title}</h1>
+            <p className="mt-3 font-body text-[15px] text-[#1D241F]/70">{selected.commonNames}</p>
+          </div>
 
           <div className="grid gap-8 xl:grid-cols-[1fr_360px]">
-            <article className="border border-[#11110E]/10 bg-[#FFFEFA] p-7 md:p-10">
-              <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">About this plant</p>
-              <p className="mt-6 font-body text-[15px] leading-8 text-[#4F4B43]">{selected.description}</p>
+            <article className="border border-[#1D241F]/10 bg-[#F8F6F1] p-7 md:p-8">
+              <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">About this plant</p>
+              <p className="mt-5 font-body text-[14px] leading-7 text-[#1D241F]/72">{selected.description}</p>
 
               <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
-                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Taxonomic rank</p>
-                  <p className="mt-2 font-headline text-[31px] leading-none text-[#11110E] capitalize">{selected.rank}</p>
+                <div className="border border-[#1D241F]/10 bg-[#F4F2EC] p-4">
+                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">Taxonomic rank</p>
+                  <p className="mt-2 font-headline text-[26px] leading-none text-[#1D241F] capitalize">{selected.rank}</p>
                 </div>
-                <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
-                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Family</p>
-                  <p className="mt-2 font-headline text-[31px] leading-none text-[#11110E]">{selected.taxonomy.family || 'Unknown'}</p>
+                <div className="border border-[#1D241F]/10 bg-[#F4F2EC] p-4">
+                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#1D241F]/45">Family</p>
+                  <p className="mt-2 font-headline text-[26px] leading-none text-[#1D241F]">{selected.taxonomy.family || 'Unknown'}</p>
                 </div>
               </div>
 
@@ -338,7 +316,7 @@ const JournalPage = () => {
                   href={selected.wikiUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-7 inline-flex items-center gap-2 border-b border-[#8A6A21] pb-1 font-label text-[10px] uppercase tracking-[0.2em] text-[#8A6A21] hover:opacity-70"
+                  className="mt-7 inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-[#785A1A] hover:opacity-70"
                 >
                   Open source article
                   <span className="material-symbols-outlined text-[16px]">open_in_new</span>
@@ -347,26 +325,26 @@ const JournalPage = () => {
             </article>
 
             {selected.heroImage ? (
-              <img src={selected.heroImage} alt={selected.title} className="h-[470px] w-full object-cover grayscale-[18%]" />
+              <img src={selected.heroImage} alt={selected.title} className="h-[430px] w-full object-cover" />
             ) : (
-              <div className="flex h-[470px] items-center justify-center border border-[#11110E]/10 bg-[#EFEAE0]">
-                <p className="font-body text-[13px] text-[#11110E]/55">No image returned by API for this plant.</p>
+              <div className="flex h-[430px] items-center justify-center border border-[#1D241F]/10 bg-[#ECE9E1]">
+                <p className="font-body text-[13px] text-[#1D241F]/55">No image returned by API for this plant.</p>
               </div>
             )}
           </div>
 
           <section>
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-[#11110E]/10 pb-6">
-              <h2 className="font-headline text-[48px] italic text-[#11110E] md:text-[62px]">Care Snapshot</h2>
-              <p className="font-label text-[10px] tracking-[0.16rem] uppercase text-[#6E6A60] font-bold">Highlighted from API</p>
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-[#B1B3A9]/10 pb-6">
+              <h2 className="font-headline text-[40px] italic text-[#31332C] md:text-[52px]">Care Snapshot</h2>
+              <p className="font-label text-[10px] tracking-[0.12rem] uppercase text-[#5E6058] font-bold">Highlighted from API</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-0 border-l border-[#11110E]/10 md:grid-cols-3">
-              <article className="border-r border-[#11110E]/10 bg-[#F8F5EE] p-10">
-                <span className="material-symbols-outlined text-[#8A6A21] text-3xl">water_drop</span>
+            <div className="grid grid-cols-1 gap-0 border-l border-[#B1B3A9]/10 md:grid-cols-3">
+              <article className="border-r border-[#B1B3A9]/10 bg-[#F5F4ED] p-10">
+                <span className="material-symbols-outlined text-[#785A1A] text-3xl">water_drop</span>
                 <h3 className="mt-4 font-label text-xs uppercase tracking-[0.15rem] font-black text-[#31332C]">Water Level</h3>
-                <p className="mt-4 font-headline text-[40px] leading-none text-[#11110E]">{wateringLabel(selected.watering)}</p>
-                <p className="mt-4 font-body text-sm leading-relaxed text-[#6E6A60]">{waterRetentionHint(selected.watering)}</p>
+                <p className="mt-4 font-headline text-[34px] leading-none text-[#1D241F]">{wateringLabel(selected.watering)}</p>
+                <p className="mt-4 font-body text-sm leading-relaxed text-[#5E6058]">{waterRetentionHint(selected.watering)}</p>
                 <div className="mt-5 flex items-center gap-2">
                   {[1, 2, 3].map((level) => (
                     <span
@@ -379,14 +357,14 @@ const JournalPage = () => {
                 </div>
               </article>
 
-              <article className="border-r border-[#11110E]/10 bg-[#EDE8DC] p-10">
-                <span className="material-symbols-outlined text-[#8A6A21] text-3xl">humidity_percentage</span>
+              <article className="border-r border-[#B1B3A9]/10 bg-[#E8E9E0] p-10">
+                <span className="material-symbols-outlined text-[#785A1A] text-3xl">humidity_percentage</span>
                 <h3 className="mt-4 font-label text-xs uppercase tracking-[0.15rem] font-black text-[#31332C]">Humidity Hint</h3>
-                <p className="mt-4 font-headline text-[40px] leading-none text-[#11110E]">{humidityHint(selected.watering)}</p>
-                <p className="mt-4 font-body text-sm leading-relaxed text-[#6E6A60]">Based on Kindwise watering range so users can act quickly.</p>
+                <p className="mt-4 font-headline text-[34px] leading-none text-[#1D241F]">{humidityHint(selected.watering)}</p>
+                <p className="mt-4 font-body text-sm leading-relaxed text-[#5E6058]">Based on Kindwise watering range so users can act quickly.</p>
               </article>
 
-              <article className="bg-[#11110E] p-10 text-[#F7F3EA]">
+              <article className="bg-[#2B6161] p-10 text-[#F4F2EC]">
                 <span className="material-symbols-outlined text-3xl">compost</span>
                 <h3 className="mt-4 font-label text-xs uppercase tracking-[0.15rem] font-black">Propagation</h3>
                 {selected.propagation.length ? (
@@ -482,7 +460,7 @@ const JournalPage = () => {
       </main>
 
       <Footer />
-    </Motion.div>
+    </motion.div>
   );
 };
 

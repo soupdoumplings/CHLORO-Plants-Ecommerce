@@ -1,93 +1,90 @@
-import React, { useMemo } from 'react';
-import { motion as Motion } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 
-const money = (value) => `रू ${Number(value || 0).toLocaleString('en-NP', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})}`;
 
-const isCurrentMonth = (value) => {
-  if (!value) return false;
-  const date = new Date(value);
-  const now = new Date();
-  return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-};
 
-const MetricsGrid = ({ orders = [], loading }) => {
-  const metrics = useMemo(() => {
-    const completedOrders = orders.filter((order) => order.payment_status === 'completed');
-    const pendingOrders = orders.filter((order) => order.payment_status === 'pending');
-    const cancelledOrders = orders.filter((order) => (
-      order.status === 'cancelled'
-      || ['cancelled', 'refunded', 'failed'].includes(order.payment_status)
-    ));
-    const monthlyOrders = completedOrders.filter((order) => isCurrentMonth(order.created_at));
+const MetricsGrid = ({ products, loading }) => {
+  // Calculations
+  const totalValue = products.reduce((acc, p) => acc + (parseFloat(p.price) * (p.stock || 0)), 0);
+  const activeCount = products.filter(p => p.is_active).length;
+  const criticalCount = products.filter(p => (p.stock || 0) < 10).length;
+  const velocity = products.length > 0 ? Math.round((activeCount / products.length) * 100) : 0;
 
-    const totalRevenue = completedOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-    const pendingPayments = pendingOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-    const cancelledValue = cancelledOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-    const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-
-    return [
-      {
-        label: 'Total Revenue',
-        value: money(totalRevenue),
-        helper: `${completedOrders.length} completed payment${completedOrders.length === 1 ? '' : 's'}`,
-        icon: 'payments',
-        tone: 'text-[#31332C]',
-      },
-      {
-        label: 'Pending Payments',
-        value: money(pendingPayments),
-        helper: `${pendingOrders.length} awaiting settlement`,
-        icon: 'pending_actions',
-        tone: 'text-[#785A1A]',
-      },
-      {
-        label: 'Monthly Revenue',
-        value: money(monthlyRevenue),
-        helper: `${monthlyOrders.length} paid order${monthlyOrders.length === 1 ? '' : 's'} this month`,
-        icon: 'monitoring',
-        tone: 'text-[#2F4F4F]',
-      },
-      {
-        label: 'Refunded / Cancelled',
-        value: money(cancelledValue),
-        helper: `${cancelledOrders.length} order${cancelledOrders.length === 1 ? '' : 's'} affected`,
-        icon: 'undo',
-        tone: 'text-[#9F403D]',
-      },
-    ];
-  }, [orders]);
+  const data = [
+    {
+      label: 'Total Catalog Value',
+      value: loading ? '...' : `रू ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      extra: (
+        <div className="flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+          <span className="material-symbols-outlined text-[#456565] text-sm font-bold">trending_up</span>
+          <p className="font-label text-xs font-bold text-[#456565] tracking-tight uppercase">+8.4% last quarter</p>
+        </div>
+      ),
+      valueColor: 'text-[#31332C]',
+    },
+    {
+      label: 'Active Listings',
+      value: loading ? '...' : activeCount.toString(),
+      extra: (
+        <div className="flex items-center gap-2 text-[#5E6058]">
+          <span className="material-symbols-outlined text-sm font-bold opacity-60">inventory_2</span>
+          <p className="font-label text-xs font-medium tracking-tight uppercase opacity-80">Distribution: Global</p>
+        </div>
+      ),
+      valueColor: 'text-[#31332C]',
+    },
+    {
+      label: 'Critical Stock',
+      value: loading ? '...' : criticalCount.toString().padStart(2, '0'),
+      extra: (
+        <div className="flex items-center gap-2 text-[#9F403D]">
+          <span className="material-symbols-outlined text-sm font-bold animate-pulse">report</span>
+          <p className="font-label text-xs font-bold tracking-tight uppercase">Low inventory alert</p>
+        </div>
+      ),
+      valueColor: 'text-[#9F403D]',
+    },
+    {
+      label: 'Curation Velocity',
+      value: loading ? '...' : `${velocity}%`,
+      extra: (
+        <div className="w-full bg-[#EFEEE6] h-1 relative rounded-full overflow-hidden">
+           <motion.div 
+             initial={{ width: 0 }}
+             animate={{ width: loading ? 0 : `${velocity}%` }}
+             viewport={{ once: true }}
+             transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+             className="absolute left-0 top-0 bottom-0 bg-[#785A1A] group-hover:opacity-80"
+           />
+        </div>
+      ),
+      valueColor: 'text-[#31332C]',
+    },
+  ];
 
   return (
-    <section className="mb-16 grid w-full grid-cols-1 border-l border-t border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5 sm:grid-cols-2 lg:mb-24 lg:grid-cols-4">
-      {metrics.map((metric, index) => (
-        <Motion.div
-          key={metric.label}
+    <section className="mb-24 px-12 max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-[#B1B3A9]/20 bg-white shadow-2xl shadow-black/5">
+      {data.map((metric, i) => (
+        <motion.div 
+          key={i}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="group border-b border-r border-[#B1B3A9]/20 p-6 transition-colors hover:bg-[#FBF9F4] md:p-8 lg:p-10"
+          transition={{ duration: 0.7, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className={`p-10 group hover:bg-[#FBF9F4] transition-colors ${i < 3 ? 'border-b lg:border-b-0 lg:border-r border-[#B1B3A9]/20' : ''}`}
         >
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <p className="font-label text-[10px] uppercase tracking-[0.2em] text-[#5E6058]">{metric.label}</p>
-            <span className={`material-symbols-outlined text-[20px] ${metric.tone}`}>{metric.icon}</span>
-          </div>
-          <Motion.h3
-            initial={{ opacity: 0, scale: 0.94 }}
+          <p className="font-label text-xs tracking-widest text-[#5E6058] uppercase mb-4">{metric.label}</p>
+          <motion.h3 
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className={`mb-5 truncate font-headline text-[34px] tracking-tight md:text-[40px] ${metric.tone}`}
+            transition={{ duration: 0.5, delay: 0.3 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className={`font-headline text-5xl ${metric.valueColor} mb-6 tracking-tight`}
           >
-            {loading ? '...' : metric.value}
-          </Motion.h3>
-          <p className="font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#5E6058]/75">
-            {loading ? 'Reading database' : metric.helper}
-          </p>
-        </Motion.div>
+            {metric.value}
+          </motion.h3>
+          {metric.extra}
+        </motion.div>
       ))}
     </section>
   );

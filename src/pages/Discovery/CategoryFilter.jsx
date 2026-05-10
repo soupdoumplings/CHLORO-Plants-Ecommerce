@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const sortOptions = ['Latest', 'Price: Low to High', 'Price: High to Low', 'Popular'];
 
@@ -7,18 +7,18 @@ const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCatego
   const [sortOpen, setSortOpen] = useState(false);
 
   return (
-    <Motion.div
+    <motion.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full page-shell page-gutter py-10"
+      className="w-full max-w-[1440px] mx-auto px-10 lg:px-14 py-10"
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         {/* Category Pills */}
         <div className="flex flex-wrap items-center gap-2.5">
           {categories.map((cat, i) => (
-            <Motion.button
+            <motion.button
               key={cat}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -34,7 +34,7 @@ const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCatego
               }`}
             >
               {cat}
-            </Motion.button>
+            </motion.button>
           ))}
         </div>
 
@@ -47,17 +47,17 @@ const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCatego
             <span className="text-[#B0B0A8]">Showing {productCount} results</span>
             <span className="mx-2 text-[#B0B0A8]">·</span>
             <span className="font-semibold">Sort by {activeSort}</span>
-            <Motion.span
+            <motion.span
               animate={{ rotate: sortOpen ? 180 : 0 }}
               transition={{ duration: 0.25 }}
               className="material-symbols-outlined text-[16px] inline-block"
             >
               expand_more
-            </Motion.span>
+            </motion.span>
           </button>
 
           {sortOpen && (
-            <Motion.div
+            <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -80,11 +80,11 @@ const CategoryFilter = ({ categories = ['All Objects'], activeCategory, onCatego
                   {opt}
                 </button>
               ))}
-            </Motion.div>
+            </motion.div>
           )}
         </div>
       </div>
-    </Motion.div>
+    </motion.div>
   );
 };
 

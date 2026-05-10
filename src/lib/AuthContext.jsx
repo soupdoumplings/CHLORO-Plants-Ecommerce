@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 
@@ -7,7 +6,7 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(null); // null means role is currently being fetched
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           setIsAdmin(false);
         }
-      } catch {
+      } catch (err) {
         setIsAdmin(false);
       }
     };
@@ -33,24 +32,13 @@ export const AuthProvider = ({ children }) => {
       if (!currentUser) return;
       const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).single();
       if (!data) {
-        const name = currentUser.user_metadata?.full_name
-          || currentUser.user_metadata?.name
-          || currentUser.email?.split('@')[0]
-          || currentUser.phone
-          || 'User';
-        const baseRow = {
+        const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'User';
+        await supabase.from('users').insert([{
           id: currentUser.id,
-          email: currentUser.email || `${currentUser.phone || currentUser.id}@phone.chloro.local`,
+          email: currentUser.email,
           name: name,
           role: 'USER'
-        };
-        const phoneRow = currentUser.phone || currentUser.user_metadata?.phone
-          ? { ...baseRow, phone: currentUser.phone || currentUser.user_metadata?.phone }
-          : baseRow;
-        const { error: insertError } = await supabase.from('users').insert([phoneRow]);
-        if (insertError && phoneRow.phone) {
-          await supabase.from('users').insert([baseRow]);
-        }
+        }]);
       }
     };
 
@@ -60,7 +48,6 @@ export const AuthProvider = ({ children }) => {
         await fetchRole(currentUser);
       } catch (err) {
         console.error('User metadata hydrate error:', err);
-        setIsAdmin(false);
       }
     };
 
@@ -68,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false); // instantly unblock global loading
+      setLoading(false);
 
       if (session?.user) {
         hydrateUserMeta(session.user);
@@ -78,20 +65,16 @@ export const AuthProvider = ({ children }) => {
     }).catch((err) => {
       console.error('Session init error:', err);
       setLoading(false);
-      setIsAdmin(false);
     });
 
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false); // ensure global loading is false
+        setLoading(false);
 
         if (session?.user) {
-          if (event === 'SIGNED_IN') {
-            setIsAdmin(null); // Re-fetch role on new login
-          }
           hydrateUserMeta(session.user);
         } else {
           setIsAdmin(false);
@@ -103,33 +86,30 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (email, password, fullName, phone = '') => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    const normalizedPhone = String(phone || '').trim();
-
     const { data, error } = await supabase.auth.signUp({
-      email: normalizedEmail,
+      email,
       password,
       options: {
         data: {
-          full_name: String(fullName || '').trim(),
-          phone: normalizedPhone,
+          full_name: fullName,
+          phone,
         }
       }
     });
     if (error) throw error;
-
+    
     if (data?.user) {
       // Attempt to immediately create their user profile row, failing silently if already exists
       const baseUserRow = {
         id: data.user.id,
-        email: normalizedEmail,
-        name: String(fullName || '').trim(),
+        email: email,
+        name: fullName,
         role: 'USER'
       };
-      const userRow = normalizedPhone ? { ...baseUserRow, phone: normalizedPhone } : baseUserRow;
+      const userRow = phone ? { ...baseUserRow, phone } : baseUserRow;
       let { error: dbError } = await supabase.from('users').insert([userRow]);
       // Backward-compatible fallback if the users table doesn't have a phone column yet.
-      if (dbError && normalizedPhone) {
+      if (dbError && phone) {
         const fallback = await supabase.from('users').insert([baseUserRow]);
         dbError = fallback.error;
       }
@@ -145,65 +125,6 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     });
-    if (error) throw error;
-    return data;
-  };
-
-  const signInWithPhone = async (phone) => {
-    const normalizedPhone = String(phone || '').replace(/[^\d+]/g, '');
-    if (!normalizedPhone || normalizedPhone.length < 7) {
-      throw new Error('Enter a valid phone number with country code.');
-    }
-
-    const { data, error } = await supabase.auth.signInWithOtp({
-      phone: normalizedPhone,
-      options: {
-        shouldCreateUser: true,
-        data: { phone: normalizedPhone },
-      },
-    });
-
-    if (error) throw error;
-    return data;
-  };
-
-  const signInWithEmailOtp = async (email) => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      throw new Error('Enter a valid email address.');
-    }
-
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: normalizedEmail,
-      options: {
-        shouldCreateUser: false,
-      },
-    });
-
-    if (error) throw error;
-    return data;
-  };
-
-  const verifyEmailOtp = async (email, token) => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: normalizedEmail,
-      token: String(token || '').trim(),
-      type: 'email',
-    });
-
-    if (error) throw error;
-    return data;
-  };
-
-  const verifyPhoneOtp = async (phone, token) => {
-    const normalizedPhone = String(phone || '').replace(/[^\d+]/g, '');
-    const { data, error } = await supabase.auth.verifyOtp({
-      phone: normalizedPhone,
-      token: String(token || '').trim(),
-      type: 'sms',
-    });
-
     if (error) throw error;
     return data;
   };
@@ -225,7 +146,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider }}>
       {children}
     </AuthContext.Provider>
   );

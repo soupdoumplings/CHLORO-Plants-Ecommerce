@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import DiscoveryHero from './DiscoveryHero';
@@ -8,7 +8,10 @@ import ProductGrid from './ProductGrid';
 import Newsletter from './Newsletter';
 import Footer from '../../components/Footer';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage } from '../../lib/localImages';
+import SaleBanner from '../../components/SaleBanner';
+
+// Mock sale end date (3 days from now)
+const SALE_ENDS_AT = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
 
 
 const DiscoveryPage = () => {
@@ -23,18 +26,25 @@ const DiscoveryPage = () => {
     const fetchProducts = async () => {
       const { data, error } = await supabase.from('products').select('*');
       if (!error && data) {
-        setAllProducts(data.map(p => ({
+        setAllProducts(data.map((p, index) => {
+            // Mock sale data for demonstration: put the first two items on sale
+            const is_on_sale = index < 2;
+            const discount_price = is_on_sale ? `${(Number(p.price) * 0.8).toFixed(2)}` : null;
+
+            return {
             ...p,
             id: p.id,
             name: p.name,
-            price: `रू ${Number(p.price).toFixed(2)}`,
+            price: `${Number(p.price).toFixed(2)}`,
             rawPrice: Number(p.price),
-            image: p.images && p.images.length > 0 ? p.images[0] : fallbackCatalogImage,
+            image: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80',
             category: p.category || 'Indoor Plants',
             tags: p.tags || [],
             is_featured: p.is_featured || false,
-            season: p.season || 'All Year'
-        })));
+            season: p.season || 'All Year',
+            is_on_sale,
+            discount_price
+        }}));
       }
     };
     fetchProducts();
@@ -67,7 +77,7 @@ const DiscoveryPage = () => {
     items.sort((a, b) => {
       if (a.is_featured && !b.is_featured) return -1;
       if (!a.is_featured && b.is_featured) return 1;
-      return 0;
+      return 0; 
     });
 
     if (activeSort === 'Price: Low to High') {
@@ -79,7 +89,7 @@ const DiscoveryPage = () => {
   }, [allProducts, activeCategory, activeSort, filterParam, searchQuery]);
 
   return (
-    <Motion.div
+    <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -87,15 +97,16 @@ const DiscoveryPage = () => {
       className="min-h-screen bg-[#F9F7F2] flex flex-col"
     >
       <Navbar />
+      <SaleBanner saleEndsAt={SALE_ENDS_AT} />
       <main className="flex-grow">
         <DiscoveryHero />
 
         {/* Active search query banner */}
         {searchQuery.trim() && (
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full page-shell page-gutter pt-10 pb-2"
+            className="w-full max-w-[1440px] mx-auto px-4 md:px-10 lg:px-14 pt-10 pb-2"
           >
             <div className="flex items-center justify-between border-b border-[#1D241F]/10 pb-5">
               <div>
@@ -106,7 +117,7 @@ const DiscoveryPage = () => {
                 {filteredProducts.length} item{filteredProducts.length !== 1 ? 's' : ''}
               </p>
             </div>
-          </Motion.div>
+          </motion.div>
         )}
 
         {/* Category filter — hidden when searching */}
@@ -132,7 +143,7 @@ const DiscoveryPage = () => {
         <Newsletter />
       </main>
       <Footer />
-    </Motion.div>
+    </motion.div>
   );
 };
 

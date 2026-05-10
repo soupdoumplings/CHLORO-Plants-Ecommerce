@@ -1,9 +1,9 @@
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   return (
-    <Motion.div
+    <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, height: 0, marginBottom: 0 }}
@@ -65,7 +65,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           </button>
         </div>
       </div>
-    </Motion.div>
+    </motion.div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import wateringCanImg from '../../assets/products/watering-can.png';
 import scissorsImg from '../../assets/products/scissors.png';
 import monsteraImg from '../../assets/products/monstera.png';
@@ -39,11 +39,11 @@ const OrderHistory = () => {
 
   return (
     <div className="w-full pt-20 pb-24 border-t border-[#B0B0A8]/20 bg-white">
-      <div className="page-shell page-gutter">
-
+      <div className="max-w-[1440px] mx-auto px-10 lg:px-14">
+        
         {/* Header & Toggles */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -55,28 +55,28 @@ const OrderHistory = () => {
             <h2 className="font-headline text-[32px] md:text-[40px] leading-none text-[#1A1A1A]">
               Order History.
             </h2>
-          </Motion.div>
+          </motion.div>
 
-          <Motion.div
+          <motion.div 
             initial={{ opacity: 0, x: 15 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="flex bg-[#F9F7F2] p-1.5 rounded-sm"
           >
-            <button
+            <button 
               onClick={() => setActiveTab('ALL ORDERS')}
               className={`font-label text-[9px] tracking-[0.15em] uppercase px-5 py-2.5 transition-colors ${activeTab === 'ALL ORDERS' ? 'bg-[#EDEBE4] text-[#1A1A1A] font-semibold' : 'text-[#6B6B6B] hover:text-[#1A1A1A]'}`}
             >
               All Orders
             </button>
-            <button
+            <button 
               onClick={() => setActiveTab('DRAFTS')}
               className={`font-label text-[9px] tracking-[0.15em] uppercase px-5 py-2.5 transition-colors ${activeTab === 'DRAFTS' ? 'bg-[#EDEBE4] text-[#1A1A1A] font-semibold' : 'text-[#6B6B6B] hover:text-[#1A1A1A]'}`}
             >
               Drafts
             </button>
-          </Motion.div>
+          </motion.div>
         </div>
 
         {/* Table Headings */}
@@ -91,7 +91,7 @@ const OrderHistory = () => {
         {/* Table Rows */}
         <div className="flex flex-col gap-6">
           {orderHistoryData.map((order, idx) => (
-            <Motion.div
+            <motion.div 
               key={order.ref}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ const OrderHistory = () => {
                   {order.status}
                 </span>
               </div>
-            </Motion.div>
+            </motion.div>
           ))}
         </div>
 

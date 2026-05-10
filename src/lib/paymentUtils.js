@@ -19,7 +19,7 @@ const ESEWA_CONFIG = {
 // ─── Khalti Configuration (from .env) ────────────────────────
 const KHALTI_CONFIG = {
   endpoint: import.meta.env.VITE_KHALTI_ENDPOINT || 'https://a.khalti.com/api/v2/epayment/initiate/',
-  secretKey: import.meta.env.VITE_KHALTI_SECRET_KEY || '',
+  secretKey: import.meta.env.VITE_KHALTI_SECRET_KEY || 'live_secret_key_68791341fdd94846a146f0457ff7b455',
 };
 
 /**
@@ -121,10 +121,6 @@ export const initiateKhaltiPayment = async ({
   websiteUrl,
 }) => {
   try {
-    if (!KHALTI_CONFIG.secretKey) {
-      throw new Error('Khalti secret key is not configured.');
-    }
-
     // In dev, use Vite proxy to bypass CORS. In production, use the direct endpoint or your backend.
     const isDev = import.meta.env.DEV;
     const khaltiUrl = isDev

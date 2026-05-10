@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
-import { useWishlist } from '../../lib/WishlistContext';
 
 
 const aspectMap = {
@@ -14,9 +13,7 @@ const aspectMap = {
 const DiscoveryProductCard = ({ product, index }) => {
   const aspect = aspectMap[product.aspect] || 'aspect-[4/5]';
   const { addToBag } = useCart();
-  const wishlist = useWishlist();
   const [added, setAdded] = useState(false);
-  const navigate = useNavigate();
 
   const handleAddToBag = async (e) => {
     e.preventDefault();
@@ -35,16 +32,8 @@ const DiscoveryProductCard = ({ product, index }) => {
     }
   };
 
-  const handleWishlist = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    await wishlist.toggleWishlist(product);
-  };
-
-  const saved = wishlist.isWishlisted(product.id);
-
   return (
-    <Motion.div
+    <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -59,7 +48,7 @@ const DiscoveryProductCard = ({ product, index }) => {
       <Link to={`/catalogue/${product.id}`} className="cursor-pointer block">
         {/* Image Container */}
         <div className={`${aspect} relative mb-5 overflow-hidden bg-[#EDEBE4]`}>
-          <Motion.img
+          <motion.img
             src={product.image}
             alt={product.name}
             className="h-full w-full object-cover"
@@ -68,71 +57,52 @@ const DiscoveryProductCard = ({ product, index }) => {
           />
 
           {/* Hover overlay tinted glass */}
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0 }}
             variants={{ hover: { opacity: 1 } }}
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-black/[0.04]"
           />
-
-          <button
-            type="button"
-            onClick={handleWishlist}
-            className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center border transition-colors ${
-              saved
-                ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
-                : 'border-white/75 bg-white/85 text-[#0F3A3A] hover:bg-white'
-            }`}
-            aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
-          >
-            <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
-          </button>
-
-          {/* View Product CTA - slides up from below the frame */}
-          <Motion.div
-            initial={{ opacity: 0, y: 15 }}
-            variants={{ hover: { opacity: 1, y: 0 } }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[max-content] flex gap-2 z-10"
-          >
-            <button
-              type="button"
-              onClick={() => navigate(`/catalogue/${product.id}`)}
-              className="bg-white/95 backdrop-blur-md px-6 py-2.5 shadow-sm flex items-center justify-center cursor-pointer"
-            >
-              <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
-                View Details
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={handleAddToBag}
-              className="bg-[#2F4F4F] text-white px-6 py-2.5 shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
-            >
-              <span className="font-label text-[9px] tracking-[0.15em] uppercase font-semibold">
-                {added ? 'Added' : 'Add to Bag'}
-              </span>
-            </button>
-          </Motion.div>
         </div>
       </Link>
 
+        {/* View Product CTA - always visible on mobile, slide up on hover for desktop */}
+        <motion.div
+          initial={{ opacity: 1, y: 0 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-[90%] md:w-[max-content] flex flex-col md:flex-row gap-2 z-10 md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300"
+        >
+          <Link to={`/catalogue/${product.id}`} className="bg-white/95 backdrop-blur-md w-full md:w-auto px-6 py-3 md:py-2.5 min-h-[44px] shadow-sm flex items-center justify-center">
+            <span className="font-label text-[10px] md:text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A] font-semibold">
+              View Details
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={handleAddToBag}
+            className="bg-[#2F4F4F] text-white w-full md:w-auto px-6 py-3 md:py-2.5 min-h-[44px] shadow-sm flex items-center justify-center hover:bg-[#1A2F2F] transition-colors"
+          >
+            <span className="font-label text-[10px] md:text-[9px] tracking-[0.15em] uppercase font-semibold">
+              {added ? 'Added' : 'Add to Bag'}
+            </span>
+          </button>
+        </motion.div>
 
         {/* Tags */}
         {product.tags && product.tags.length > 0 && (
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="absolute top-4 left-4 flex flex-col items-start gap-1.5 pointer-events-none"
           >
-            {product.tags.slice(0, 2).map((tag) => (
+            {product.tags.slice(0, 2).map((tag, idx) => (
               <span key={`${product.id}-${tag}`} className="inline-block bg-[#0D3535] text-[#FBF9F4] font-label text-[9px] tracking-[0.12em] uppercase px-3 py-1.5 font-medium shadow-sm max-w-[150px] truncate">
                 {tag}
               </span>
             ))}
-          </Motion.div>
+          </motion.div>
         )}
       {/* Product Info */}
       <Link to={`/catalogue/${product.id}`} className="block">
@@ -145,19 +115,32 @@ const DiscoveryProductCard = ({ product, index }) => {
               {product.category}
             </p>
           </div>
-          <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap pt-0.5">
-            {product.price}
-          </span>
+          <div className="flex flex-col items-end pt-0.5">
+            {product.is_on_sale ? (
+              <>
+                <span className="font-headline text-[16px] text-[#C5A059] whitespace-nowrap">
+                  रू {product.discount_price}
+                </span>
+                <span className="font-headline text-[12px] text-[#1A1A1A] line-through opacity-50 whitespace-nowrap">
+                  रू {product.price}
+                </span>
+              </>
+            ) : (
+              <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap">
+                रू {product.price}
+              </span>
+            )}
+          </div>
         </div>
       </Link>
-    </Motion.div>
+    </motion.div>
   );
 };
 
 const ProductGrid = ({ products }) => {
   return (
-    <div className="w-full page-shell page-gutter pb-24">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
+    <div className="w-full max-w-[1440px] mx-auto px-4 md:px-10 lg:px-14 pb-16 md:pb-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-x-6 gap-y-12 md:gap-y-14">
         {products.map((product, i) => (
           <DiscoveryProductCard key={product.id} product={product} index={i} />
         ))}

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../lib/CartContext';
-import { useAuth } from '../../lib/AuthContext';
-import { supabase } from '../../supabase';
 import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl } from '../../lib/paymentUtils';
-import { saveCheckoutBillingDetails } from '../../lib/customerProfile';
+import { useAuth } from '../../lib/AuthContext';
+import { validateVoucher } from '../../lib/voucherUtils';
 
 const paymentLabels = {
   card: { text: 'Pay Securely', color: '#1A1A1A' },
@@ -14,80 +13,40 @@ const paymentLabels = {
   cod: { text: 'Complete Order', color: '#2F4F4F' }
 };
 
-const formatAddress = (address) => {
-  return [address?.addressLine, address?.city, address?.country, address?.postalCode]
-    .map((part) => String(part || '').trim())
-    .filter(Boolean)
-    .join(', ');
-};
-
-const getInputValue = (selector) => document.querySelector(selector)?.value?.trim() || '';
-
-const mergeVisibleCheckoutValues = (checkoutDetails) => ({
-  ...checkoutDetails,
-  email: checkoutDetails.email?.trim() || getInputValue('input[autocomplete="email"]'),
-  phone: checkoutDetails.phone?.trim() || getInputValue('input[autocomplete="tel"]'),
-  firstName: checkoutDetails.firstName?.trim() || getInputValue('input[autocomplete="given-name"]'),
-  lastName: checkoutDetails.lastName?.trim() || getInputValue('input[autocomplete="family-name"]'),
-  shippingAddress: {
-    ...checkoutDetails.shippingAddress,
-    addressLine: checkoutDetails.shippingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="shipping street-address"]'),
-    city: checkoutDetails.shippingAddress?.city?.trim() || getInputValue('input[autocomplete="shipping address-level2"]'),
-    country: checkoutDetails.shippingAddress?.country?.trim() || getInputValue('input[autocomplete="shipping country-name"]'),
-    postalCode: checkoutDetails.shippingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="shipping postal-code"]'),
-  },
-  billingAddress: {
-    ...checkoutDetails.billingAddress,
-    addressLine: checkoutDetails.billingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="billing street-address"]'),
-    city: checkoutDetails.billingAddress?.city?.trim() || getInputValue('input[autocomplete="billing address-level2"]'),
-    country: checkoutDetails.billingAddress?.country?.trim() || getInputValue('input[autocomplete="billing country-name"]'),
-    postalCode: checkoutDetails.billingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="billing postal-code"]'),
-  },
-});
-
-const createOrderWithConsentFallback = async (payload) => {
-  const insertOrder = async (orderPayload) => supabase
-    .from('orders')
-    .insert(orderPayload)
-    .select('id')
-    .single();
-
-  const { data, error } = await insertOrder(payload);
-  if (!error) return { data, error };
-
-  const message = String(error.message || '').toLowerCase();
-  if (!message.includes('email_order_updates') && !message.includes('marketing_opt_in')) {
-    return { data, error };
-  }
-
-  const compatiblePayload = { ...payload };
-  delete compatiblePayload.email_order_updates;
-  delete compatiblePayload.marketing_opt_in;
-  return insertOrder(compatiblePayload);
-};
-
-const sendOrderEmailNotification = async ({ orderId, enabled }) => {
-  if (!enabled) return;
-
-  const { error } = await supabase.functions.invoke('order-email-notifications', {
-    body: { orderId },
-  });
-
-  if (error) {
-    console.warn('Order email notification was not sent:', error.message);
-  }
-};
-
-const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
+const CheckoutSummary = ({ paymentMethod }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
-  const { user } = useAuth();
+  const { session } = useAuth();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [voucherInput, setVoucherInput] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [voucherError, setVoucherError] = useState('');
+  const [voucherMessage, setVoucherMessage] = useState('');
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = 500.00; // Editorial Rate
-  const total = subtotal + shipping;
+  const total = Math.max(0, subtotal + shipping - (appliedVoucher?.discount || 0));
+
+  const handleApplyVoucher = async () => {
+    setVoucherError('');
+    setVoucherMessage('');
+    if (!voucherInput.trim()) return;
+
+    const result = await validateVoucher(voucherInput.trim(), session?.user?.id);
+    if (result.success) {
+      setAppliedVoucher({ code: voucherInput.trim(), discount: result.discount, id: result.voucherId });
+      setVoucherInput('');
+      setVoucherMessage(`Voucher applied! Saved रू ${result.discount}`);
+    } else {
+      setVoucherError(result.error || 'Invalid voucher');
+    }
+  };
+
+  const removeVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherMessage('');
+  };
 
   const handlePayment = async () => {
     setError('');
@@ -102,92 +61,27 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       return;
     }
 
-    if (paymentMethod === 'card') {
-      setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
-      return;
-    }
-
-    const visibleCheckoutDetails = mergeVisibleCheckoutValues(checkoutDetails);
-
-    const customerName = `${visibleCheckoutDetails.firstName || ''} ${visibleCheckoutDetails.lastName || ''}`.trim()
-      || user?.user_metadata?.full_name
-      || user?.email?.split('@')?.[0]
-      || 'Customer';
-    const customerEmail = visibleCheckoutDetails.email?.trim() || user?.email || '';
-    const customerPhone = visibleCheckoutDetails.phone?.trim();
-    const shippingAddress = formatAddress(visibleCheckoutDetails.shippingAddress);
-
-    if (!customerEmail || !customerPhone || !visibleCheckoutDetails.shippingAddress?.addressLine || !visibleCheckoutDetails.shippingAddress?.city || !visibleCheckoutDetails.shippingAddress?.country) {
-      setError('Please complete your email, phone, address, city, and country.');
-      return;
-    }
-
     setProcessing(true);
 
     const transactionId = generateTransactionId();
     const baseUrl = getBaseUrl();
 
     try {
-      const { data: order, error: orderError } = await createOrderWithConsentFallback({
-        user_id: user.id,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_email: customerEmail,
-        shipping_address: shippingAddress,
-        total_amount: total,
-        status: 'pending',
-        payment_method: paymentMethod,
-        payment_status: 'pending',
-        payment_reference: transactionId,
-        email_order_updates: Boolean(visibleCheckoutDetails.emailOrderUpdates),
-        marketing_opt_in: Boolean(visibleCheckoutDetails.marketingEmails),
-      });
-
-      if (orderError) throw orderError;
-
-      await saveCheckoutBillingDetails({ user, checkoutDetails: visibleCheckoutDetails });
-
-      const { error: paymentInsertError } = await supabase.from('payments').insert({
-        order_id: order.id,
-        user_id: user.id,
-        amount: total,
-        provider: paymentMethod,
-        status: 'pending',
-        reference: transactionId,
-        metadata: {
-          checkout_source: 'web',
-        },
-      });
-
-      if (paymentInsertError) {
-        console.warn('Payment record was not inserted:', paymentInsertError.message);
+      const successUrlParams = new URLSearchParams();
+      if (appliedVoucher) {
+         successUrlParams.append('voucher_code', appliedVoucher.code);
       }
-
-      const orderItems = cartItems.map((item) => ({
-        order_id: order.id,
-        product_id: item.productId,
-        quantity: item.quantity,
-        price_at_time: item.price,
-        product_name: item.name,
-      }));
-
-      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-      if (itemsError) throw itemsError;
-
-      await sendOrderEmailNotification({
-        orderId: order.id,
-        enabled: visibleCheckoutDetails.emailOrderUpdates,
-      });
+      const successUrlQuery = successUrlParams.toString() ? `?${successUrlParams.toString()}` : '';
 
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
           totalAmount: total,
-          amount: subtotal,
+          amount: subtotal - (appliedVoucher?.discount || 0) > 0 ? subtotal - (appliedVoucher?.discount || 0) : 0,
           taxAmount: 0,
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
+          successUrl: `${baseUrl}/payment/success${successUrlQuery}`,
           failureUrl: `${baseUrl}/payment/failure`,
         });
       } else if (paymentMethod === 'khalti') {
@@ -196,7 +90,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
             amount: total * 100, // Convert to paisa
             purchaseOrderId: transactionId,
             purchaseOrderName: `Petals & Pots Order ${transactionId}`,
-            returnUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
+            returnUrl: `${baseUrl}/payment/success${successUrlQuery}`,
             websiteUrl: baseUrl,
           });
 
@@ -212,11 +106,17 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
         }
       } else if (paymentMethod === 'cod') {
         await clearBag();
-        navigate(`/payment/success?method=cod&order_id=${order.id}&ref=${transactionId}&amount=${total}`);
+        const voucherParam = appliedVoucher ? `&voucher_code=${appliedVoucher.code}` : '';
+        navigate(`/payment/success?method=cod&order_id=${transactionId}&amount=${total}${voucherParam}`);
+      } else {
+        setTimeout(() => {
+          setProcessing(false);
+          setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
+        }, 1500);
       }
     } catch (err) {
       console.error('Payment error:', err);
-      setError(err.message || 'Payment failed. Please try again.');
+      setError('Payment failed. Please try again.');
       setProcessing(false);
     }
   };
@@ -224,7 +124,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const currentPayment = paymentLabels[paymentMethod] || { text: 'Select Payment Method', color: '#B0B0A8' };
 
   return (
-    <Motion.div
+    <motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -250,7 +150,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
                     {item.name}
                   </h4>
                   <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] mt-2 max-w-[100px] leading-relaxed">
-                    {item.variant} x {item.quantity}
+                    {item.variant} × {item.quantity}
                   </p>
                 </div>
                 <p className="font-headline text-[15px] text-[#1A1A1A] tracking-tight mt-auto">
@@ -267,7 +167,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           <span>Subtotal</span>
           <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
         </div>
-
+        
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
           <span>Shipping <span className="text-[#6B6B6B]/70 capitalize tracking-normal text-[10px] font-medium ml-1">(Editorial Rate)</span></span>
           <span className="text-[#1A1A1A]">रू {shipping.toFixed(2)}</span>
@@ -277,6 +177,35 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           <span>Taxes</span>
           <span className="text-[#1A1A1A]">रू 0.00</span>
         </div>
+
+        {appliedVoucher && (
+          <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#60BB46] font-semibold">
+            <span>Discount ({appliedVoucher.code}) <button onClick={removeVoucher} className="text-[#D94F4F] ml-2 hover:underline">Remove</button></span>
+            <span>- रू {appliedVoucher.discount.toFixed(2)}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="mb-8">
+        <div className="flex gap-2">
+          <input 
+            type="text" 
+            placeholder="Voucher Code" 
+            value={voucherInput}
+            onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+            disabled={appliedVoucher !== null}
+            className="flex-1 border border-[#B0B0A8]/40 bg-transparent px-4 py-3 text-[12px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors"
+          />
+          <button 
+            onClick={handleApplyVoucher}
+            disabled={appliedVoucher !== null || !voucherInput.trim()}
+            className="bg-[#1A1A1A] text-white px-5 py-3 font-label text-[10px] tracking-[0.15em] uppercase font-semibold disabled:opacity-50"
+          >
+            Apply
+          </button>
+        </div>
+        {voucherError && <p className="text-[#D94F4F] text-[10px] mt-2 font-medium tracking-wide">{voucherError}</p>}
+        {voucherMessage && <p className="text-[#60BB46] text-[10px] mt-2 font-medium tracking-wide">{voucherMessage}</p>}
       </div>
 
       <div className="flex justify-between items-end mb-10">
@@ -289,7 +218,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       </div>
 
       {error && (
-        <Motion.div
+        <motion.div
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-[#FAF2F2] border-l-2 border-[#D94F4F] py-3.5 px-4 flex items-center gap-3 mb-6"
@@ -298,10 +227,10 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           <p className="font-label text-[9px] tracking-[0.05em] text-[#9F403D] font-medium leading-snug pt-[1px]">
             {error}
           </p>
-        </Motion.div>
+        </motion.div>
       )}
 
-      <button
+      <button 
         onClick={handlePayment}
         disabled={processing || cartItems.length === 0}
         className="w-full py-5 px-6 font-label text-[11px] tracking-[0.2em] uppercase font-semibold transition-all duration-300 shadow-sm mb-6 disabled:opacity-50 disabled:cursor-not-allowed text-white"
@@ -313,10 +242,10 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] text-center w-full">
         {paymentMethod === 'esewa' && 'SECURE TRANSACTION VIA ESEWA'}
         {paymentMethod === 'khalti' && 'SECURE TRANSACTION VIA KHALTI'}
-        {paymentMethod === 'cod' && 'PAY ON DELIVERY - NO ADVANCE REQUIRED'}
+        {paymentMethod === 'cod' && 'PAY ON DELIVERY — NO ADVANCE REQUIRED'}
         {paymentMethod === 'card' && 'SECURE ENCRYPTED TRANSACTION BY STRIPE'}
       </p>
-    </Motion.div>
+    </motion.div>
   );
 };
 

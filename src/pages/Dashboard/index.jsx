@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProfileHeader from './ProfileHeader';
@@ -7,7 +7,7 @@ import ProfileDetails from './ProfileDetails';
 
 const DashboardPage = () => {
   return (
-    <Motion.div
+    <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -16,13 +16,13 @@ const DashboardPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[72px] lg:mt-[90px]">
+      <main className="flex-grow w-full max-w-[1440px] mx-auto px-10 lg:px-14 pb-20 mt-[82px] lg:mt-[100px]">
         <ProfileHeader />
         <ProfileDetails />
       </main>
 
       <Footer />
-    </Motion.div>
+    </motion.div>
   );
 };
 

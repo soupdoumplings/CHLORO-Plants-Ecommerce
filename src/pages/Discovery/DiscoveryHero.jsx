@@ -1,24 +1,24 @@
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import heroImage from '../../assets/discovery-hero.png';
 
 const DiscoveryHero = () => {
   return (
     <section className="w-full pt-[82px]">
-      <div className="page-shell page-gutter">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[75vh] items-center">
           {/* Left — Editorial Copy */}
-          <div className="flex flex-col justify-center py-20 lg:py-32 lg:pr-16">
-            <Motion.p
+          <div className="flex flex-col justify-center py-12 md:py-20 lg:py-32 lg:pr-16">
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="font-label text-[10px] tracking-[0.2em] uppercase text-[#2F4F4F] font-semibold mb-6"
             >
               Summer Collection / Vol. 04
-            </Motion.p>
+            </motion.p>
 
-            <Motion.h1
+            <motion.h1
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -27,9 +27,9 @@ const DiscoveryHero = () => {
               Living{' '}
               <br />
               <span className="italic font-light">Sculpture</span>
-            </Motion.h1>
+            </motion.h1>
 
-            <Motion.p
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -38,11 +38,11 @@ const DiscoveryHero = () => {
               A meticulous collection of rare botanical specimens
               and artisan-crafted vessels, designed to transform
               domestic spaces into living galleries.
-            </Motion.p>
+            </motion.p>
           </div>
 
           {/* Right — Editorial Image */}
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0, scale: 1.06 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -53,7 +53,7 @@ const DiscoveryHero = () => {
               alt="Summer collection — Living Sculpture"
               className="w-full h-full object-cover object-center"
             />
-          </Motion.div>
+          </motion.div>
         </div>
       </div>
     </section>

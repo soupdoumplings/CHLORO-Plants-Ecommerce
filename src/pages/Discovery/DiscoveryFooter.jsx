@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const footerColumns = [
   {
@@ -31,12 +31,12 @@ const columnVariants = {
 
 const DiscoveryFooter = () => {
   return (
-    <footer className="w-full bg-[#F3F1EA] border-t border-[#B0B0A8]/15 pt-20 pb-14 page-gutter">
-      <div className="page-shell">
+    <footer className="w-full bg-[#F3F1EA] border-t border-[#B0B0A8]/15 pt-20 pb-14 px-10 lg:px-14">
+      <div className="max-w-[1440px] mx-auto">
         {/* Main footer grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-20 mb-20">
           {/* Brand column */}
-          <Motion.div
+          <motion.div
             custom={0}
             initial="hidden"
             whileInView="visible"
@@ -50,10 +50,10 @@ const DiscoveryFooter = () => {
             <p className="font-body text-[13px] text-[#4A4A4A]/70 leading-relaxed max-w-[240px]">
               Curating life's botanical masterworks since 2012.
             </p>
-          </Motion.div>
+          </motion.div>
 
           {/* Shop column */}
-          <Motion.div
+          <motion.div
             custom={1}
             initial="hidden"
             whileInView="visible"
@@ -76,10 +76,10 @@ const DiscoveryFooter = () => {
                 </li>
               ))}
             </ul>
-          </Motion.div>
+          </motion.div>
 
           {/* Info column */}
-          <Motion.div
+          <motion.div
             custom={2}
             initial="hidden"
             whileInView="visible"
@@ -102,10 +102,10 @@ const DiscoveryFooter = () => {
                 </li>
               ))}
             </ul>
-          </Motion.div>
+          </motion.div>
 
           {/* Social column */}
-          <Motion.div
+          <motion.div
             custom={3}
             initial="hidden"
             whileInView="visible"
@@ -132,11 +132,11 @@ const DiscoveryFooter = () => {
                 @petalsandpots
               </a>
             </div>
-          </Motion.div>
+          </motion.div>
         </div>
 
         {/* Bottom bar */}
-        <Motion.div
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -160,7 +160,7 @@ const DiscoveryFooter = () => {
               Terms
             </a>
           </div>
-        </Motion.div>
+        </motion.div>
       </div>
     </footer>
   );

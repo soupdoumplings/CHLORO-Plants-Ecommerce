@@ -1,13 +1,13 @@
 import React from 'react';
 import { useCart } from '../../lib/CartContext';
-import { publicPlantImages } from '../../lib/localImages';
 
 const CatalogueHero = () => {
   const { addToBag } = useCart();
   return (
-    <section className="relative w-full min-h-[80vh] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
+    <section className="relative w-full min-h-[966px] flex flex-col md:flex-row bg-[#FBF9F4] pt-20">
+      
       {/* Left Column: Identity */}
-      <div className="w-full md:w-[410px] flex flex-col items-start pt-10 gap-8 text-left">
+      <div className="w-full md:w-[410px] flex flex-col items-start px-12 pt-16 gap-12 text-left">
         <div className="space-y-4">
           <span className="font-sans text-[10px] tracking-[0.32em] uppercase text-[#785A1A]">
             Specimen No. 1042
@@ -34,7 +34,7 @@ const CatalogueHero = () => {
               <span className="font-sans text-[10px] tracking-[0.16em] uppercase text-[#31332C]/50 font-bold">Price</span>
               <p className="font-headline text-3xl text-[#31332C]">रू 12,500</p>
             </div>
-            <button
+            <button 
               onClick={() => addToBag({
                 id: 'himalayan-orchid-id',
                 name: 'Himalayan Orchid',
@@ -49,13 +49,13 @@ const CatalogueHero = () => {
       </div>
 
       {/* Right Column: Visual Focus */}
-      <div className="flex-1 bg-[#F5F4ED] relative min-h-[600px] md:h-auto overflow-hidden">
-        <img
-          src={publicPlantImages.orchid}
-          alt="Himalayan Orchid"
+      <div className="flex-1 bg-[#F5F4ED] relative h-[966px] overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1599931302353-8d693f41af90?q=80&w=2574&auto=format&fit=crop" 
+          alt="Himalayan Orchid" 
           className="w-full h-full object-cover transition-transform duration-[10s] hover:scale-110 brightness-[0.95]"
         />
-
+        
         {/* Floating Quote Box */}
         <div className="absolute left-[-48px] bottom-12 bg-white p-8 w-64 shadow-2xl shadow-black/10 z-10 border border-[#B1B3A9]/10">
           <p className="font-sans text-xs leading-[162%] text-[#5E6058] italic">
@@ -63,7 +63,7 @@ const CatalogueHero = () => {
           </p>
         </div>
       </div>
-
+      
     </section>
   );
 };

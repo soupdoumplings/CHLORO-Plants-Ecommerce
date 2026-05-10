@@ -4,14 +4,16 @@
  * All colors, fonts, and spacing are defined here for consistency.
  */
 
-/* Self-hosted atelier fonts and Material Symbols avoid blocked third-party font requests. */
-@import "./styles/local-fonts.css";
+/* Google Fonts: Newsreader (headlines) & Inter (body text) */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@100..900&display=swap');
+/* Material Symbols for icon system */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
 /* Custom Design Tokens for the CHLORO brand */
 @theme {
-  --font-headline: "Cormorant Garamond", "Newsreader", serif;
+  --font-headline: "Newsreader", serif;
   --font-body: "Inter", sans-serif;
   --font-label: "Inter", sans-serif;
   --font-serif: "Newsreader", serif;
@@ -73,8 +75,33 @@
     background-color: #fbf9f4;
     color: #31332c;
     font-family: var(--font-body);
+    font-size: 1rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Responsive typography fallbacks */
+  h1 {
+    font-size: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Accessible touch targets for mobile */
+  button, input, select, textarea {
+    min-height: 44px;
   }
 }
 
@@ -87,26 +114,4 @@
 .editorial-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-}
-
-.page-gutter {
-  padding-inline: clamp(1.25rem, 7vw, 9rem);
-}
-
-.page-gutter-tight {
-  padding-inline: clamp(1.25rem, 3vw, 3rem);
-}
-
-.page-shell {
-  width: 100%;
-  margin-inline: auto;
-}
-
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
 }

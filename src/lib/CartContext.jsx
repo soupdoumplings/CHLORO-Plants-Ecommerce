@@ -1,9 +1,6 @@
-/* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
-import { fallbackCatalogImage } from './localImages';
 
 const CartContext = createContext();
 
@@ -13,16 +10,11 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const redirectToLogin = () => {
-    navigate('/login', { state: { from: `${location.pathname}${location.search}` } });
-  };
-
-  const fetchCart = useCallback(async () => {
+  const fetchCart = async () => {
     if (!session?.user) {
-      setCartItems([]);
+      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      setCartItems(guestCart);
       setLoading(false);
       return;
     }
@@ -44,7 +36,7 @@ export const CartProvider = ({ children }) => {
         name: item.products.name,
         price: Number(item.products.price),
         quantity: item.quantity,
-        image: item.products.images?.[0] || fallbackCatalogImage,
+        image: item.products.images?.[0] || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
         variant: 'STUDIO SPECIMEN' // Default variant for simplicity
       }));
 
@@ -54,18 +46,13 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  };
 
   useEffect(() => {
     fetchCart();
-  }, [fetchCart]);
+  }, [session]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) {
-      redirectToLogin();
-      return { success: false, requiresAuth: true, error: 'Please log in to add items to your bag.' };
-    }
-
     // Enforce cart limit
     const currentTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     if (currentTotal + quantity > CART_LIMIT) {
@@ -73,7 +60,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      // Parse price: handle both raw numbers and formatted strings like "NPR 50.00"
+      // Parse price: handle both raw numbers and formatted strings like "रू 50.00"
       let priceValue = 0;
       if (typeof product.price === 'number') {
         priceValue = product.price;
@@ -81,6 +68,32 @@ export const CartProvider = ({ children }) => {
         priceValue = Number(product.rawPrice);
       } else {
         priceValue = Number(String(product.price).replace(/[^0-9.]/g, ''));
+      }
+
+      if (!session?.user) {
+        // Guest cart logic
+        const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+        const existingItem = guestCart.find(item => item.productId === product.id);
+        
+        if (existingItem) {
+          if (existingItem.quantity + quantity > CART_LIMIT) {
+             return { success: false, error: `Cart limit is ${CART_LIMIT} items` };
+          }
+          existingItem.quantity += quantity;
+        } else {
+          guestCart.push({
+            id: `guest_${Date.now()}_${Math.random()}`,
+            productId: product.id,
+            name: product.name,
+            price: Number(priceValue),
+            quantity: quantity,
+            image: product.images?.[0] || product.image || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
+            variant: 'STUDIO SPECIMEN'
+          });
+        }
+        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+        setCartItems(guestCart);
+        return { success: true };
       }
 
       // Check if item already exists in bag
@@ -94,7 +107,7 @@ export const CartProvider = ({ children }) => {
           .from('cart_items')
           .update({ quantity: existingItem.quantity + quantity })
           .eq('id', existingItem.id);
-
+        
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -105,17 +118,9 @@ export const CartProvider = ({ children }) => {
             quantity: quantity,
             price_snapshot: priceValue
           }]);
-
+        
         if (error) throw error;
       }
-
-      // Create a notification for the added item
-      await supabase.from('notifications').insert([{
-        user_id: session.user.id,
-        type: 'SYSTEM',
-        message: `You added ${quantity}x ${product.name || 'item'} to your bag.`,
-        link: '/cart'
-      }]);
 
       await fetchCart(); // Refresh cart
       return { success: true };
@@ -129,7 +134,13 @@ export const CartProvider = ({ children }) => {
     if (newQty < 1) return removeFromBag(id);
 
     if (!session?.user) {
-      redirectToLogin();
+      const guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      const itemIndex = guestCart.findIndex(item => item.id === id);
+      if (itemIndex > -1) {
+        guestCart[itemIndex].quantity = newQty;
+        localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+        setCartItems(guestCart);
+      }
       return;
     }
 
@@ -148,7 +159,10 @@ export const CartProvider = ({ children }) => {
 
   const removeFromBag = async (id) => {
     if (!session?.user) {
-      redirectToLogin();
+      let guestCart = JSON.parse(localStorage.getItem('chloro_guest_cart') || '[]');
+      guestCart = guestCart.filter(item => item.id !== id);
+      localStorage.setItem('chloro_guest_cart', JSON.stringify(guestCart));
+      setCartItems(guestCart);
       return;
     }
 
@@ -167,6 +181,7 @@ export const CartProvider = ({ children }) => {
 
   const clearBag = async () => {
     if (!session?.user) {
+      localStorage.removeItem('chloro_guest_cart');
       setCartItems([]);
       return;
     }
@@ -186,12 +201,12 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      loading,
-      addToBag,
-      updateQuantity,
-      removeFromBag,
+    <CartContext.Provider value={{ 
+      cartItems, 
+      loading, 
+      addToBag, 
+      updateQuantity, 
+      removeFromBag, 
       clearBag,
       cartCount,
       CART_LIMIT

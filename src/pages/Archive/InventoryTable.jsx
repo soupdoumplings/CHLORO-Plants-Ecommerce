@@ -2,10 +2,9 @@
  * CHLORO — Admin Inventory CRUD Component
  */
 import React, { useEffect, useState } from 'react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage } from '../../lib/localImages';
 
 const InventoryTable = ({ products, loading, onRefresh }) => {
   const [holdings, setHoldings] = useState([]);
@@ -37,25 +36,25 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
   };
 
   return (
-    <Motion.section
+    <motion.section
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="mb-24 page-shell w-full relative"
+      className="mb-24 px-12 max-w-[1440px] mx-auto w-full relative"
     >
       {/* Custom Delete Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <Motion.div
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
               className="absolute inset-0 bg-[#31332C]/40 backdrop-blur-sm"
             />
-            <Motion.div
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -85,12 +84,12 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                   </button>
                 </div>
               </div>
-            </Motion.div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      <Motion.div
+      <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -104,7 +103,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Lowland</button>
           <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Equipment</button>
         </div>
-      </Motion.div>
+      </motion.div>
 
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left">
@@ -138,7 +137,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
               // State 3: Dynamically render each specimen from the database
               <AnimatePresence>
                 {holdings.map((item, i) => (
-                  <Motion.tr
+                  <motion.tr
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -148,7 +147,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                   >
                     <td className="py-8 px-4 flex items-center gap-6">
                       <div className="w-20 h-20 bg-[#EFEEE6] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                        <img src={item.images?.[0] || fallbackCatalogImage} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.images?.[0] || "https://images.unsplash.com/photo-1616046229478-9901c5536a45"} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div>
                         <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
@@ -185,14 +184,14 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                         <button onClick={() => confirmDelete(item.id)} className="material-symbols-outlined text-[#5E6058] hover:text-[#9F403D] transition-colors p-2 hover:bg-[#F5F4ED]">delete</button>
                       </div>
                     </td>
-                  </Motion.tr>
+                  </motion.tr>
                 ))}
               </AnimatePresence>
             )}
           </tbody>
         </table>
       </div>
-    </Motion.section>
+    </motion.section>
   );
 };
 
