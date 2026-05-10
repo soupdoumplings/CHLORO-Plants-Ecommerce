@@ -450,7 +450,7 @@ const AiDiagnosisPage = () => {
 
             <div className="mt-14 flex max-w-[700px] items-center justify-between border-b border-[#E5E1D7] pb-5">
               <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">03. Prescribed Apothecary</p>
-              <Link to="/products-gifts" className="font-label text-[8px] uppercase tracking-[0.18em] text-[#785A1A] underline underline-offset-4">
+              <Link to="/discovery" className="font-label text-[8px] uppercase tracking-[0.18em] text-[#785A1A] underline underline-offset-4">
                 View Full Range
               </Link>
             </div>
