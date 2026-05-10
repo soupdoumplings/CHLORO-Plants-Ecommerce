@@ -8,6 +8,7 @@ import ArchivePreview from './ArchivePreview';
 import VisualBreak from './VisualBreak';
 import CategoryShelf from './CategoryShelf';
 import WhyChooseUs from './WhyChooseUs';
+import CustomerReviews from './CustomerReviews';
 import PlantRecommendations from '../../components/PlantRecommendations';
 
 const HomePage = () => {
@@ -29,6 +30,7 @@ const HomePage = () => {
         <Philosophy />
         <VisualBreak />
         <WhyChooseUs />
+        <CustomerReviews />
       </main>
 
       <Footer />
