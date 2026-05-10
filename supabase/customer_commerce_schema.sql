@@ -126,6 +126,8 @@ CREATE INDEX IF NOT EXISTS wishlist_product_id_idx ON public.wishlist(product_id
 -- Existing order tables: add finance-friendly fields and indexes.
 ALTER TABLE public.orders
   ADD COLUMN IF NOT EXISTS billing_details JSONB,
+  ADD COLUMN IF NOT EXISTS email_order_updates BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS marketing_opt_in BOOLEAN NOT NULL DEFAULT FALSE,
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 ALTER TABLE public.orders

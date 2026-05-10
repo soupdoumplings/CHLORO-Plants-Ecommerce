@@ -45,6 +45,39 @@ const mergeVisibleCheckoutValues = (checkoutDetails) => ({
   },
 });
 
+const createOrderWithConsentFallback = async (payload) => {
+  const insertOrder = async (orderPayload) => supabase
+    .from('orders')
+    .insert(orderPayload)
+    .select('id')
+    .single();
+
+  const { data, error } = await insertOrder(payload);
+  if (!error) return { data, error };
+
+  const message = String(error.message || '').toLowerCase();
+  if (!message.includes('email_order_updates') && !message.includes('marketing_opt_in')) {
+    return { data, error };
+  }
+
+  const compatiblePayload = { ...payload };
+  delete compatiblePayload.email_order_updates;
+  delete compatiblePayload.marketing_opt_in;
+  return insertOrder(compatiblePayload);
+};
+
+const sendOrderEmailNotification = async ({ orderId, enabled }) => {
+  if (!enabled) return;
+
+  const { error } = await supabase.functions.invoke('order-email-notifications', {
+    body: { orderId },
+  });
+
+  if (error) {
+    console.warn('Order email notification was not sent:', error.message);
+  }
+};
+
 const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
@@ -95,22 +128,20 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     const baseUrl = getBaseUrl();
 
     try {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_email: customerEmail,
-          shipping_address: shippingAddress,
-          total_amount: total,
-          status: 'pending',
-          payment_method: paymentMethod,
-          payment_status: 'pending',
-          payment_reference: transactionId,
-        })
-        .select('id')
-        .single();
+      const { data: order, error: orderError } = await createOrderWithConsentFallback({
+        user_id: user.id,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_email: customerEmail,
+        shipping_address: shippingAddress,
+        total_amount: total,
+        status: 'pending',
+        payment_method: paymentMethod,
+        payment_status: 'pending',
+        payment_reference: transactionId,
+        email_order_updates: Boolean(visibleCheckoutDetails.emailOrderUpdates),
+        marketing_opt_in: Boolean(visibleCheckoutDetails.marketingEmails),
+      });
 
       if (orderError) throw orderError;
 
@@ -142,6 +173,11 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
 
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
+
+      await sendOrderEmailNotification({
+        orderId: order.id,
+        enabled: visibleCheckoutDetails.emailOrderUpdates,
+      });
 
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
