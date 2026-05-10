@@ -110,3 +110,34 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+@media (hover: hover) and (pointer: fine) {
+  img:not([src$=".svg"]):not(.no-image-zoom) {
+    transform-origin: center;
+    transition:
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  img:not([src$=".svg"]):not(.no-image-zoom):hover,
+  .group:hover img:not([src$=".svg"]):not(.no-image-zoom),
+  a:hover img:not([src$=".svg"]):not(.no-image-zoom),
+  button:hover img:not([src$=".svg"]):not(.no-image-zoom) {
+    transform: scale(1.045);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img:not([src$=".svg"]):not(.no-image-zoom) {
+    transition: none;
+  }
+
+  img:not([src$=".svg"]):not(.no-image-zoom):hover,
+  .group:hover img:not([src$=".svg"]):not(.no-image-zoom),
+  a:hover img:not([src$=".svg"]):not(.no-image-zoom),
+  button:hover img:not([src$=".svg"]):not(.no-image-zoom) {
+    transform: none;
+  }
+}
