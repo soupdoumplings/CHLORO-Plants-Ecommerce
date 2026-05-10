@@ -131,6 +131,10 @@ $$;
 -- 4. Schedule the daily cron job (Nepal 08:00 = UTC 02:15)
 --    IMPORTANT: Replace CRON_SECRET_HERE with a secure random string
 --    that you also set as the CRON_SECRET Supabase secret.
+--    For Gmail delivery, set Edge Function secrets:
+--    EMAIL_PROVIDER=gmail, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET,
+--    GMAIL_REFRESH_TOKEN, GMAIL_FROM
+--    Optional fallback: RESEND_API_KEY, RESEND_FROM
 CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS pg_net WITH SCHEMA extensions;
 
