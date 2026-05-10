@@ -35,14 +35,14 @@ const ToggleOption = ({ active, option, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`flex items-center gap-3 border px-4 py-4 text-left transition-colors ${
+    className={`flex items-center gap-1.5 border px-2 py-4 text-left transition-colors ${
       active
         ? 'border-[#0F3A3A] bg-[#0F3A3A] text-[#FBF9F4]'
         : 'border-[#B0B0A8]/30 bg-white text-[#1A1A1A] hover:border-[#0F3A3A]/50'
     }`}
   >
-    <span className="material-symbols-outlined text-[19px]">{option.icon}</span>
-    <span className="font-label text-[10px] font-bold uppercase tracking-[0.14em] leading-snug">
+    <span className="material-symbols-outlined text-[19px] flex-shrink-0">{option.icon}</span>
+    <span className="font-label text-[9px] font-bold uppercase tracking-[0.04em] leading-snug">
       {option.label}
     </span>
   </button>
@@ -165,7 +165,7 @@ const PreferenceOnboarding = () => {
                     <p className="font-label text-[9px] uppercase tracking-[0.18em] text-[#1A1A1A] font-bold mb-3">
                       Visual Style
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {preferenceOptions.style.map((option) => (
                         <ToggleOption
                           key={option.value}

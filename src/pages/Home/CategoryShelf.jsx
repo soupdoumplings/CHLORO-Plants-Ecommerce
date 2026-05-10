@@ -18,7 +18,7 @@ const CATEGORIES = [
   {
     id: 3,
     title: 'Pet-Friendly',
-    image: publicPlantImages.leaf,
+    image: publicPlantImages.cat,
     link: '/discovery?filter=Pet-Friendly'
   },
   {

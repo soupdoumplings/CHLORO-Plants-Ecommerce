@@ -32,4 +32,5 @@ export const publicPlantImages = {
   lavender: '/lavender.jpg',
   flower: '/ful.jpg',
   phool: '/phool.png',
+  cat: '/cat.jpg',
 };

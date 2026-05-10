@@ -200,17 +200,16 @@ export default function ChatbotWidget() {
       <AnimatePresence>
         {!isOpen && (
           <Motion.button
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 border border-[#11110E]/15 bg-[#FFFEFA] px-4 py-3 text-[#11110E] shadow-[0_18px_55px_rgba(17,17,14,0.12)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#11110E] cursor-none group"
+            className="fixed bottom-6 right-6 z-50 flex h-9 w-9 items-center justify-center bg-white rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-110 transition-all cursor-none group"
             title="Open botanical assistant"
           >
-            <span className="flex h-8 w-8 items-center justify-center bg-[#11110E] text-[#FBF9F4]">
-              <Sparkles className="h-4 w-4" />
-            </span>
-            <span className="font-label text-[10px] font-bold uppercase tracking-[0.2em]">Atelier AI</span>
+            <div className="flex h-6 w-6 items-center justify-center bg-black rounded-full text-white">
+              <Sparkles className="h-3.5 w-3.5" />
+            </div>
           </Motion.button>
         )}
       </AnimatePresence>

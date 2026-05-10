@@ -22,13 +22,12 @@ const accountLinks = [
 const supportLinks = [
   { label: 'Order Help', to: '/dashboard' },
   { label: 'Care Reminders', to: '/my-plants' },
-  { label: 'Admin Access', to: '/archive' },
 ];
 
 const FooterNavLink = ({ to, children }) => (
   <Link
     to={to}
-    className="block font-headline text-[19px] md:text-[21px] leading-tight text-[#FBF9F4]/82 hover:text-[#FBF9F4] transition-colors"
+    className="block font-headline text-[17px] md:text-[18px] leading-tight text-[#FBF9F4]/65 hover:text-[#FBF9F4] transition-colors"
   >
     {children}
   </Link>
@@ -41,37 +40,37 @@ const Footer = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-[#0F3A3A] text-[#FBF9F4] page-gutter pt-14 md:pt-16 pb-7 border-t border-[#FBF9F4]/10 cursor-auto"
+      className="w-full bg-[#0F3A3A] text-[#FBF9F4] page-gutter pt-8 md:pt-10 pb-6 border-t border-[#FBF9F4]/10 cursor-auto"
     >
-      <div className="page-shell flex flex-col gap-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
-          <div className="lg:col-span-6">
-            <p className="font-label text-[9px] uppercase tracking-[0.26em] text-[#C6E9E9]/75 font-bold mb-5">
+      <div className="page-shell flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          <div className="lg:col-span-5">
+            <p className="font-label text-[8px] uppercase tracking-[0.26em] text-[#C6E9E9]/75 font-bold mb-3">
               Botanical Ecommerce Studio
             </p>
-            <h2 className="font-headline italic text-[58px] sm:text-[78px] lg:text-[96px] leading-[0.86] tracking-tight">
+            <h2 className="font-headline italic text-[38px] sm:text-[48px] lg:text-[56px] leading-[0.86] tracking-tight">
               CHLORO
             </h2>
-            <p className="font-body text-[14px] md:text-[15px] leading-relaxed text-[#FBF9F4]/72 max-w-[460px] mt-6">
+            <p className="font-body text-[13px] md:text-[14px] leading-relaxed text-[#FBF9F4]/72 max-w-[400px] mt-4">
               Shop living specimens, tools, vessels, and care support from our Kathmandu botanical studio.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 mt-7">
+            <div className="flex flex-col sm:flex-row gap-2 mt-5">
               <Link
                 to="/discovery"
-                className="bg-[#FBF9F4] text-[#0F3A3A] px-6 py-3.5 font-label text-[9px] uppercase tracking-[0.18em] font-bold text-center hover:bg-[#C6E9E9] transition-colors"
+                className="bg-[#FBF9F4] text-[#0F3A3A] px-5 py-2.5 font-label text-[8px] uppercase tracking-[0.18em] font-bold text-center hover:bg-[#C6E9E9] transition-colors"
               >
                 Shop Collection
               </Link>
               <a
                 href="mailto:hello@chloro.studio"
-                className="border border-[#FBF9F4]/35 text-[#FBF9F4] px-6 py-3.5 font-label text-[9px] uppercase tracking-[0.18em] font-bold text-center hover:bg-[#FBF9F4] hover:text-[#0F3A3A] transition-colors"
+                className="border border-[#FBF9F4]/35 text-[#FBF9F4] px-5 py-2.5 font-label text-[8px] uppercase tracking-[0.18em] font-bold text-center hover:bg-[#FBF9F4] hover:text-[#0F3A3A] transition-colors"
               >
                 Contact Us
               </a>
             </div>
           </div>
 
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10 pt-2 lg:pt-6">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 pt-2 lg:pt-4">
             <div>
               <h3 className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-4">
                 Shop
@@ -108,42 +107,42 @@ const Footer = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#FBF9F4]/12 border border-[#FBF9F4]/12">
-          <div className="bg-[#0F3A3A] p-5 md:p-6 min-h-[126px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[21px] mb-4 block">mail</span>
-            <p className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-2">
+          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">mail</span>
+            <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Contact Us
             </p>
-            <a href="mailto:hello@chloro.studio" className="font-headline text-[22px] leading-tight hover:text-[#C6E9E9] transition-colors">
+            <a href="mailto:hello@chloro.studio" className="font-headline text-[16px] leading-tight hover:text-[#C6E9E9] transition-colors">
               hello@chloro.studio
             </a>
-            <p className="font-body text-[13px] leading-relaxed text-[#FBF9F4]/58 mt-3">
-              Orders, care questions, availability, and consultation requests.
+            <p className="font-body text-[11px] leading-relaxed text-[#FBF9F4]/58 mt-1.5">
+              Orders, care questions, and availability.
             </p>
           </div>
 
-          <div className="bg-[#0F3A3A] p-5 md:p-6 min-h-[126px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[21px] mb-4 block">storefront</span>
-            <p className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-2">
+          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">storefront</span>
+            <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Please Visit Us
             </p>
-            <p className="font-headline text-[22px] leading-tight">
+            <p className="font-headline text-[16px] leading-tight">
               Lazimpat, Kathmandu
             </p>
-            <p className="font-body text-[13px] leading-relaxed text-[#FBF9F4]/58 mt-3">
-              Studio visits and plant consultations are available by appointment.
+            <p className="font-body text-[11px] leading-relaxed text-[#FBF9F4]/58 mt-1.5">
+              Studio visits are available by appointment.
             </p>
           </div>
 
-          <div className="bg-[#0F3A3A] p-5 md:p-6 min-h-[126px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[21px] mb-4 block">schedule</span>
-            <p className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-2">
+          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">schedule</span>
+            <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Shopping Hours
             </p>
-            <p className="font-headline text-[22px] leading-tight">
+            <p className="font-headline text-[16px] leading-tight">
               Sun-Fri / 10:00-18:00
             </p>
-            <p className="font-body text-[13px] leading-relaxed text-[#FBF9F4]/58 mt-3">
-              Delivery and pickup coordination happens after order confirmation.
+            <p className="font-body text-[11px] leading-relaxed text-[#FBF9F4]/58 mt-1.5">
+              Delivery happens after order confirmation.
             </p>
           </div>
         </div>

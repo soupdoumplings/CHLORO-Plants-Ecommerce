@@ -20,7 +20,7 @@ const Hero = () => {
     <header
       ref={heroRef}
       data-cursor-theme="light"
-      className="relative w-full h-screen min-h-[720px] flex flex-col justify-center page-gutter pt-20 overflow-hidden"
+      className="relative w-full h-screen flex flex-col justify-center page-gutter pt-20 overflow-hidden"
     >
       <Motion.div
         className="absolute inset-0 z-0"
@@ -60,7 +60,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="font-headline text-[clamp(4.7rem,11vw,10rem)] tracking-tight leading-[0.82] text-white mb-8 drop-shadow-[0_18px_60px_rgba(0,0,0,0.28)]"
+          className="font-headline text-[clamp(4.7rem,11vw,10rem)] tracking-tight leading-[0.82] text-white mb-6 drop-shadow-[0_18px_60px_rgba(0,0,0,0.28)]"
         >
           Himalayan <br />
           <span className="italic font-extralight opacity-95">Elegance.</span>
@@ -69,7 +69,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
-          className="font-body text-[16px] md:text-[18px] leading-relaxed text-white/78 max-w-[560px] mb-10"
+          className="font-body text-[16px] md:text-[18px] leading-relaxed text-white/78 max-w-[560px] mb-2"
         >
           Shop curated living specimens, seasonal care tools, and quiet botanical support for refined homes.
         </Motion.p>
@@ -88,25 +88,25 @@ const Hero = () => {
             >
               <Link
                 to="/discovery"
-                className="block px-12 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all"
+                className="block px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all"
               >
                 Shop Collection
               </Link>
             </Motion.div>
           </Magnetic>
 
-          <Link to="/ai-diagnosis" className="flex items-center gap-5 group cursor-pointer text-white">
+          <Link to="/ai-diagnosis" className="flex items-center gap-3 group cursor-pointer text-white">
             <Magnetic magnetism={20}>
               <Motion.div
                 whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,1)' }}
-                className="w-14 h-14 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm group-hover:bg-white group-hover:border-white"
+                className="w-11 h-11 border border-white/20 flex items-center justify-center transition-all duration-500 rounded-sm group-hover:bg-white group-hover:border-white"
               >
-                <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-[22px]">psychiatry</span>
+                <span className="material-symbols-outlined text-white group-hover:text-[#31332c] transition-colors text-[18px]">psychiatry</span>
               </Motion.div>
             </Magnetic>
             <div>
               <p className="font-label text-[9px] uppercase tracking-[0.2em] text-white/60 font-bold">AI Powered</p>
-              <p className="font-headline italic text-lg text-white">AI Diagnosis</p>
+              <p className="font-headline italic text-[16px] text-white">AI Diagnosis</p>
             </div>
           </Link>
         </Motion.div>
@@ -115,7 +115,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.35, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute bottom-8 left-0 right-0 z-10 page-gutter flex items-center justify-between text-white/55"
+        className="absolute bottom-6 left-0 right-0 z-10 page-gutter flex items-center justify-between text-white/55"
         style={{ opacity: contentOpacity }}
       >
         <span className="font-label text-[9px] uppercase tracking-[0.24em] font-bold">Scroll</span>

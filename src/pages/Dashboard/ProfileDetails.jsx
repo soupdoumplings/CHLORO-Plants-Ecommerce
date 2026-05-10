@@ -27,7 +27,7 @@ const Field = ({ label, children }) => (
 );
 
 const ProfileDetails = () => {
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [avatar, setAvatar] = useState(user?.user_metadata?.avatar_url || profileImg);
@@ -289,8 +289,12 @@ const ProfileDetails = () => {
           )}
         </Motion.div>
 
-        <PreferenceSettings />
-        <PlantRecommendations surface="dashboard" />
+        {!isAdmin && (
+          <>
+            <PreferenceSettings />
+            <PlantRecommendations surface="dashboard" />
+          </>
+        )}
         <RecentOrders />
       </div>
     </Motion.section>
