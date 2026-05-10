@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Leaf, Phone } from 'lucide-react';
+import { Eye, EyeOff, Leaf, Mail, Phone } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa';
 import { useAuth } from '../../lib/AuthContext';
 
@@ -14,6 +14,7 @@ const AuthPage = () => {
   const [phone, setPhone] = useState('');
   const [otpToken, setOtpToken] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -23,7 +24,7 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp } = useAuth();
+  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp } = useAuth();
   const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => ({
@@ -44,6 +45,18 @@ const AuthPage = () => {
     setIsLoading(true);
 
     try {
+      if (isLogin && loginMethod === 'email-code') {
+        if (!emailOtpSent) {
+          await signInWithEmailOtp(email);
+          setEmailOtpSent(true);
+          setSuccessMsg('We sent a one-time code to your email.');
+        } else {
+          await verifyEmailOtp(email, otpToken);
+          setSuccessMsg('Email verified. Opening your account...');
+        }
+        return;
+      }
+
       if (isLogin && loginMethod === 'phone') {
         if (!otpSent) {
           await signInWithPhone(phone);
@@ -101,6 +114,9 @@ const AuthPage = () => {
 
   const changeLoginMethod = (method) => {
     setLoginMethod(method);
+    setOtpSent(false);
+    setEmailOtpSent(false);
+    setOtpToken('');
     resetMessages();
   };
 
@@ -181,17 +197,21 @@ const AuthPage = () => {
                 {successMsg && <div className="mb-4 border border-[#C6E9E9] bg-[#C6E9E9]/25 p-3 font-body text-[12px] text-[#244545]">{successMsg}</div>}
 
                 {isLogin && (
-                  <div className="mb-5 grid grid-cols-2 border border-[#2F4F4F]/12 bg-white/45 p-1">
-                    {['email', 'phone'].map((method) => (
+                  <div className="mb-5 grid grid-cols-3 border border-[#2F4F4F]/12 bg-white/45 p-1">
+                    {[
+                      { id: 'email', label: 'Password' },
+                      { id: 'email-code', label: 'Email Code' },
+                      { id: 'phone', label: 'Phone' },
+                    ].map((method) => (
                       <button
-                        key={method}
+                        key={method.id}
                         type="button"
-                        onClick={() => changeLoginMethod(method)}
+                        onClick={() => changeLoginMethod(method.id)}
                         className={`py-2.5 font-label text-[9px] font-bold uppercase tracking-[0.16em] transition-colors ${
-                          loginMethod === method ? 'bg-[#2F4F4F] text-[#FBF9F4]' : 'text-[#456565]/60 hover:text-[#2F4F4F]'
+                          loginMethod === method.id ? 'bg-[#2F4F4F] text-[#FBF9F4]' : 'text-[#456565]/60 hover:text-[#2F4F4F]'
                         }`}
                       >
-                        {method}
+                        {method.label}
                       </button>
                     ))}
                   </div>
@@ -205,10 +225,25 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {(!isLogin || loginMethod === 'email') && (
+                  {(!isLogin || loginMethod === 'email' || loginMethod === 'email-code') && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
-                      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={fieldClass} autoComplete="email" />
+                      <div className={loginMethod === 'email-code' && isLogin ? 'flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60' : ''}>
+                        {loginMethod === 'email-code' && isLogin && <Mail size={14} className="mb-3 mr-2 shrink-0 text-[#2F4F4F]/35" />}
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            setEmailOtpSent(false);
+                            setOtpToken('');
+                          }}
+                          placeholder="you@example.com"
+                          className={loginMethod === 'email-code' && isLogin ? 'w-full bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none placeholder:text-[#31332c]/20' : fieldClass}
+                          autoComplete="email"
+                        />
+                      </div>
                     </div>
                   )}
 
@@ -234,7 +269,7 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {isLogin && loginMethod === 'phone' && otpSent && (
+                  {isLogin && ((loginMethod === 'phone' && otpSent) || (loginMethod === 'email-code' && emailOtpSent)) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">One-Time Code</label>
                       <input type="text" required inputMode="numeric" value={otpToken} onChange={(e) => setOtpToken(e.target.value)} placeholder="123456" className={fieldClass} autoComplete="one-time-code" />
@@ -291,7 +326,15 @@ const AuthPage = () => {
                   type="submit"
                   className="w-full bg-[#2F4F4F] py-4 font-label text-[10px] font-semibold uppercase tracking-[0.25em] text-[#e0fffe] shadow-lg shadow-[#2F4F4F]/20 transition-all duration-300 hover:bg-[#1a3333] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isLoading ? 'Processing...' : isLogin && loginMethod === 'phone' ? (otpSent ? 'Verify Code' : 'Send Code') : isLogin ? 'Enter Portfolio' : 'Create Account'}
+                  {isLoading
+                    ? 'Processing...'
+                    : isLogin && loginMethod === 'phone'
+                      ? (otpSent ? 'Verify Code' : 'Send Code')
+                      : isLogin && loginMethod === 'email-code'
+                        ? (emailOtpSent ? 'Verify Code' : 'Send Email Code')
+                        : isLogin
+                          ? 'Enter Portfolio'
+                          : 'Create Account'}
                 </Motion.button>
               </Motion.form>
             </AnimatePresence>
