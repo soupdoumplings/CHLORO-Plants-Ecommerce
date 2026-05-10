@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     payment_method TEXT NOT NULL DEFAULT 'cod',
     payment_status TEXT NOT NULL DEFAULT 'pending',
     payment_reference TEXT,
+    email_order_updates BOOLEAN NOT NULL DEFAULT TRUE,
+    marketing_opt_in BOOLEAN NOT NULL DEFAULT FALSE,
     admin_notes TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

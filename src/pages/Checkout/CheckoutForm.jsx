@@ -450,6 +450,42 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             </Motion.div>
           )}
         </AnimatePresence>
+
+        <div className="mt-8 space-y-4 border-t border-[#B0B0A8]/20 pt-7">
+          <label className="flex cursor-pointer items-start gap-3 bg-white/55 p-4">
+            <input
+              type="checkbox"
+              checked={checkoutDetails.emailOrderUpdates}
+              onChange={(event) => updateDetails({ emailOrderUpdates: event.target.checked })}
+              className="mt-1 h-4 w-4 accent-[#0F3A3A]"
+            />
+            <span>
+              <span className="block font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
+                Email me order updates
+              </span>
+              <span className="mt-1 block font-body text-[12px] leading-relaxed text-[#5E6058]">
+                We will only send purchase, payment, and delivery updates for this order.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex cursor-pointer items-start gap-3 bg-white/35 p-4">
+            <input
+              type="checkbox"
+              checked={checkoutDetails.marketingEmails}
+              onChange={(event) => updateDetails({ marketingEmails: event.target.checked })}
+              className="mt-1 h-4 w-4 accent-[#785A1A]"
+            />
+            <span>
+              <span className="block font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
+                Send plant care tips and offers
+              </span>
+              <span className="mt-1 block font-body text-[12px] leading-relaxed text-[#5E6058]">
+                Optional. Leave this off if you only want essential order emails.
+              </span>
+            </span>
+          </label>
+        </div>
       </Motion.section>
     </div>
   );

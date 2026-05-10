@@ -20,6 +20,63 @@ const formatAddress = (address) => {
     .join(', ');
 };
 
+const getInputValue = (selector) => document.querySelector(selector)?.value?.trim() || '';
+
+const mergeVisibleCheckoutValues = (checkoutDetails) => ({
+  ...checkoutDetails,
+  email: checkoutDetails.email?.trim() || getInputValue('input[autocomplete="email"]'),
+  phone: checkoutDetails.phone?.trim() || getInputValue('input[autocomplete="tel"]'),
+  firstName: checkoutDetails.firstName?.trim() || getInputValue('input[autocomplete="given-name"]'),
+  lastName: checkoutDetails.lastName?.trim() || getInputValue('input[autocomplete="family-name"]'),
+  shippingAddress: {
+    ...checkoutDetails.shippingAddress,
+    addressLine: checkoutDetails.shippingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="shipping street-address"]'),
+    city: checkoutDetails.shippingAddress?.city?.trim() || getInputValue('input[autocomplete="shipping address-level2"]'),
+    country: checkoutDetails.shippingAddress?.country?.trim() || getInputValue('input[autocomplete="shipping country-name"]'),
+    postalCode: checkoutDetails.shippingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="shipping postal-code"]'),
+  },
+  billingAddress: {
+    ...checkoutDetails.billingAddress,
+    addressLine: checkoutDetails.billingAddress?.addressLine?.trim() || getInputValue('input[autocomplete="billing street-address"]'),
+    city: checkoutDetails.billingAddress?.city?.trim() || getInputValue('input[autocomplete="billing address-level2"]'),
+    country: checkoutDetails.billingAddress?.country?.trim() || getInputValue('input[autocomplete="billing country-name"]'),
+    postalCode: checkoutDetails.billingAddress?.postalCode?.trim() || getInputValue('input[autocomplete="billing postal-code"]'),
+  },
+});
+
+const createOrderWithConsentFallback = async (payload) => {
+  const insertOrder = async (orderPayload) => supabase
+    .from('orders')
+    .insert(orderPayload)
+    .select('id')
+    .single();
+
+  const { data, error } = await insertOrder(payload);
+  if (!error) return { data, error };
+
+  const message = String(error.message || '').toLowerCase();
+  if (!message.includes('email_order_updates') && !message.includes('marketing_opt_in')) {
+    return { data, error };
+  }
+
+  const compatiblePayload = { ...payload };
+  delete compatiblePayload.email_order_updates;
+  delete compatiblePayload.marketing_opt_in;
+  return insertOrder(compatiblePayload);
+};
+
+const sendOrderEmailNotification = async ({ orderId, enabled }) => {
+  if (!enabled) return;
+
+  const { error } = await supabase.functions.invoke('order-email-notifications', {
+    body: { orderId },
+  });
+
+  if (error) {
+    console.warn('Order email notification was not sent:', error.message);
+  }
+};
+
 const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
@@ -49,15 +106,17 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       return;
     }
 
-    const customerName = `${checkoutDetails.firstName || ''} ${checkoutDetails.lastName || ''}`.trim()
+    const visibleCheckoutDetails = mergeVisibleCheckoutValues(checkoutDetails);
+
+    const customerName = `${visibleCheckoutDetails.firstName || ''} ${visibleCheckoutDetails.lastName || ''}`.trim()
       || user?.user_metadata?.full_name
       || user?.email?.split('@')?.[0]
       || 'Customer';
-    const customerEmail = checkoutDetails.email?.trim() || user?.email || '';
-    const customerPhone = checkoutDetails.phone?.trim();
-    const shippingAddress = formatAddress(checkoutDetails.shippingAddress);
+    const customerEmail = visibleCheckoutDetails.email?.trim() || user?.email || '';
+    const customerPhone = visibleCheckoutDetails.phone?.trim();
+    const shippingAddress = formatAddress(visibleCheckoutDetails.shippingAddress);
 
-    if (!customerEmail || !customerPhone || !shippingAddress) {
+    if (!customerEmail || !customerPhone || !visibleCheckoutDetails.shippingAddress?.addressLine || !visibleCheckoutDetails.shippingAddress?.city) {
       setError('Please complete your email, phone, and shipping address.');
       return;
     }
@@ -68,22 +127,20 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     const baseUrl = getBaseUrl();
 
     try {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_email: customerEmail,
-          shipping_address: shippingAddress,
-          total_amount: total,
-          status: 'pending',
-          payment_method: paymentMethod,
-          payment_status: 'pending',
-          payment_reference: transactionId,
-        })
-        .select('id')
-        .single();
+      const { data: order, error: orderError } = await createOrderWithConsentFallback({
+        user_id: user.id,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_email: customerEmail,
+        shipping_address: shippingAddress,
+        total_amount: total,
+        status: 'pending',
+        payment_method: paymentMethod,
+        payment_status: 'pending',
+        payment_reference: transactionId,
+        email_order_updates: Boolean(visibleCheckoutDetails.emailOrderUpdates),
+        marketing_opt_in: Boolean(visibleCheckoutDetails.marketingEmails),
+      });
 
       if (orderError) throw orderError;
 
@@ -97,6 +154,11 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
 
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
+
+      await sendOrderEmailNotification({
+        orderId: order.id,
+        enabled: visibleCheckoutDetails.emailOrderUpdates,
+      });
 
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({

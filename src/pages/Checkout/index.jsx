@@ -28,6 +28,8 @@ const CheckoutPage = () => {
       postalCode: '',
     },
     sameAsShipping: true,
+    emailOrderUpdates: true,
+    marketingEmails: false,
   });
 
   return (
