@@ -167,23 +167,14 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const sendPasswordResetOtp = async (email) => {
+  const sendPasswordResetEmail = async (email) => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       throw new Error('Enter a valid email address.');
     }
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
-    if (error) throw error;
-    return data;
-  };
-
-  const verifyEmailOtp = async (email, token, type = 'email') => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: normalizedEmail,
-      token: String(token || '').trim(),
-      type,
+    const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      redirectTo: `${window.location.origin}/login?recovery=1`,
     });
 
     if (error) throw error;
@@ -228,7 +219,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, sendPasswordResetEmail, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

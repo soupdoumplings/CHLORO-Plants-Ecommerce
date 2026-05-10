@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Leaf, Phone } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa';
 import { useAuth } from '../../lib/AuthContext';
@@ -8,10 +8,12 @@ import { useAuth } from '../../lib/AuthContext';
 const fieldClass = 'w-full border-b border-[#2F4F4F]/15 bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60';
 
 const AuthPage = () => {
+  const location = useLocation();
+  const isRecoveryLink = new URLSearchParams(location.search).get('recovery') === '1';
   const [isLogin, setIsLogin] = useState(true);
   const [loginMethod, setLoginMethod] = useState('email');
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [resetStep, setResetStep] = useState(1);
+  const [isForgotPassword, setIsForgotPassword] = useState(isRecoveryLink);
+  const [resetStep, setResetStep] = useState(isRecoveryLink ? 3 : 1);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [otpToken, setOtpToken] = useState('');
@@ -25,7 +27,7 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword } = useAuth();
+  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, sendPasswordResetEmail, updatePassword } = useAuth();
   const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => ({
@@ -49,16 +51,8 @@ const AuthPage = () => {
       if (isForgotPassword) {
         if (resetStep === 1) {
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error('Enter a valid email address.');
-          await sendPasswordResetOtp(email);
-          setResetStep(2);
-          setSuccessMsg('Recovery code sent to your email.');
-          return;
-        }
-
-        if (resetStep === 2) {
-          await verifyEmailOtp(email, otpToken, 'recovery');
-          setResetStep(3);
-          setSuccessMsg('Code verified. Enter your new password.');
+          await sendPasswordResetEmail(email);
+          setSuccessMsg('Reset link sent. Open it from your email to set a new password.');
           return;
         }
 
@@ -71,6 +65,7 @@ const AuthPage = () => {
         setPassword('');
         setConfirmPassword('');
         setSuccessMsg('Password updated successfully. You can now sign in.');
+        navigate('/login', { replace: true });
         return;
       }
 
@@ -218,7 +213,7 @@ const AuthPage = () => {
                 </h2>
                 <p className="mb-6 font-body text-[13px] leading-relaxed text-[#797c73]">
                   {isForgotPassword
-                    ? (resetStep === 1 ? 'Enter your email to receive a recovery code.' : resetStep === 2 ? 'Check your email for the recovery code.' : 'Create a new password.')
+                    ? (resetStep === 1 ? 'Enter your email and Supabase will send a secure reset link.' : 'Create a new password for your account.')
                     : isLogin ? 'Continue to your orders, wishlist, and recommendations.' : 'Create your account to save billing details and shop faster.'}
                 </p>
 
@@ -290,7 +285,7 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {((isLogin && !isForgotPassword && loginMethod === 'phone' && otpSent) || (isForgotPassword && resetStep === 2)) && (
+                  {isLogin && !isForgotPassword && loginMethod === 'phone' && otpSent && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">One-Time Code</label>
                       <input type="text" required inputMode="numeric" value={otpToken} onChange={(e) => setOtpToken(e.target.value)} placeholder="123456" className={fieldClass} autoComplete="one-time-code" />
@@ -383,7 +378,7 @@ const AuthPage = () => {
                   {isLoading
                     ? 'Processing...'
                     : isForgotPassword
-                      ? (resetStep === 1 ? 'Send Recovery Code' : resetStep === 2 ? 'Verify Code' : 'Update Password')
+                      ? (resetStep === 1 ? 'Send Reset Link' : 'Update Password')
                     : isLogin && loginMethod === 'phone'
                       ? (otpSent ? 'Verify Code' : 'Send Code')
                         : isLogin
