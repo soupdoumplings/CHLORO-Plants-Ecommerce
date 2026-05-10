@@ -6,7 +6,8 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_AP
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const PRODUCT_CONTEXT_LIMIT = 12;
+const PRODUCT_CONTEXT_LIMIT = 20;
+const PRODUCT_FETCH_LIMIT = 40;
 
 const supabase = SUPABASE_URL && SERVICE_ROLE_KEY
   ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
@@ -234,6 +235,42 @@ const normalizeProduct = (product) => ({
   stock: Number(product.stock || 0),
 });
 
+const productCareScore = (product) => {
+  const text = [
+    product.name,
+    product.category,
+    product.description,
+    ...(product.tags || []),
+  ].join(' ').toLowerCase();
+
+  const careTerms = [
+    'care',
+    'tool',
+    'soil',
+    'fertilizer',
+    'feed',
+    'neem',
+    'spray',
+    'mist',
+    'meter',
+    'pruning',
+    'scissor',
+    'watering',
+    'fungal',
+    'diagnosis',
+  ];
+
+  const careScore = careTerms.reduce((score, term) => score + (text.includes(term) ? 2 : 0), 0);
+  const stockScore = product.stock > 0 ? 2 : 0;
+  return careScore + stockScore;
+};
+
+const rankProductsForPrompt = (products) => (
+  [...products]
+    .sort((a, b) => productCareScore(b) - productCareScore(a))
+    .slice(0, PRODUCT_CONTEXT_LIMIT)
+);
+
 const loadProducts = async () => {
   if (!supabase) return [];
 
@@ -243,20 +280,20 @@ const loadProducts = async () => {
       .select('id,name,price,category,tags,description,info,curator_quote,images,stock,is_active')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
-      .limit(PRODUCT_CONTEXT_LIMIT);
+      .limit(PRODUCT_FETCH_LIMIT);
 
     if (!activeResult.error) {
-      return (activeResult.data || []).map(normalizeProduct);
+      return rankProductsForPrompt((activeResult.data || []).map(normalizeProduct));
     }
 
     const fallbackResult = await supabase
       .from('products')
       .select('id,name,price,category,tags,description,info,curator_quote,images,stock')
       .order('created_at', { ascending: false })
-      .limit(PRODUCT_CONTEXT_LIMIT);
+      .limit(PRODUCT_FETCH_LIMIT);
 
     if (fallbackResult.error) throw fallbackResult.error;
-    return (fallbackResult.data || []).map(normalizeProduct);
+    return rankProductsForPrompt((fallbackResult.data || []).map(normalizeProduct));
   } catch (error) {
     console.error('Product lookup failed:', error.message);
     return [];
