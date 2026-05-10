@@ -105,7 +105,7 @@ const ProductCard = ({ product, index }) => {
     : product.price;
 
   const content = (
-    <article className="bg-[#F7F5EF] p-5">
+    <article className="border border-[#11110E]/10 bg-[#FFFEFA] p-5 transition-transform duration-300 hover:-translate-y-1">
       <div className="aspect-[1.12/1] overflow-hidden bg-[#E6E4DC]">
         {product.image ? (
           <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
@@ -115,14 +115,14 @@ const ProductCard = ({ product, index }) => {
           </div>
         )}
       </div>
-      <p className="mt-5 font-label text-[8px] uppercase tracking-[0.3em] text-[#7A756A]">{product.category || product.priority || 'Apothecary'}</p>
-      <h3 className="mt-2 font-headline text-[22px] leading-tight text-[#181812]">{product.name}</h3>
+      <p className="mt-5 font-label text-[8px] uppercase tracking-[0.3em] text-[#8A6A21]">{product.category || product.priority || 'Apothecary'}</p>
+      <h3 className="mt-2 font-headline text-[28px] leading-tight text-[#11110E]">{product.name}</h3>
       <p className="mt-3 min-h-[42px] font-body text-[12px] leading-relaxed text-[#6D695F]">{product.reason}</p>
       <button
         type="button"
         onClick={handleAdd}
         disabled={!isRealProduct}
-        className="mt-5 flex w-full items-center justify-center gap-2 bg-[#555555] px-4 py-3 text-[#FBF9F4] transition-colors hover:bg-[#181812] disabled:cursor-default disabled:bg-[#8F8B82]"
+        className="mt-5 flex w-full items-center justify-center gap-2 bg-[#11110E] px-4 py-3 text-[#FBF9F4] transition-colors hover:bg-[#2F2A22] disabled:cursor-default disabled:bg-[#8F8B82]"
       >
         <ShoppingBag className="h-3.5 w-3.5" />
         <span className="font-label text-[9px] uppercase tracking-[0.2em]">
@@ -244,40 +244,40 @@ const AiDiagnosisPage = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="min-h-screen bg-[#FAF8F2] text-[#181812]"
+      className="min-h-screen bg-[#F7F3EA] text-[#11110E]"
     >
       <Navbar />
 
       <main className="pt-[82px]">
-        <section className="grid grid-cols-1 border-b border-[#EDE9DF] px-6 py-12 md:px-10 md:py-16 lg:grid-cols-[1fr_210px]">
+        <section className="grid grid-cols-1 border-b border-[#11110E]/10 px-6 py-12 md:px-10 md:py-16 lg:grid-cols-[1fr_260px]">
           <div>
-            <p className="font-label text-[9px] uppercase tracking-[0.55em] text-[#736D61]">Botanical Intelligence v.2.4</p>
-            <h1 className="mt-4 max-w-[900px] font-headline text-[64px] leading-[0.88] tracking-[-0.03em] md:text-[100px]">
-              The Digital <span className="italic">Clinician</span>
+            <p className="font-label text-[9px] uppercase tracking-[0.55em] text-[#8A6A21]">Botanical Intelligence v.2.4</p>
+            <h1 className="mt-4 max-w-[1040px] font-headline text-[72px] leading-[0.78] md:text-[124px]">
+              Diagnostic <span className="italic">Atelier</span>
             </h1>
-            <p className="mt-8 max-w-[560px] font-body text-[15px] leading-relaxed text-[#69645B]">
-              Upload, drag, or paste a clear plant photo. Gemini reads visible symptoms, then returns a practical care assessment for Nepal homes and CHLORO inventory.
+            <p className="mt-8 max-w-[620px] font-body text-[15px] leading-relaxed text-[#5E5A52]">
+              Upload a clear plant photograph. Gemini studies the visible symptoms, then returns a composed care protocol for Nepal homes and CHLORO inventory.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {['Upload', 'Drag', 'Paste'].map((item) => (
-                <span key={item} className="border border-[#DED8CC] bg-[#FFFEFA] px-4 py-2 font-label text-[9px] uppercase tracking-[0.22em] text-[#6D695F]">
+                <span key={item} className="border border-[#11110E]/12 bg-[#FFFEFA] px-4 py-2 font-label text-[9px] uppercase tracking-[0.22em] text-[#6D695F]">
                   {item}
                 </span>
               ))}
             </div>
           </div>
           <div className="mt-10 flex items-center justify-start lg:mt-0 lg:justify-center">
-            <div className="flex h-24 w-24 items-center justify-center bg-[#E7E7DF] text-[#456565]">
-              <Leaf className="h-8 w-8 fill-current" />
+            <div className="flex h-28 w-28 items-center justify-center border border-[#11110E] bg-[#11110E] text-[#F7F3EA]">
+              <Leaf className="h-9 w-9" />
             </div>
           </div>
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-[42vw_1fr]">
-          <aside className="border-b border-[#EDE9DF] px-6 py-12 md:px-10 lg:min-h-[1200px] lg:border-b-0 lg:border-r">
+          <aside className="border-b border-[#11110E]/10 px-6 py-12 md:px-10 lg:min-h-[1200px] lg:border-b-0 lg:border-r">
             <div className="flex max-w-[520px] items-center justify-between gap-5">
               <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">01. Capture Specimen</p>
-              <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#456565]">{clinicalState}</p>
+              <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#8A6A21]">{clinicalState}</p>
             </div>
 
             <label
@@ -292,7 +292,7 @@ const AiDiagnosisPage = () => {
                 handleFiles(event.dataTransfer.files);
               }}
               className={`relative mt-8 block aspect-[4/5] max-w-[520px] cursor-pointer overflow-hidden border bg-[#F0D0A4] transition-all duration-300 ${
-                isDragging ? 'border-[#456565] shadow-[0_20px_80px_rgba(69,101,101,0.14)]' : 'border-[#D7C8AE]'
+                isDragging ? 'border-[#11110E] shadow-[0_20px_80px_rgba(17,17,14,0.14)]' : 'border-[#D7C8AE]'
               }`}
             >
               <input
@@ -306,8 +306,8 @@ const AiDiagnosisPage = () => {
                 alt="Plant specimen"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-[#EFC98F]/10" />
-              <div className="absolute left-1/2 top-1/2 flex w-[220px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center border border-white/55 bg-[#F5F2E9]/92 px-5 py-8 text-center shadow-[0_18px_60px_rgba(24,24,18,0.08)] backdrop-blur-sm">
+              <div className="absolute inset-0 bg-[#11110E]/10" />
+              <div className="absolute left-1/2 top-1/2 flex w-[230px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center border border-white/65 bg-[#FFFEFA]/92 px-5 py-8 text-center shadow-[0_18px_60px_rgba(24,24,18,0.12)] backdrop-blur-sm">
                 {isPreparing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                 <span className="mt-5 font-label text-[9px] uppercase tracking-[0.18em] text-[#565149]">
                   {image ? 'Replace Specimen' : 'Upload New Specimen'}
@@ -317,8 +317,8 @@ const AiDiagnosisPage = () => {
                 </span>
               </div>
               {(isPreparing || isAnalyzing) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#FAF8F2]/75">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#456565]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-[#F7F3EA]/75">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#11110E]" />
                 </div>
               )}
             </label>
@@ -339,13 +339,13 @@ const AiDiagnosisPage = () => {
               </div>
             </div>
 
-            <div className="mt-10 max-w-[520px] border border-[#DED8CC] bg-[#FFFEFA] p-5">
+            <div className="mt-10 max-w-[520px] border border-[#11110E]/12 bg-[#FFFEFA] p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                  <LocateFixed className="mt-0.5 h-4 w-4 shrink-0 text-[#456565]" />
+                  <LocateFixed className="mt-0.5 h-4 w-4 shrink-0 text-[#8A6A21]" />
                   <div>
                     <p className="font-label text-[9px] uppercase tracking-[0.28em] text-[#6D695F]">Location Context</p>
-                    <p className="mt-2 font-body text-[12px] leading-relaxed text-[#6D695F]">
+                    <p className="mt-2 font-body text-[12px] leading-relaxed text-[#5E5A52]">
                       {locating
                         ? 'Detecting your current plant-care climate...'
                         : location
@@ -363,7 +363,7 @@ const AiDiagnosisPage = () => {
                   type="button"
                   onClick={handleUseCurrentLocation}
                   disabled={!isSupported || locating}
-                  className="shrink-0 border border-[#456565] px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#456565] transition-colors hover:bg-[#456565] hover:text-[#FFFEFA] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="shrink-0 border border-[#11110E] px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {locating ? 'Locating' : location ? 'Refresh' : 'Use Location'}
                 </button>
@@ -383,7 +383,7 @@ const AiDiagnosisPage = () => {
                 onChange={(event) => setNotes(event.target.value)}
                 rows={6}
                 placeholder="Yellow lower leaves, sticky residue, brown tips, recent repotting, balcony sun..."
-                className="mt-4 w-full resize-none border border-[#DED8CC] bg-[#FFFEFA] p-4 font-body text-sm leading-relaxed text-[#333029] outline-none placeholder:text-[#918B80] focus:border-[#785A1A]"
+                className="mt-4 w-full resize-none border border-[#11110E]/12 bg-[#FFFEFA] p-4 font-body text-sm leading-relaxed text-[#333029] outline-none placeholder:text-[#918B80] focus:border-[#11110E]"
               />
               {error && (
                 <div className="mt-4 flex gap-3 border border-[#A90000]/25 bg-[#A90000]/5 px-4 py-3 text-[#A90000]">
@@ -396,7 +396,7 @@ const AiDiagnosisPage = () => {
                   type="button"
                   onClick={handleAnalyze}
                   disabled={!image || isPreparing || isAnalyzing}
-                  className="flex items-center justify-center gap-3 bg-[#181812] px-6 py-4 text-[#FAF8F2] transition-colors hover:bg-[#555555] disabled:cursor-not-allowed disabled:bg-[#A8A298]"
+                  className="flex items-center justify-center gap-3 bg-[#11110E] px-6 py-4 text-[#F7F3EA] transition-colors hover:bg-[#2F2A22] disabled:cursor-not-allowed disabled:bg-[#A8A298]"
                 >
                   {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                   <span className="font-label text-[10px] uppercase tracking-[0.2em]">
@@ -412,7 +412,7 @@ const AiDiagnosisPage = () => {
                       setError('');
                       setCaptureNotice('');
                     }}
-                    className="flex w-14 items-center justify-center border border-[#DED8CC] bg-[#FFFEFA] text-[#6D695F] transition-colors hover:border-[#181812] hover:text-[#181812]"
+                    className="flex w-14 items-center justify-center border border-[#11110E]/12 bg-[#FFFEFA] text-[#6D695F] transition-colors hover:border-[#11110E] hover:text-[#11110E]"
                     title="Clear specimen"
                   >
                     <X className="h-4 w-4" />
@@ -423,8 +423,8 @@ const AiDiagnosisPage = () => {
           </aside>
 
           <section className="px-6 py-12 md:px-12">
-            <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">02. Analysis & Results</p>
-            <h2 className="mt-8 font-headline text-[38px] leading-tight text-[#A90000] md:text-[45px]">
+            <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#8A6A21]">02. Analysis & Results</p>
+            <h2 className="mt-8 max-w-[820px] font-headline text-[48px] leading-[0.92] text-[#11110E] md:text-[68px]">
               {resultTitle}
             </h2>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -436,9 +436,9 @@ const AiDiagnosisPage = () => {
               </span>
             </div>
 
-            <article className="mt-16 max-w-[700px] bg-white px-8 py-9 shadow-[0_1px_0_rgba(0,0,0,0.05)] md:px-12 md:py-11">
-              <h3 className="font-headline text-[25px] italic">The Assessment</h3>
-              <p className="mt-8 font-body text-[14px] leading-loose text-[#6C675E]">
+            <article className="mt-16 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-9 shadow-[0_1px_0_rgba(0,0,0,0.05)] md:px-12 md:py-11">
+              <h3 className="font-headline text-[34px] italic">The Assessment</h3>
+              <p className="mt-8 font-body text-[15px] leading-loose text-[#5E5A52]">
                 {result?.summary || (image
                   ? 'The specimen is captured. Begin clinical analysis to receive a structured reading of pigmentation, visible stress, likely causes, and care steps for Nepal conditions.'
                   : 'Awaiting a live specimen. Upload, drag, or paste a plant image to activate Gemini analysis. The assessment will remain grounded in visible evidence and local care context.')}
@@ -448,27 +448,27 @@ const AiDiagnosisPage = () => {
               </p>
             </article>
 
-            <div className="mt-14 flex max-w-[700px] items-center justify-between border-b border-[#E5E1D7] pb-5">
+            <div className="mt-14 flex max-w-[760px] items-center justify-between border-b border-[#11110E]/10 pb-5">
               <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">03. Prescribed Apothecary</p>
-              <Link to="/products-gifts" className="font-label text-[8px] uppercase tracking-[0.18em] text-[#785A1A] underline underline-offset-4">
+              <Link to="/products-gifts" className="font-label text-[8px] uppercase tracking-[0.18em] text-[#8A6A21] underline underline-offset-4">
                 View Full Range
               </Link>
             </div>
             {result && displayProducts.length ? (
-              <div className="mt-8 grid max-w-[700px] grid-cols-1 gap-7 sm:grid-cols-2">
+              <div className="mt-8 grid max-w-[760px] grid-cols-1 gap-7 sm:grid-cols-2">
                 {displayProducts.slice(0, 2).map((product, index) => (
                   <ProductCard key={product.id || product.name} product={product} index={index} />
                 ))}
               </div>
             ) : result ? (
-              <div className="mt-8 max-w-[700px] border border-[#E5E1D7] bg-white px-8 py-7">
+              <div className="mt-8 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-7">
                 <p className="font-headline text-[24px] italic text-[#181812]">No prescribed product yet.</p>
                 <p className="mt-3 font-body text-[13px] leading-relaxed text-[#6D695F]">
                   Gemini did not find a matching item in CHLORO inventory. Add care products in the database to make this section recommend only real stock.
                 </p>
               </div>
             ) : (
-              <div className="mt-8 max-w-[700px] border border-[#E5E1D7] bg-[#FFFEFA] px-8 py-7">
+              <div className="mt-8 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-7">
                 <p className="font-headline text-[24px] italic text-[#181812]">Prescriptions unlock after analysis.</p>
                 <p className="mt-3 font-body text-[13px] leading-relaxed text-[#6D695F]">
                   The assistant will only recommend products that exist in your CHLORO product database.
@@ -476,7 +476,7 @@ const AiDiagnosisPage = () => {
               </div>
             )}
 
-            <div className="mt-16 max-w-[700px] border-t border-[#E5E1D7] pt-10">
+            <div className="mt-16 max-w-[760px] border-t border-[#11110E]/10 pt-10">
               <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">Recovery Protocol</p>
               <div className="mt-7 space-y-7">
                 {protocol.slice(0, 4).map((item, index) => (
@@ -499,20 +499,20 @@ const AiDiagnosisPage = () => {
           </section>
         </section>
 
-        <section className="bg-[#F2F0E8] px-6 py-24 text-center md:px-10">
-          <h2 className="font-headline text-[45px] leading-tight md:text-[54px]">
-            Expertise delivered <span className="italic">weekly.</span>
+        <section className="bg-[#11110E] px-6 py-24 text-center text-[#F7F3EA] md:px-10">
+          <h2 className="font-headline text-[52px] leading-[0.9] md:text-[70px]">
+            Care notes, <span className="italic">composed weekly.</span>
           </h2>
-          <p className="mx-auto mt-5 max-w-[410px] font-body text-[13px] leading-relaxed text-[#777166]">
+          <p className="mx-auto mt-5 max-w-[430px] font-body text-[13px] leading-relaxed text-[#F7F3EA]/64">
             Join our inner circle for clinical plant care insights and early access to the archive.
           </p>
-          <form className="mx-auto mt-12 flex max-w-[440px] items-center border-b border-[#9D968A]">
+          <form className="mx-auto mt-12 flex max-w-[440px] items-center border-b border-[#D8B56D]/60">
             <input
               type="email"
               placeholder="EMAIL ADDRESS"
-              className="min-w-0 flex-1 bg-transparent py-3 font-label text-[9px] uppercase tracking-[0.2em] outline-none placeholder:text-[#9D968A]"
+              className="min-w-0 flex-1 bg-transparent py-3 font-label text-[9px] uppercase tracking-[0.2em] outline-none placeholder:text-[#F7F3EA]/40"
             />
-            <button type="button" className="py-3 font-label text-[9px] uppercase tracking-[0.2em] text-[#555047]">Submit</button>
+            <button type="button" className="py-3 font-label text-[9px] uppercase tracking-[0.2em] text-[#D8B56D]">Submit</button>
           </form>
         </section>
       </main>

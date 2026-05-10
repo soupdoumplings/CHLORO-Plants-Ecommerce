@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const STORAGE_KEY = 'chloro-essential-storage-notice';
 
 const CookieNotice = () => {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setVisible(window.localStorage.getItem(STORAGE_KEY) !== 'dismissed');
-  }, []);
+  const [visible, setVisible] = useState(() => window.localStorage.getItem(STORAGE_KEY) !== 'dismissed');
 
   const dismiss = () => {
     window.localStorage.setItem(STORAGE_KEY, 'dismissed');
