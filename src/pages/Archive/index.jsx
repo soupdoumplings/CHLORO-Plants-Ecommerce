@@ -6,6 +6,7 @@ import ArchiveHeader from './ArchiveHeader';
 import BroadcastWidget from './BroadcastWidget';
 import MetricsGrid from './MetricsGrid';
 import OrdersTable from './OrdersTable';
+import StockInfoBar from './StockInfoBar';
 import InventoryTable from './InventoryTable';
 import SystemLog from './SystemLog';
 import { supabase } from '../../supabase';
@@ -69,6 +70,7 @@ const ArchivePage = () => {
         <BroadcastWidget />
         <MetricsGrid products={products} orders={orders} loading={loading || ordersLoading} />
         <OrdersTable orders={orders} loading={ordersLoading} onRefresh={fetchOrders} />
+        <StockInfoBar products={products} loading={loading} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
         <SystemLog orders={orders} loading={ordersLoading} />
       </main>
