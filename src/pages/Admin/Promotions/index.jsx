@@ -101,6 +101,10 @@ const PromotionsPage = () => {
     setError('');
 
     try {
+      if (new Date(formData.end_at).getTime() <= new Date(formData.start_at).getTime()) {
+        throw new Error('Sale end time must be after the start time.');
+      }
+
       const status = getStatus(formData);
       const { error: insertError } = await supabase.from('promotions').insert({
         product_id: formData.product_id,
@@ -197,7 +201,7 @@ const PromotionsPage = () => {
                       <span className={`px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] ${statusStyle[status] || statusStyle.scheduled}`}>
                         {status}
                       </span>
-                      <h2 className="mt-4 font-headline text-3xl leading-tight">{promotion.products?.name || 'Plant'}</h2>
+                      <h2 className="mt-4 font-headline text-3xl leading-tight">{promotion.products?.name || 'Product'}</h2>
                       <p className="mt-2 font-body text-sm text-[#5E6058]">
                         {promotion.discount_percent}% off from {new Date(promotion.start_at).toLocaleString()} to {new Date(promotion.end_at).toLocaleString()}
                       </p>
@@ -248,14 +252,14 @@ const PromotionsPage = () => {
               <h2 className="font-headline text-4xl">New Sale</h2>
               <div className="mt-8 space-y-6">
                 <label className="block">
-                  <span className="font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#5E6058]">Plant</span>
+                  <span className="font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#5E6058]">Product</span>
                   <select
                     required
                     value={formData.product_id}
                     onChange={(event) => setFormData({ ...formData, product_id: event.target.value })}
                     className="mt-2 w-full border border-[#B1B3A9]/30 bg-white px-4 py-3 font-body text-sm outline-none focus:border-[#785A1A]"
                   >
-                    <option value="">Choose a plant</option>
+                    <option value="">Choose a product</option>
                     {products.map((product) => (
                       <option key={product.id} value={product.id}>{product.name} / {formatRupees(product.price)}</option>
                     ))}

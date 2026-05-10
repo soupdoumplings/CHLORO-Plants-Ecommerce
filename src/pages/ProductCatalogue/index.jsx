@@ -9,16 +9,12 @@ import { useWishlist } from '../../lib/WishlistContext';
 import { supabase } from '../../supabase';
 import heroImage from '../../assets/discovery-hero.png';
 import { fallbackCatalogImage } from '../../lib/localImages';
+import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 const fallbackImage = fallbackCatalogImage;
 
 const filters = ['All', 'Plants', 'Care', 'Gifts'];
 const sorts = ['Latest', 'Price: Low', 'Price: High'];
-
-const formatPrice = (price) => `रू ${Number(price || 0).toLocaleString('en-NP', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})}`;
 
 const textIncludes = (product, terms) => {
   const text = [
@@ -37,7 +33,7 @@ const getProductType = (product) => {
     return 'Gifts';
   }
 
-  if (textIncludes(product, ['tool', 'care', 'soil', 'fertilizer', 'feed', 'secateur', 'scissor', 'watering', 'spray', 'mist'])) {
+  if (textIncludes(product, ['tool', 'care', 'soil', 'fertilizer', 'feed', 'secateur', 'scissor', 'pruning', 'watering', 'spray', 'mist', 'neem', 'meter'])) {
     return 'Care';
   }
 
@@ -45,12 +41,16 @@ const getProductType = (product) => {
 };
 
 const normalizeProduct = (product) => {
-  const rawPrice = Number(product.price || 0);
+  const isOnSale = hasActiveSale(product);
+  const rawPrice = getEffectivePrice(product);
 
   return {
     ...product,
     rawPrice,
-    displayPrice: formatPrice(rawPrice),
+    originalPrice: Number(product.price || 0),
+    salePrice: isOnSale ? Number(product.sale_price || 0) : null,
+    isOnSale,
+    displayPrice: formatRupees(rawPrice),
     image: product.images?.[0] || product.image || fallbackImage,
     category: product.category || 'Indoor Plants',
     tags: Array.isArray(product.tags) ? product.tags : [],
@@ -72,6 +72,8 @@ const ProductTile = ({ product, index }) => {
       ...product,
       price: product.rawPrice,
       rawPrice: product.rawPrice,
+      effectivePrice: product.rawPrice,
+      salePrice: product.salePrice,
     });
 
     if (result?.success) {
@@ -98,11 +100,16 @@ const ProductTile = ({ product, index }) => {
     >
       <Link to={`/catalogue/${product.id}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-[#E8E9E0]">
-          <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
-          <div className="absolute left-4 top-4 flex gap-2">
+          <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
+          <div className="absolute left-4 top-4 flex flex-wrap gap-2">
             <span className="bg-[#0F3A3A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-[#FBF9F4]">
               {product.type}
             </span>
+            {product.isOnSale && (
+              <span className="bg-[#785A1A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-[#FBF9F4]">
+                Sale
+              </span>
+            )}
           </div>
           <button
             type="button"
@@ -130,7 +137,12 @@ const ProductTile = ({ product, index }) => {
             <h2 className="font-headline text-[25px] leading-tight text-[#1D241F] transition-colors group-hover:text-[#785A1A]">{product.name}</h2>
             <p className="mt-2 font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#797C73]">{product.category}</p>
           </div>
-          <p className="shrink-0 font-headline text-[18px] text-[#1D241F]">{product.displayPrice}</p>
+          <div className="shrink-0 text-right">
+            {product.isOnSale && (
+              <p className="font-body text-[11px] text-[#797C73]/55 line-through">{formatRupees(product.originalPrice)}</p>
+            )}
+            <p className="font-headline text-[18px] text-[#1D241F]">{product.displayPrice}</p>
+          </div>
         </div>
       </Link>
     </Motion.article>
@@ -215,7 +227,7 @@ const ProductCataloguePage = () => {
 
       <main className="flex-grow">
         <section className="relative min-h-[560px] overflow-hidden pt-[130px]">
-          <img src={heroImage} alt="Products and gifts" className="absolute inset-0 h-full w-full object-cover" />
+          <img src={heroImage} alt="Products and gifts" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[9000ms] hover:scale-[1.03]" />
           <div className="absolute inset-0 bg-[#071F1F]/55" />
           <div className="relative z-10 page-shell page-gutter pb-16 text-[#FBF9F4]">
             <Motion.p
@@ -284,7 +296,7 @@ const ProductCataloguePage = () => {
                 key={filter}
                 type="button"
                 onClick={() => setActiveFilter(filter)}
-                className={`flex items-center gap-2 rounded-full border px-4 py-2.5 transition-colors ${
+                className={`flex items-center gap-2 border px-4 py-2.5 transition-colors ${
                   activeFilter === filter
                     ? 'border-[#0F3A3A] bg-[#0F3A3A] text-[#FBF9F4]'
                     : 'border-[#D9DBCF] bg-white text-[#31332C] hover:border-[#0F3A3A]/40'

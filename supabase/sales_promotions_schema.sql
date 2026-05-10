@@ -32,6 +32,48 @@ CREATE TABLE IF NOT EXISTS public.promotions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.promotions
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+ALTER TABLE public.promotions
+  ALTER COLUMN status SET DEFAULT 'scheduled';
+
+UPDATE public.promotions
+SET status = 'scheduled'
+WHERE status IS NULL;
+
+UPDATE public.promotions
+SET created_at = NOW()
+WHERE created_at IS NULL;
+
+ALTER TABLE public.promotions
+  DROP CONSTRAINT IF EXISTS promotions_discount_percent_check;
+
+ALTER TABLE public.promotions
+  ADD CONSTRAINT promotions_discount_percent_check
+  CHECK (discount_percent > 0 AND discount_percent <= 90);
+
+ALTER TABLE public.promotions
+  DROP CONSTRAINT IF EXISTS promotions_status_check;
+
+ALTER TABLE public.promotions
+  ADD CONSTRAINT promotions_status_check
+  CHECK (status IN ('scheduled', 'active', 'expired'));
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'promotions_product_id_fkey'
+      AND conrelid = 'public.promotions'::regclass
+  ) THEN
+    ALTER TABLE public.promotions
+      ADD CONSTRAINT promotions_product_id_fkey
+      FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS promotions_product_id_idx ON public.promotions(product_id);
 CREATE INDEX IF NOT EXISTS promotions_status_idx ON public.promotions(status);
 CREATE INDEX IF NOT EXISTS products_sale_idx ON public.products(is_on_sale, sale_ends_at);
