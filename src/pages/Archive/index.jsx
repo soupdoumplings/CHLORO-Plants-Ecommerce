@@ -11,6 +11,11 @@ import InventoryTable from './InventoryTable';
 import SystemLog from './SystemLog';
 import { supabase } from '../../supabase';
 
+const normalizeRpcOrder = (order) => ({
+  ...order,
+  order_items: Array.isArray(order.order_items) ? order.order_items : [],
+});
+
 const ArchivePage = () => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -39,17 +44,28 @@ const ArchivePage = () => {
     try {
       setOrdersLoading(true);
       setOrdersError('');
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from('orders')
         .select('*, order_items(*)')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
 
       if (error) throw error;
-      setOrders(data || []);
+
+      if ((data || []).length > 0 || count === 0) {
+        setOrders(data || []);
+        return;
+      }
+
+      const { data: rpcData, error: rpcError } = await supabase.rpc('admin_order_queue');
+      if (rpcError) throw rpcError;
+      setOrders((rpcData || []).map(normalizeRpcOrder));
     } catch (err) {
       console.error('Error fetching orders:', err.message);
       setOrders([]);
-      setOrdersError(err.message || 'Could not load customer orders.');
+      setOrdersError(
+        `${err.message || 'Could not load customer orders.'} If customers can see orders but admin cannot, run supabase/admin_orders_visibility_patch.sql in Supabase SQL Editor.`
+      );
     } finally {
       setOrdersLoading(false);
     }

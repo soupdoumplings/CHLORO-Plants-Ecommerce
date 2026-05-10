@@ -58,4 +58,69 @@ CREATE INDEX IF NOT EXISTS orders_user_id_idx ON public.orders(user_id);
 CREATE INDEX IF NOT EXISTS orders_created_at_idx ON public.orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS order_items_order_id_idx ON public.order_items(order_id);
 
+CREATE OR REPLACE FUNCTION public.admin_order_queue()
+RETURNS TABLE (
+    id UUID,
+    user_id UUID,
+    customer_name TEXT,
+    customer_phone TEXT,
+    customer_email TEXT,
+    shipping_address TEXT,
+    total_amount NUMERIC,
+    status TEXT,
+    payment_method TEXT,
+    payment_status TEXT,
+    payment_reference TEXT,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    order_items JSONB
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Only admins can read the fulfillment queue.';
+    END IF;
+
+    RETURN QUERY
+    SELECT
+        orders.id,
+        orders.user_id,
+        orders.customer_name,
+        orders.customer_phone,
+        orders.customer_email,
+        orders.shipping_address,
+        orders.total_amount,
+        orders.status::TEXT,
+        orders.payment_method,
+        orders.payment_status,
+        orders.payment_reference,
+        orders.created_at,
+        orders.updated_at,
+        COALESCE(
+            JSONB_AGG(
+                JSONB_BUILD_OBJECT(
+                    'id', order_items.id,
+                    'order_id', order_items.order_id,
+                    'product_id', order_items.product_id,
+                    'quantity', order_items.quantity,
+                    'price_at_time', order_items.price_at_time,
+                    'product_name', order_items.product_name,
+                    'created_at', order_items.created_at
+                )
+            ) FILTER (WHERE order_items.id IS NOT NULL),
+            '[]'::JSONB
+        ) AS order_items
+    FROM public.orders
+    LEFT JOIN public.order_items ON order_items.order_id = orders.id
+    GROUP BY orders.id
+    ORDER BY orders.created_at DESC
+    LIMIT 100;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_order_queue() TO authenticated;
+
 NOTIFY pgrst, 'reload schema';
