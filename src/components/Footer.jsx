@@ -3,8 +3,9 @@ import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const shopLinks = [
-  { label: 'All Products', to: '/discovery' },
-  { label: 'Catalogue', to: '/catalogue' },
+  { label: 'Shop Collection', to: '/discovery' },
+  { label: 'Products & Gifts', to: '/products-gifts' },
+  { label: 'Plant Catalogue', to: '/catalogue' },
   { label: 'Plant Care', to: '/journal' },
   { label: 'AI Diagnosis', to: '/ai-diagnosis' },
 ];

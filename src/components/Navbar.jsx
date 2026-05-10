@@ -109,6 +109,12 @@ const Navbar = () => {
                 >
                   Shop
                 </Link>
+                <Link
+                  to="/products-gifts"
+                  className={`transition-all duration-300 ${location.pathname === '/products-gifts' ? `${text} border-b ${border}` : `${textDim} hover:text-[#628141]`}`}
+                >
+                  Gifts
+                </Link>
                 {user && (
                   <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:text-[#628141] transition-colors`}>The Journal</Link>
                 )}
