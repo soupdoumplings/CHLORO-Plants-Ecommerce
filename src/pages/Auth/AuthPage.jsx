@@ -10,6 +10,8 @@ const fieldClass = 'w-full border-b border-[#2F4F4F]/15 bg-transparent pb-3 font
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loginMethod, setLoginMethod] = useState('email');
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetStep, setResetStep] = useState(1);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [otpToken, setOtpToken] = useState('');
@@ -24,7 +26,7 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp } = useAuth();
+  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword } = useAuth();
   const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => ({
@@ -45,6 +47,34 @@ const AuthPage = () => {
     setIsLoading(true);
 
     try {
+      if (isForgotPassword) {
+        if (resetStep === 1) {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error('Enter a valid email address.');
+          await sendPasswordResetOtp(email);
+          setResetStep(2);
+          setSuccessMsg('Recovery code sent to your email.');
+          return;
+        }
+
+        if (resetStep === 2) {
+          await verifyEmailOtp(email, otpToken, 'recovery');
+          setResetStep(3);
+          setSuccessMsg('Code verified. Enter your new password.');
+          return;
+        }
+
+        if (!isPasswordStrong) throw new Error('Password must be 8+ characters and include a special character.');
+        if (password !== confirmPassword) throw new Error('Passwords do not match.');
+        await updatePassword(password);
+        setIsForgotPassword(false);
+        setResetStep(1);
+        setOtpToken('');
+        setPassword('');
+        setConfirmPassword('');
+        setSuccessMsg('Password updated successfully. You can now sign in.');
+        return;
+      }
+
       if (isLogin && loginMethod === 'email-code') {
         if (!emailOtpSent) {
           await signInWithEmailOtp(email);
@@ -117,6 +147,18 @@ const AuthPage = () => {
     setOtpSent(false);
     setEmailOtpSent(false);
     setOtpToken('');
+    setIsForgotPassword(false);
+    setResetStep(1);
+    resetMessages();
+  };
+
+  const toggleAuthMode = (mode) => {
+    setIsLogin(mode === 'login');
+    setIsForgotPassword(false);
+    setResetStep(1);
+    setOtpSent(false);
+    setEmailOtpSent(false);
+    setOtpToken('');
     resetMessages();
   };
 
@@ -163,23 +205,23 @@ const AuthPage = () => {
         <div className="flex flex-1 items-center justify-center px-8 py-8 md:px-16 lg:px-20">
           <div className="w-full max-w-[390px]">
             <div className="mb-6 flex items-center gap-8">
-              <button type="button" onClick={() => { setIsLogin(true); resetMessages(); }} className="relative pb-3 outline-none">
-                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
+              <button type="button" onClick={() => toggleAuthMode('login')} className="relative pb-3 outline-none">
+                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${isLogin && !isForgotPassword ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Sign In
                 </span>
-                {isLogin && <Motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]" />}
+                {isLogin && !isForgotPassword && <Motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]" />}
               </button>
-              <button type="button" onClick={() => { setIsLogin(false); resetMessages(); }} className="relative pb-3 outline-none">
-                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${!isLogin ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
+              <button type="button" onClick={() => toggleAuthMode('signup')} className="relative pb-3 outline-none">
+                <span className={`font-label text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${!isLogin && !isForgotPassword ? 'text-[#2F4F4F]' : 'text-[#2F4F4F]/25 hover:text-[#2F4F4F]/50'}`}>
                   Create Account
                 </span>
-                {!isLogin && <Motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]" />}
+                {!isLogin && !isForgotPassword && <Motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#2F4F4F]" />}
               </button>
             </div>
 
             <AnimatePresence mode="wait">
               <Motion.form
-                key={isLogin ? `login-${loginMethod}` : 'signup'}
+                key={isForgotPassword ? `forgot-${resetStep}` : isLogin ? `login-${loginMethod}` : 'signup'}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -187,16 +229,18 @@ const AuthPage = () => {
                 onSubmit={handleAuth}
               >
                 <h2 className="mb-2 font-headline text-[2.1rem] leading-tight text-[#31332c]">
-                  {isLogin ? 'Welcome back.' : 'Join CHLORO.'}
+                  {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome back.' : 'Join CHLORO.'}
                 </h2>
                 <p className="mb-6 font-body text-[13px] leading-relaxed text-[#797c73]">
-                  {isLogin ? 'Continue to your orders, wishlist, and recommendations.' : 'Create your account to save billing details and shop faster.'}
+                  {isForgotPassword
+                    ? (resetStep === 1 ? 'Enter your email to receive a recovery code.' : resetStep === 2 ? 'Check your email for the recovery code.' : 'Create a new password.')
+                    : isLogin ? 'Continue to your orders, wishlist, and recommendations.' : 'Create your account to save billing details and shop faster.'}
                 </p>
 
                 {errorMsg && <div className="mb-4 border border-red-100 bg-red-50 p-3 font-body text-[12px] text-red-500">{errorMsg}</div>}
                 {successMsg && <div className="mb-4 border border-[#C6E9E9] bg-[#C6E9E9]/25 p-3 font-body text-[12px] text-[#244545]">{successMsg}</div>}
 
-                {isLogin && (
+                {isLogin && !isForgotPassword && (
                   <div className="mb-5 grid grid-cols-3 border border-[#2F4F4F]/12 bg-white/45 p-1">
                     {[
                       { id: 'email', label: 'Password' },
@@ -218,18 +262,18 @@ const AuthPage = () => {
                 )}
 
                 <div className="mb-7 space-y-5">
-                  {!isLogin && (
+                  {!isLogin && !isForgotPassword && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Full Name</label>
                       <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your Name" className={fieldClass} autoComplete="name" />
                     </div>
                   )}
 
-                  {(!isLogin || loginMethod === 'email' || loginMethod === 'email-code') && (
+                  {((!isLogin && !isForgotPassword) || (isLogin && !isForgotPassword && (loginMethod === 'email' || loginMethod === 'email-code')) || (isForgotPassword && resetStep === 1)) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
-                      <div className={loginMethod === 'email-code' && isLogin ? 'flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60' : ''}>
-                        {loginMethod === 'email-code' && isLogin && <Mail size={14} className="mb-3 mr-2 shrink-0 text-[#2F4F4F]/35" />}
+                      <div className={loginMethod === 'email-code' && isLogin && !isForgotPassword ? 'flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60' : ''}>
+                        {loginMethod === 'email-code' && isLogin && !isForgotPassword && <Mail size={14} className="mb-3 mr-2 shrink-0 text-[#2F4F4F]/35" />}
                         <input
                           type="email"
                           required
@@ -240,14 +284,14 @@ const AuthPage = () => {
                             setOtpToken('');
                           }}
                           placeholder="you@example.com"
-                          className={loginMethod === 'email-code' && isLogin ? 'w-full bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none placeholder:text-[#31332c]/20' : fieldClass}
+                          className={loginMethod === 'email-code' && isLogin && !isForgotPassword ? 'w-full bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none placeholder:text-[#31332c]/20' : fieldClass}
                           autoComplete="email"
                         />
                       </div>
                     </div>
                   )}
 
-                  {(!isLogin || loginMethod === 'phone') && (
+                  {(!isLogin || (isLogin && !isForgotPassword && loginMethod === 'phone')) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Phone Number</label>
                       <div className="flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60">
@@ -269,16 +313,34 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {isLogin && ((loginMethod === 'phone' && otpSent) || (loginMethod === 'email-code' && emailOtpSent)) && (
+                  {((isLogin && !isForgotPassword && ((loginMethod === 'phone' && otpSent) || (loginMethod === 'email-code' && emailOtpSent))) || (isForgotPassword && resetStep === 2)) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">One-Time Code</label>
                       <input type="text" required inputMode="numeric" value={otpToken} onChange={(e) => setOtpToken(e.target.value)} placeholder="123456" className={fieldClass} autoComplete="one-time-code" />
                     </div>
                   )}
 
-                  {(!isLogin || loginMethod === 'email') && (
+                  {((!isLogin && !isForgotPassword) || (isLogin && !isForgotPassword && loginMethod === 'email') || (isForgotPassword && resetStep === 3)) && (
                     <div className="relative">
-                      <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Password</label>
+                      <div className="mb-2.5 flex items-center justify-between gap-4">
+                        <label className="block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">
+                          {isForgotPassword ? 'New Password' : 'Password'}
+                        </label>
+                        {isLogin && !isForgotPassword && loginMethod === 'email' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsForgotPassword(true);
+                              setResetStep(1);
+                              setOtpToken('');
+                              resetMessages();
+                            }}
+                            className="font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#456565]/70 transition-colors hover:text-[#2F4F4F]"
+                          >
+                            Forgot Password?
+                          </button>
+                        )}
+                      </div>
                       <input
                         type={showPassword ? 'text' : 'password'}
                         required
@@ -286,12 +348,12 @@ const AuthPage = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="********"
                         className={`${fieldClass} pr-8`}
-                        autoComplete={isLogin ? 'current-password' : 'new-password'}
+                        autoComplete={isLogin && !isForgotPassword ? 'current-password' : 'new-password'}
                       />
                       <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
-                      {!isLogin && (
+                      {(!isLogin || isForgotPassword) && (
                         <div className="mt-2 flex gap-4">
                           <span className={`text-[8px] uppercase tracking-widest ${passwordCriteria.length ? 'text-green-600' : 'text-[#2F4F4F]/30'}`}>8+ Chars</span>
                           <span className={`text-[8px] uppercase tracking-widest ${passwordCriteria.special ? 'text-green-600' : 'text-[#2F4F4F]/30'}`}>Special Char</span>
@@ -300,7 +362,7 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {!isLogin && (
+                  {((!isLogin && !isForgotPassword) || (isForgotPassword && resetStep === 3)) && (
                     <div className="relative">
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Confirm Password</label>
                       <input
@@ -319,6 +381,21 @@ const AuthPage = () => {
                   )}
                 </div>
 
+                {isForgotPassword && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPassword(false);
+                      setResetStep(1);
+                      setOtpToken('');
+                      resetMessages();
+                    }}
+                    className="mb-4 w-full text-center font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#456565]/70 transition-colors hover:text-[#2F4F4F]"
+                  >
+                    Cancel Recovery
+                  </button>
+                )}
+
                 <Motion.button
                   whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(47,79,79,0.15)' }}
                   whileTap={{ scale: 0.98 }}
@@ -328,6 +405,8 @@ const AuthPage = () => {
                 >
                   {isLoading
                     ? 'Processing...'
+                    : isForgotPassword
+                      ? (resetStep === 1 ? 'Send Recovery Code' : resetStep === 2 ? 'Verify Code' : 'Update Password')
                     : isLogin && loginMethod === 'phone'
                       ? (otpSent ? 'Verify Code' : 'Send Code')
                       : isLogin && loginMethod === 'email-code'
