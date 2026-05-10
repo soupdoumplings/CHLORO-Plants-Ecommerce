@@ -244,6 +244,11 @@ const AuthPage = () => {
                     ))}
                   </div>
                 )}
+                {isLogin && !isForgotPassword && loginMethod === 'phone' && (
+                  <p className="-mt-2 mb-5 font-body text-[11px] leading-relaxed text-[#797c73]">
+                    Phone codes require a Supabase SMS provider. For the free demo, use password login and keep phone saved in your profile or checkout details.
+                  </p>
+                )}
 
                 <div className="mb-7 space-y-5">
                   {!isLogin && !isForgotPassword && (

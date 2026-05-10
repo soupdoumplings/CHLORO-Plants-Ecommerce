@@ -166,7 +166,13 @@ export const AuthProvider = ({ children }) => {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      const message = String(error.message || '').toLowerCase();
+      if (message.includes('sms') || message.includes('phone') || message.includes('provider')) {
+        throw new Error('Phone OTP needs an SMS provider in Supabase. For the free-tier demo, use password login and save the phone number in profile or checkout.');
+      }
+      throw error;
+    }
     return data;
   };
 
