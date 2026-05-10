@@ -30,6 +30,24 @@ const normalizeWishlistItem = (item) => {
   };
 };
 
+const attachProductsToWishlist = async (wishlistItems) => {
+  const productIds = [...new Set((wishlistItems || []).map((item) => item.product_id).filter(Boolean))];
+  if (!productIds.length) return wishlistItems || [];
+
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds);
+
+  if (error) throw error;
+
+  const productsById = new Map((products || []).map((product) => [String(product.id), product]));
+  return wishlistItems.map((item) => ({
+    ...item,
+    product: productsById.get(String(item.product_id)) || null,
+  }));
+};
+
 export const WishlistProvider = ({ children }) => {
   const { session } = useAuth();
   const navigate = useNavigate();
@@ -55,12 +73,13 @@ export const WishlistProvider = ({ children }) => {
     try {
       const { data, error: fetchError } = await supabase
         .from('wishlist')
-        .select('id, product_id, created_at, products(*)')
+        .select('id, product_id')
         .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       if (fetchError) throw fetchError;
-      setItems((data || []).map(normalizeWishlistItem));
+      const wishlistWithProducts = await attachProductsToWishlist(data || []);
+      setItems(wishlistWithProducts.map(normalizeWishlistItem));
     } catch (err) {
       setError(err.message || 'Could not load wishlist.');
       setItems([]);
