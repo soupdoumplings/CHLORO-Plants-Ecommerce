@@ -89,6 +89,12 @@ $$;
 -- Free-tier setup:
 -- 1. Deploy supabase/functions/watering-reminders.
 -- 2. Add Edge Function secrets:
---    SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, CRON_SECRET, APP_URL
+--    Required:
+--    SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, CRON_SECRET, APP_URL
+--    Gmail delivery:
+--    EMAIL_PROVIDER=gmail, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET,
+--    GMAIL_REFRESH_TOKEN, GMAIL_FROM
+--    Optional fallback:
+--    RESEND_API_KEY, RESEND_FROM
 -- 3. Schedule the function daily at 08:00 Nepal time.
 --    Nepal 08:00 is UTC 02:15, so the cron expression is: 15 2 * * *
