@@ -1,0 +1,246 @@
+﻿<html><head><meta charset="utf-8"><style>body{font-family:Georgia,serif;color:#1f211d;line-height:1.55;margin:48px;}h1{font-size:34px;}h2{font-size:23px;margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:6px;}p,li{font-size:12.5pt;}code{font-family:Consolas,monospace;}</style></head><body>
+<h1>CHLORO Project Guide</h1>
+<br>
+<h2>Project Overview</h2>
+<br>
+<p>CHLORO is a luxury botanical ecommerce and plant-care web application. It combines a fashion-house visual language with practical plant shopping, saved customer profiles, wishlist, checkout, admin inventory, sales promotions, order management, AI plant diagnosis, and a compact botanical chatbot.</p>
+<br>
+<p>The project is designed for a school assignment and a free-tier student setup. It avoids paid-only payment processing, avoids paid SMS setup by default, and keeps AI usage inside a single Supabase Edge Function so quota errors can be handled cleanly.</p>
+<br>
+<h2>Technology Stack</h2>
+<br>
+<ul>
+<li>React 19 is used for the frontend because the project needs reusable UI components, stateful flows, and fast page transitions.</li>
+<li>Vite is used for local development and production builds because it is lightweight and quick.</li>
+<li>Tailwind utility classes are used for the visual system, spacing, responsive layouts, and animation-friendly styling.</li>
+<li>Framer Motion is used for page fades, card reveals, hover movement, and elegant transitions.</li>
+<li>Supabase is used for authentication, database tables, row-level security, storage-compatible product images, and Edge Functions.</li>
+<li>Gemini is called through `supabase/functions/gemini-ai`, not directly from the browser. This keeps the API key off the client.</li>
+<li>Local SQL files in `supabase/` act as reproducible setup patches for schema, orders, promotions, reminders, notifications, and product seeding.</li>
+</ul>
+<br>
+<h2>Customer Flow</h2>
+<br>
+<p>1. A visitor lands on the CHLORO storefront and can browse the home page, catalogue, seasonal discovery, products, gifts, and care tools.</p>
+<p>2. A customer creates an account or signs in.</p>
+<p>3. The customer completes profile onboarding and saves phone, address, city, country, and plant preferences.</p>
+<p>4. The customer adds products to wishlist or bag.</p>
+<p>5. Checkout creates an order, inserts order items, stores billing details, and optionally sends an order email notification.</p>
+<p>6. The customer can return to the dashboard to view details, preferences, recommendations, recent orders, and wishlist.</p>
+<p>7. AI diagnosis can analyze plant images and recommend existing CHLORO care products from the database.</p>
+<br>
+<h2>Admin Flow</h2>
+<br>
+<p>1. Admin users are detected from `public.users.role = &#39;ADMIN&#39;`.</p>
+<p>2. Admins are redirected away from the customer dashboard into `/archive`.</p>
+<p>3. The admin dashboard shows revenue metrics, customer orders, stock overview, inventory, and system logs.</p>
+<p>4. Admins can update order status and payment status.</p>
+<p>5. Admins can manage inventory through add/edit product pages.</p>
+<p>6. Admins can schedule sales through `/admin/promotions`.</p>
+<p>7. Promotions update the product&#39;s `is_on_sale`, `sale_price`, and `sale_ends_at` fields so the customer catalogue, cart, and product pages show discounted pricing.</p>
+<br>
+<h2>Authentication</h2>
+<br>
+<p>The main sign-in method is email and password through Supabase Auth. Google OAuth is also wired through Supabase.</p>
+<br>
+<p>Forgot password uses Supabase recovery OTP:</p>
+<br>
+<ul>
+<li>The app calls `resetPasswordForEmail`.</li>
+<li>The email template must use `{{ .Token }}` so the user receives a 6-digit code instead of a reset link.</li>
+<li>The app verifies the code with `verifyOtp({ type: &#39;recovery&#39; })`.</li>
+<li>After verification, the user sets a new password.</li>
+</ul>
+<br>
+<p>Phone numbers are saved in profile and checkout. Phone OTP login uses Supabase SMS OTP, but Supabase requires an SMS provider for real delivery. For the free-tier demo, use password login and demonstrate phone as saved profile/checkout data unless an SMS provider is intentionally configured.</p>
+<br>
+<h2>Database Features</h2>
+<br>
+<p>Important tables:</p>
+<br>
+<ul>
+<li>`public.users`: role, name, email, phone, address fields, and preferences.</li>
+<li>`public.user_profiles`: richer profile and onboarding details.</li>
+<li>`public.billing_details`: saved checkout details.</li>
+<li>`public.products`: catalogue products, care tools, gifts, sale fields, stock, tags, and images.</li>
+<li>`public.cart_items`: saved customer cart.</li>
+<li>`public.wishlist`: saved customer wishlist.</li>
+<li>`public.orders`: customer order header, status, payment status, customer contact, shipping address, and totals.</li>
+<li>`public.order_items`: products inside an order.</li>
+<li>`public.payments`: optional payment tracking for finance metrics.</li>
+<li>`public.promotions`: scheduled sales.</li>
+<li>`public.notifications`: in-app notification rows.</li>
+<li>`public.user_plants`: watering reminder plants.</li>
+</ul>
+<br>
+<p>Important SQL files:</p>
+<br>
+<ul>
+<li>`supabase/customer_commerce_schema.sql`: customer profiles, billing, wishlist, payments, and commerce compatibility.</li>
+<li>`supabase/checkout_orders_compat_patch.sql`: makes old order tables compatible with current checkout inserts.</li>
+<li>`supabase/admin_orders_visibility_patch.sql`: lets admins view orders safely when RLS blocks direct reads.</li>
+<li>`supabase/sales_promotions_schema.sql`: adds promotions and sale fields.</li>
+<li>`supabase/product_catalogue_seed.sql`: inserts 15 extra products across plants, care tools, and gifts.</li>
+<li>`supabase/password_reset_otp_template.html`: Supabase email template for recovery OTP.</li>
+</ul>
+<br>
+<h2>SQL Dump Audit</h2>
+<br>
+<p>The dumped `chloro_backup.sql` confirms that the project database includes products, orders, order items, users, wishlist, user profiles, promotions, reviews, watering reminders, and Supabase auth internals.</p>
+<br>
+<p>The main issue found in the dump is order visibility for admins:</p>
+<br>
+<ul>
+<li>The backup policies show `Users can view own orders`.</li>
+<li>That means customers can see their orders, but admins may see an empty order queue.</li>
+<li>The project includes `supabase/admin_orders_visibility_patch.sql` to fix this with admin-aware RLS policies and a secure `admin_order_queue()` RPC fallback.</li>
+</ul>
+<br>
+<p>Do not commit full database dumps. They can contain auth records, emails, metadata, and private operational data.</p>
+<br>
+<h2>AI Diagnosis</h2>
+<br>
+<p>AI diagnosis runs through the Supabase Edge Function at `supabase/functions/gemini-ai`.</p>
+<br>
+<p>The browser sends:</p>
+<br>
+<ul>
+<li>image data,</li>
+<li>optional user notes,</li>
+<li>mode: `diagnosis`.</li>
+</ul>
+<br>
+<p>The Edge Function:</p>
+<br>
+<ul>
+<li>loads active products from Supabase using the service role key,</li>
+<li>ranks care tools and diagnosis-related products higher,</li>
+<li>sends the image and product list to Gemini,</li>
+<li>requests structured JSON,</li>
+<li>validates product IDs so the model cannot invent products,</li>
+<li>returns diagnosis summary, likely problems, care plan, Nepal-specific notes, prevention, and matching product recommendations.</li>
+</ul>
+<br>
+<p>Care tools are connected to AI through product tags and categories such as `Care Tools`, `ai-diagnosis`, `watering`, `neem`, `soil`, `pruning`, and `fungal-care`.</p>
+<br>
+<h2>Chatbot</h2>
+<br>
+<p>The botanical chatbot is a compact floating concierge. It can answer about plant care, gifts, products, checkout, and general customer support.</p>
+<br>
+<p>It uses the same Gemini Edge Function in `chat` mode. It does not expose the Gemini API key in the browser. The widget is hidden on admin/auth pages so it does not crowd sensitive workflows.</p>
+<br>
+<h2>Sales And Promotions</h2>
+<br>
+<p>Admins can open `/admin/promotions`, choose a product, enter a discount percentage, and set start/end times.</p>
+<br>
+<p>When a sale is active:</p>
+<br>
+<ul>
+<li>the `promotions` row records the schedule,</li>
+<li>the product row stores `is_on_sale = true`,</li>
+<li>the product row stores the calculated `sale_price`,</li>
+<li>customer catalogue and cart use the sale price through `src/lib/pricing.js`.</li>
+</ul>
+<br>
+<p>If the sale is scheduled for the future, it remains in the promotions table. The lightweight school implementation does not require a paid scheduler. Admins can end a sale manually.</p>
+<br>
+<h2>Orders</h2>
+<br>
+<p>Checkout creates:</p>
+<br>
+<ul>
+<li>an `orders` row,</li>
+<li>one `order_items` row per cart item,</li>
+<li>optionally a `payments` row,</li>
+<li>optional email notification through the order email Edge Function.</li>
+</ul>
+<br>
+<p>Admin order display reads `orders` with nested `order_items`. If direct RLS reading returns nothing, the code calls `admin_order_queue()`. If admin still cannot see orders, run `supabase/admin_orders_visibility_patch.sql` in the Supabase SQL Editor.</p>
+<br>
+<h2>Notifications And Email</h2>
+<br>
+<p>Order email notification is handled by `supabase/functions/order-email-notifications`.</p>
+<br>
+<p>The free-tier-safe recommendation is:</p>
+<br>
+<ul>
+<li>keep email notifications optional through the checkout consent checkbox,</li>
+<li>avoid SMS unless a provider is intentionally configured,</li>
+<li>avoid paid email providers unless the project owner chooses one.</li>
+</ul>
+<br>
+<p>Supabase Auth emails can handle password recovery OTP without adding a paid email service for the school demo.</p>
+<br>
+<h2>Free-Tier Safety</h2>
+<br>
+<p>This project is designed to avoid surprise costs:</p>
+<br>
+<ul>
+<li>No paid SMS provider is configured by code.</li>
+<li>Card payments are not fully integrated; COD is the safest demo option.</li>
+<li>eSewa/Khalti are represented as demo/proxy flows and should not be treated as production payment settlement.</li>
+<li>Gemini calls are handled through one Edge Function and show quota errors if the free quota is exhausted.</li>
+<li>Product images in the seed use local/public paths instead of uploading paid storage assets.</li>
+<li>Database dumps should remain local and uncommitted.</li>
+</ul>
+<br>
+<h2>UI Direction</h2>
+<br>
+<p>The visual direction is elegant botanical luxury:</p>
+<br>
+<ul>
+<li>serif display headlines,</li>
+<li>restrained neutral backgrounds,</li>
+<li>deep green and antique gold accents,</li>
+<li>editorial image blocks,</li>
+<li>thin borders,</li>
+<li>soft reveal animations,</li>
+<li>image hover zoom,</li>
+<li>minimal admin controls that still remain readable.</li>
+</ul>
+<br>
+<p>The customer dashboard is split into:</p>
+<br>
+<ul>
+<li>My Details,</li>
+<li>My Preferences,</li>
+<li>Orders &amp; Wishlist.</li>
+</ul>
+<br>
+<p>This keeps the customer experience calm while still supporting practical ecommerce tasks.</p>
+<br>
+<h2>Demo Checklist</h2>
+<br>
+<p>1. Sign in as a normal customer.</p>
+<p>2. Save profile and phone/address details.</p>
+<p>3. Add a product to wishlist.</p>
+<p>4. Add a product to bag and checkout with COD.</p>
+<p>5. Visit dashboard and show orders/wishlist.</p>
+<p>6. Sign in as admin.</p>
+<p>7. Open `/archive` and show metrics, order queue, stock overview, and inventory.</p>
+<p>8. Open `/admin/promotions`, schedule a sale, and confirm sale price appears in the shop.</p>
+<p>9. Open AI diagnosis, upload a plant image, and show diagnosis plus recommended care tools.</p>
+<p>10. Open products &amp; gifts and filter by Plants, Care, and Gifts.</p>
+<br>
+<h2>Final Setup Notes</h2>
+<br>
+<p>Run these SQL files in Supabase SQL Editor if the matching feature is missing:</p>
+<br>
+<p>1. `supabase/customer_commerce_schema.sql`</p>
+<p>2. `supabase/checkout_orders_compat_patch.sql`</p>
+<p>3. `supabase/admin_orders_visibility_patch.sql`</p>
+<p>4. `supabase/sales_promotions_schema.sql`</p>
+<p>5. `supabase/product_catalogue_seed.sql`</p>
+<br>
+<p>For password reset OTP, update the Supabase Auth recovery email template to show `{{ .Token }}`.</p>
+<br>
+<p>For AI, set these Supabase Edge Function secrets:</p>
+<br>
+<ul>
+<li>`GEMINI_API_KEY`</li>
+<li>`SUPABASE_URL`</li>
+<li>`SUPABASE_SERVICE_ROLE_KEY`</li>
+</ul>
+<br>
+<p>Keep the service role key only in Supabase secrets. Never put it in frontend `.env` files.</p>
+</body></html>

@@ -97,11 +97,11 @@ const getAssistantErrorMessage = (error) => {
 const ProductPill = ({ product }) => (
   <Link
     to={`/catalogue/${product.id}`}
-    className="mt-3 grid grid-cols-[48px_1fr] gap-3 border border-[#D8D0C0] bg-[#F8F5EE] p-2 transition-colors duration-300 hover:border-[#11110E] hover:bg-[#FFFEFA]"
+    className="group mt-3 grid grid-cols-[48px_1fr] gap-3 border border-[#D8D0C0] bg-[#F8F5EE] p-2 transition-colors duration-300 hover:border-[#11110E] hover:bg-[#FFFEFA]"
   >
     <div className="aspect-square overflow-hidden bg-[#E8E9E0]">
       {product.image ? (
-        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+        <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
           <Leaf className="h-4 w-4 text-[#797C73]" />
@@ -221,9 +221,9 @@ export default function ChatbotWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-5 right-5 z-50 flex max-h-[min(680px,calc(100vh-40px))] w-[min(420px,calc(100vw-24px))] flex-col overflow-hidden border border-[#CFC6B5] bg-[#FFFEFA] shadow-[0_32px_100px_rgba(17,17,14,0.18)] cursor-auto"
+            className="fixed bottom-5 right-5 z-50 flex max-h-[min(540px,calc(100vh-32px))] w-[min(380px,calc(100vw-24px))] flex-col overflow-hidden border border-[#CFC6B5] bg-[#FFFEFA] shadow-[0_32px_100px_rgba(17,17,14,0.18)] cursor-auto"
           >
-            <div className="flex items-center justify-between border-b border-[#D8D0C0] bg-[#11110E] px-5 py-4 text-[#FBF9F4]">
+            <div className="flex items-center justify-between border-b border-[#D8D0C0] bg-[#11110E] px-4 py-3 text-[#FBF9F4]">
               <div className="flex min-w-0 items-center gap-3">
                 {currentCategory && (
                   <button
@@ -254,9 +254,9 @@ export default function ChatbotWidget() {
               </button>
             </div>
 
-            <div className="no-scrollbar flex-1 overflow-y-auto bg-[#F8F5EE] px-5 py-5">
-              <div className="mb-5 border-b border-[#D8D0C0] pb-5">
-                <div className="mb-4 flex items-center justify-between">
+            <div className="no-scrollbar flex-1 overflow-y-auto bg-[#F8F5EE] px-4 py-4">
+              <div className="mb-4 border-b border-[#D8D0C0] pb-4">
+                <div className="mb-3 flex items-center justify-between">
                   <span className="font-label text-[8px] uppercase tracking-[0.24em] text-[#7A756A]">
                     Concierge
                   </span>
@@ -264,10 +264,10 @@ export default function ChatbotWidget() {
                     {formatTime()}
                   </span>
                 </div>
-                <p className="font-headline text-[34px] leading-[0.9] text-[#11110E]">
+                <p className="font-headline text-[28px] leading-[0.92] text-[#11110E]">
                   {currentCategory || 'How may we assist?'}
                 </p>
-                <p className="mt-3 max-w-[320px] font-body text-[13px] leading-relaxed text-[#6E6A60]">
+                <p className="mt-2 max-w-[320px] font-body text-[12px] leading-relaxed text-[#6E6A60]">
                   {currentCategory
                     ? CATEGORIES[currentCategory].description
                     : 'Plant selection, diagnosis, gifts, products, and checkout guidance.'}
@@ -318,7 +318,7 @@ export default function ChatbotWidget() {
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[88%] border px-4 py-3 ${
+                      className={`max-w-[88%] border px-3.5 py-2.5 ${
                         message.sender === 'user'
                           ? 'border-[#11110E] bg-[#11110E] text-[#FBF9F4]'
                           : message.tone === 'error'
@@ -326,7 +326,7 @@ export default function ChatbotWidget() {
                             : 'border-[#D8D0C0] bg-white text-[#31332C]'
                       }`}
                     >
-                      <p className="whitespace-pre-line font-body text-[13px] leading-relaxed">{message.text}</p>
+                      <p className="whitespace-pre-line font-body text-[12px] leading-relaxed">{message.text}</p>
                       {message.products?.map((product) => (
                         <ProductPill key={product.id} product={product} />
                       ))}
@@ -362,12 +362,12 @@ export default function ChatbotWidget() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-[#D8D0C0] bg-[#FFFEFA] px-4 py-3">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-[#D8D0C0] bg-[#FFFEFA] px-3 py-2.5">
               <input
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Ask about care, gifts, checkout..."
-                className="min-w-0 flex-1 border border-[#D8D0C0] bg-white px-4 py-2.5 font-body text-[13px] text-[#31332C] outline-none transition-colors placeholder:text-[#797C73]/70 focus:border-[#11110E]"
+                className="min-w-0 flex-1 border border-[#D8D0C0] bg-white px-3 py-2 font-body text-[12px] text-[#31332C] outline-none transition-colors placeholder:text-[#797C73]/70 focus:border-[#11110E]"
               />
               <button
                 type="submit"
