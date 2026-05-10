@@ -73,7 +73,7 @@ const AnimatedRoutes = () => {
 
 import CustomCursor from './components/CustomCursor';
 import ChatbotWidget from './components/ChatbotWidget';
-import CookieNotice from './components/CookieNotice';
+import SiteConsent from './components/SiteConsent';
 
 function App() {
   return (
@@ -90,7 +90,7 @@ function App() {
                     <ChatbotWidget />
                     <PreferenceOnboarding />
                     <ProfileOnboarding />
-                    <CookieNotice />
+                    <SiteConsent />
                   </div>
                 </CartProvider>
               </WishlistProvider>

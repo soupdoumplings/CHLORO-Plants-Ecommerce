@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const STORAGE_KEY = 'chloro-essential-storage-notice';
 
-const CookieNotice = () => {
+const SiteConsent = () => {
   const [visible, setVisible] = useState(() => window.localStorage.getItem(STORAGE_KEY) !== 'dismissed');
 
   const dismiss = () => {
@@ -35,4 +35,4 @@ const CookieNotice = () => {
   );
 };
 
-export default CookieNotice;
+export default SiteConsent;
