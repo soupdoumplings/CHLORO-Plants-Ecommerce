@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Leaf, Mail, Phone } from 'lucide-react';
+import { Eye, EyeOff, Leaf, Phone } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa';
 import { useAuth } from '../../lib/AuthContext';
 
@@ -16,7 +16,6 @@ const AuthPage = () => {
   const [phone, setPhone] = useState('');
   const [otpToken, setOtpToken] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -26,7 +25,7 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword } = useAuth();
+  const { signIn, signUp, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword } = useAuth();
   const navigate = useNavigate();
 
   const passwordCriteria = useMemo(() => ({
@@ -72,18 +71,6 @@ const AuthPage = () => {
         setPassword('');
         setConfirmPassword('');
         setSuccessMsg('Password updated successfully. You can now sign in.');
-        return;
-      }
-
-      if (isLogin && loginMethod === 'email-code') {
-        if (!emailOtpSent) {
-          await signInWithEmailOtp(email);
-          setEmailOtpSent(true);
-          setSuccessMsg('We sent a one-time code to your email.');
-        } else {
-          await verifyEmailOtp(email, otpToken);
-          setSuccessMsg('Email verified. Opening your account...');
-        }
         return;
       }
 
@@ -145,7 +132,6 @@ const AuthPage = () => {
   const changeLoginMethod = (method) => {
     setLoginMethod(method);
     setOtpSent(false);
-    setEmailOtpSent(false);
     setOtpToken('');
     setIsForgotPassword(false);
     setResetStep(1);
@@ -157,7 +143,6 @@ const AuthPage = () => {
     setIsForgotPassword(false);
     setResetStep(1);
     setOtpSent(false);
-    setEmailOtpSent(false);
     setOtpToken('');
     resetMessages();
   };
@@ -241,10 +226,9 @@ const AuthPage = () => {
                 {successMsg && <div className="mb-4 border border-[#C6E9E9] bg-[#C6E9E9]/25 p-3 font-body text-[12px] text-[#244545]">{successMsg}</div>}
 
                 {isLogin && !isForgotPassword && (
-                  <div className="mb-5 grid grid-cols-3 border border-[#2F4F4F]/12 bg-white/45 p-1">
+                  <div className="mb-5 grid grid-cols-2 border border-[#2F4F4F]/12 bg-white/45 p-1">
                     {[
                       { id: 'email', label: 'Password' },
-                      { id: 'email-code', label: 'Email Code' },
                       { id: 'phone', label: 'Phone' },
                     ].map((method) => (
                       <button
@@ -269,25 +253,18 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {((!isLogin && !isForgotPassword) || (isLogin && !isForgotPassword && (loginMethod === 'email' || loginMethod === 'email-code')) || (isForgotPassword && resetStep === 1)) && (
+                  {((!isLogin && !isForgotPassword) || (isLogin && !isForgotPassword && loginMethod === 'email') || (isForgotPassword && resetStep === 1)) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Email Address</label>
-                      <div className={loginMethod === 'email-code' && isLogin && !isForgotPassword ? 'flex items-center border-b border-[#2F4F4F]/15 transition-colors duration-300 focus-within:border-[#2F4F4F]/60' : ''}>
-                        {loginMethod === 'email-code' && isLogin && !isForgotPassword && <Mail size={14} className="mb-3 mr-2 shrink-0 text-[#2F4F4F]/35" />}
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            setEmailOtpSent(false);
-                            setOtpToken('');
-                          }}
-                          placeholder="you@example.com"
-                          className={loginMethod === 'email-code' && isLogin && !isForgotPassword ? 'w-full bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none placeholder:text-[#31332c]/20' : fieldClass}
-                          autoComplete="email"
-                        />
-                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className={fieldClass}
+                        autoComplete="email"
+                      />
                     </div>
                   )}
 
@@ -313,7 +290,7 @@ const AuthPage = () => {
                     </div>
                   )}
 
-                  {((isLogin && !isForgotPassword && ((loginMethod === 'phone' && otpSent) || (loginMethod === 'email-code' && emailOtpSent))) || (isForgotPassword && resetStep === 2)) && (
+                  {((isLogin && !isForgotPassword && loginMethod === 'phone' && otpSent) || (isForgotPassword && resetStep === 2)) && (
                     <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">One-Time Code</label>
                       <input type="text" required inputMode="numeric" value={otpToken} onChange={(e) => setOtpToken(e.target.value)} placeholder="123456" className={fieldClass} autoComplete="one-time-code" />
@@ -409,8 +386,6 @@ const AuthPage = () => {
                       ? (resetStep === 1 ? 'Send Recovery Code' : resetStep === 2 ? 'Verify Code' : 'Update Password')
                     : isLogin && loginMethod === 'phone'
                       ? (otpSent ? 'Verify Code' : 'Send Code')
-                      : isLogin && loginMethod === 'email-code'
-                        ? (emailOtpSent ? 'Verify Code' : 'Send Email Code')
                         : isLogin
                           ? 'Enter Portfolio'
                           : 'Create Account'}

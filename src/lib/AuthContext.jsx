@@ -167,23 +167,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const signInWithEmailOtp = async (email) => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      throw new Error('Enter a valid email address.');
-    }
-
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: normalizedEmail,
-      options: {
-        shouldCreateUser: false,
-      },
-    });
-
-    if (error) throw error;
-    return data;
-  };
-
   const sendPasswordResetOtp = async (email) => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
@@ -245,7 +228,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );
