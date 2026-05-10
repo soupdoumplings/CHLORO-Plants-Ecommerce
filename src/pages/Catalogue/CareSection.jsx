@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import WateringReminderModal from '../../components/WateringReminderModal';
+import { useAuth } from '../../lib/AuthContext';
 
 const CareSection = ({ product }) => {
+  const { user } = useAuth();
+  const [reminderOpen, setReminderOpen] = useState(false);
+  const [reminderSaved, setReminderSaved] = useState(false);
   const optimalPlace = product?.optimal_place || 'Bright Indirect Light';
   const waterFrequency = product?.water_frequency || 'Every 7 Days';
   const plantName = product?.name || 'This specimen';
@@ -118,18 +123,23 @@ const CareSection = ({ product }) => {
                 className="bg-white p-10 border border-[#B1B3A9]/15 shadow-2xl shadow-black/5 transform group-hover:-translate-y-2 transition-transform duration-500"
               >
                  <p className="font-label text-[9px] tracking-[0.1rem] uppercase mb-6 opacity-60 font-black text-[#31332C]">Botanical Management</p>
-                 <h4 className="font-headline italic text-2xl text-[#31332C] mb-6">Set Hydration Schedule</h4>
+                 <h4 className="font-headline italic text-2xl text-[#31332C] mb-6">Set Watering Reminder</h4>
                  <div className="space-y-6">
                     <div className="flex justify-between items-center border-b border-[#B1B3A9]/10 pb-3">
                        <span className="text-xs font-body text-[#31332C]">Frequency</span>
                        <span className="text-xs font-label uppercase text-[#785A1A] font-black tracking-widest">{waterFrequency}</span>
                     </div>
-                    <motion.button 
+                    <p className="font-body text-xs leading-relaxed text-[#5E6058]">
+                      Save this plant to My Plants and receive bell plus email reminders on watering day.
+                    </p>
+                    <motion.button
+                      type="button"
                       whileHover={{ y: -1 }}
                       whileTap={{ scale: 0.97 }}
+                      onClick={() => setReminderOpen(true)}
                       className="w-full py-4 text-[10px] font-label tracking-widest uppercase border border-[#5F5E5E] text-[#5F5E5E] hover:bg-[#5F5E5E] hover:text-white transition-all font-bold"
                     >
-                       Sync to Calendar
+                       {reminderSaved ? 'Reminder Saved' : 'Set Reminder'}
                     </motion.button>
                  </div>
               </motion.div>
@@ -155,6 +165,14 @@ const CareSection = ({ product }) => {
           </motion.div>
         ))}
       </div>
+      <WateringReminderModal
+        open={reminderOpen}
+        onClose={() => setReminderOpen(false)}
+        user={user}
+        plants={product ? [product] : []}
+        defaultFrequency={waterFrequency}
+        onSaved={() => setReminderSaved(true)}
+      />
     </section>
   );
 };
