@@ -9,7 +9,7 @@ const CATEGORIES = {
     description: 'Choose the right starting point.',
     actions: [
       'Find a first plant for a Kathmandu apartment',
-      'Choose a gift under NPR 2,500',
+      'Choose a gift under रू 2,500',
       'Style a balcony with easy plants',
     ],
   },

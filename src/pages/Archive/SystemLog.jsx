@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { motion as Motion } from 'framer-motion';
 
-const money = (value) => `NPR ${Number(value || 0).toLocaleString('en-NP', {
+const money = (value) => `रू ${Number(value || 0).toLocaleString('en-NP', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })}`;

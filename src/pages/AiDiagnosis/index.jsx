@@ -101,7 +101,7 @@ const ProductCard = ({ product, index }) => {
   };
 
   const priceLabel = isRealProduct
-    ? `NPR ${Number(product.price || 0).toLocaleString('en-NP')}`
+    ? `रू ${Number(product.price || 0).toLocaleString('en-NP')}`
     : product.price;
 
   const content = (

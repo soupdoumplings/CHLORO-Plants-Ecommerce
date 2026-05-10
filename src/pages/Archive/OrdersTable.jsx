@@ -15,7 +15,7 @@ const statusStyles = {
 
 const formatMoney = (value) => {
   const amount = Number(value || 0);
-  return `NPR ${amount.toLocaleString('en-NP', {
+  return `रू ${amount.toLocaleString('en-NP', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

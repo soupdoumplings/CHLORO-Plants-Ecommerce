@@ -68,7 +68,7 @@ const ProductCard = ({ product, delay = 0 }) => {
               {product.name}
             </h3>
             <p className="font-serif text-[#31332c] text-[18px] mt-1 whitespace-nowrap">
-              NPR {product.price}
+              रू {product.price}
             </p>
           </div>
           <div className="flex items-center gap-3 opacity-60 mt-auto pt-4">

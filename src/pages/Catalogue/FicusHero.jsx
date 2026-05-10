@@ -11,7 +11,7 @@ const FicusHero = ({ product }) => {
   const scientificName = product?.description || '';
   const info = product?.info || 'No description available for this specimen.';
   const provenance = product?.provenance || 'Origin unknown';
-  const price = product?.price ? `NPR ${Number(product.price).toLocaleString('en-NP')}` : 'Price on request';
+  const price = product?.price ? `रू ${Number(product.price).toLocaleString('en-NP')}` : 'Price on request';
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&q=80';

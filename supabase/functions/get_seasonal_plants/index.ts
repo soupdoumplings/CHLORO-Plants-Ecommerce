@@ -162,7 +162,7 @@ const normalizeProduct = (product) => ({
   ...product,
   image: product.images?.[0] || 'https://images.pexels.com/photos/7627358/pexels-photo-7627358.jpeg',
   rawPrice: Number(product.price || 0),
-  displayPrice: `NPR ${Number(product.price || 0).toLocaleString('en-NP', {
+  displayPrice: `रू ${Number(product.price || 0).toLocaleString('en-NP', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`,

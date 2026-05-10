@@ -218,7 +218,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
                   </p>
                 </div>
                 <p className="font-headline text-[15px] text-[#1A1A1A] tracking-tight mt-auto">
-                  NPR {(item.price * item.quantity).toFixed(2)}
+                  रू {(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
             </div>
@@ -229,17 +229,17 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       <div className="space-y-5 mb-10 border-b border-[#B0B0A8]/20 pb-10">
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
           <span>Subtotal</span>
-          <span className="text-[#1A1A1A]">NPR {subtotal.toFixed(2)}</span>
+          <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
           <span>Shipping <span className="text-[#6B6B6B]/70 capitalize tracking-normal text-[10px] font-medium ml-1">(Editorial Rate)</span></span>
-          <span className="text-[#1A1A1A]">NPR {shipping.toFixed(2)}</span>
+          <span className="text-[#1A1A1A]">रू {shipping.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
           <span>Taxes</span>
-          <span className="text-[#1A1A1A]">NPR 0.00</span>
+          <span className="text-[#1A1A1A]">रू 0.00</span>
         </div>
       </div>
 
@@ -248,7 +248,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           Total
         </span>
         <span className="font-headline text-[24px] lg:text-[28px] italic leading-none text-[#1A1A1A]">
-          NPR {total.toFixed(2)}
+          रू {total.toFixed(2)}
         </span>
       </div>
 

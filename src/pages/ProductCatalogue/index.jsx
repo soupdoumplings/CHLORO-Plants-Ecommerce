@@ -14,7 +14,7 @@ const fallbackImage = 'https://images.pexels.com/photos/7627358/pexels-photo-762
 const filters = ['All', 'Plants', 'Care', 'Gifts'];
 const sorts = ['Latest', 'Price: Low', 'Price: High'];
 
-const formatPrice = (price) => `NPR ${Number(price || 0).toLocaleString('en-NP', {
+const formatPrice = (price) => `रू ${Number(price || 0).toLocaleString('en-NP', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })}`;

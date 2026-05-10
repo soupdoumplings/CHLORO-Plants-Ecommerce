@@ -25,7 +25,7 @@ const formatAmount = (amount) => {
   const normalized = Number(String(amount).replace(/,/g, ''));
   if (Number.isNaN(normalized)) return String(amount);
 
-  return `NPR ${normalized.toLocaleString('en-NP', {
+  return `रू ${normalized.toLocaleString('en-NP', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

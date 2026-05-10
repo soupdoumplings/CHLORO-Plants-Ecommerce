@@ -22,7 +22,7 @@ const paymentStyles = {
   failed: 'text-[#9F403D]',
 };
 
-const money = (value) => `NPR ${Number(value || 0).toLocaleString('en-NP', {
+const money = (value) => `रू ${Number(value || 0).toLocaleString('en-NP', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })}`;

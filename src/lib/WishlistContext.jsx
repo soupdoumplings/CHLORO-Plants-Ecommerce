@@ -20,7 +20,7 @@ const normalizeWishlistItem = (item) => {
       name: product.name || 'Saved item',
       rawPrice: Number(product.rawPrice || product.price || 0),
       price: Number(product.price || product.rawPrice || 0),
-      displayPrice: `NPR ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
+      displayPrice: `रू ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,

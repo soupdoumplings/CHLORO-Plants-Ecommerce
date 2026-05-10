@@ -41,7 +41,7 @@ BEGIN
     SELECT
         users.id,
         'SYSTEM',
-        'New order from ' || NEW.customer_name || ' for NPR ' || NEW.total_amount::TEXT,
+        'New order from ' || NEW.customer_name || ' for रू ' || NEW.total_amount::TEXT,
         '/archive'
     FROM public.users
     WHERE users.role = 'ADMIN';

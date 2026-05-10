@@ -54,7 +54,7 @@ export const normalizeSeasonalProduct = (product) => ({
   ...product,
   image: product.images?.[0] || product.image || fallbackImage,
   rawPrice: Number(product.rawPrice || product.price || 0),
-  displayPrice: product.displayPrice || `NPR ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
+  displayPrice: product.displayPrice || `रू ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`,
