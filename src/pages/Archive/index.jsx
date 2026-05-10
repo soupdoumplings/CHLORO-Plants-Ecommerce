@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ArchiveHeader from './ArchiveHeader';
 import MetricsGrid from './MetricsGrid';
+import StockInfoBar from './StockInfoBar';
 import InventoryTable from './InventoryTable';
 import SystemLog from './SystemLog';
 import { supabase } from '../../supabase';
@@ -34,7 +35,7 @@ const ArchivePage = () => {
   }, []);
 
   return (
-    <motion.div 
+    <Motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -46,6 +47,7 @@ const ArchivePage = () => {
       <main className="w-full max-w-[1920px] mx-auto flex-grow mt-[82px] px-6 md:px-12 pt-16">
         <ArchiveHeader />
         <MetricsGrid products={products} loading={loading} />
+        <StockInfoBar products={products} loading={loading} />
         <InventoryTable products={products} loading={loading} onRefresh={fetchProducts} />
         <SystemLog />
       </main>
@@ -53,15 +55,15 @@ const ArchivePage = () => {
       <Footer />
       
       {/* Editorial Vertical Detail */}
-      <motion.div 
+      <Motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
         className="hidden lg:block absolute left-12 top-[1200px] h-[500px] w-[1px] bg-[#B1B3A9]/10 pt-16 z-0 pointer-events-none"
       >
           <span className="text-[9px] uppercase tracking-[0.4em] text-[#31332C]/20 vertical-text-rotate origin-center mt-32">Archival Manifest v.4.2</span>
-      </motion.div>
-    </motion.div>
+      </Motion.div>
+    </Motion.div>
   );
 };
 
