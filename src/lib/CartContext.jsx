@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
 import { fallbackCatalogImage } from './localImages';
+import { getEffectivePrice } from './pricing';
 
 const CartContext = createContext();
 
@@ -42,7 +43,8 @@ export const CartProvider = ({ children }) => {
         id: item.id,
         productId: item.product_id,
         name: item.products.name,
-        price: Number(item.products.price),
+        price: getEffectivePrice(item.products),
+        originalPrice: Number(item.products.price || 0),
         quantity: item.quantity,
         image: item.products.images?.[0] || fallbackCatalogImage,
         variant: 'STUDIO SPECIMEN' // Default variant for simplicity
@@ -75,7 +77,11 @@ export const CartProvider = ({ children }) => {
     try {
       // Parse price: handle both raw numbers and formatted strings like "NPR 50.00"
       let priceValue = 0;
-      if (typeof product.price === 'number') {
+      if (product.salePrice) {
+        priceValue = Number(product.salePrice);
+      } else if (product.effectivePrice) {
+        priceValue = Number(product.effectivePrice);
+      } else if (typeof product.price === 'number') {
         priceValue = product.price;
       } else if (product.rawPrice) {
         priceValue = Number(product.rawPrice);

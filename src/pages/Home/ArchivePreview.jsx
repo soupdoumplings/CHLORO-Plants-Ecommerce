@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage } from '../../lib/localImages';
+import { getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 const Archive = () => {
   const [products, setProducts] = useState([]);
@@ -34,10 +35,19 @@ const Archive = () => {
   const normalizeProduct = (item) => ({
     id: item.id,
     name: item.name,
-    price: Number(item.price || 0).toLocaleString('en-NP', {
+    price: getEffectivePrice(item).toLocaleString('en-NP', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }),
+    originalPrice: hasActiveSale(item)
+      ? Number(item.price || 0).toLocaleString('en-NP', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      : null,
+    rawPrice: getEffectivePrice(item),
+    isOnSale: hasActiveSale(item),
+    saleEndsAt: item.sale_ends_at,
     category: item.category || item.description || 'Botanical Specimen',
     image: item.images?.[0] || fallbackCatalogImage,
   });

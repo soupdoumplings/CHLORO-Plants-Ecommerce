@@ -7,8 +7,10 @@ import CategoryFilter from './CategoryFilter';
 import ProductGrid from './ProductGrid';
 import Newsletter from './Newsletter';
 import Footer from '../../components/Footer';
+import SaleBanner from '../../components/SaleBanner';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage } from '../../lib/localImages';
+import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 
 const DiscoveryPage = () => {
@@ -27,8 +29,12 @@ const DiscoveryPage = () => {
             ...p,
             id: p.id,
             name: p.name,
-            price: `रू ${Number(p.price).toFixed(2)}`,
-            rawPrice: Number(p.price),
+            price: formatRupees(getEffectivePrice(p)),
+            rawPrice: getEffectivePrice(p),
+            originalPrice: Number(p.price),
+            salePrice: hasActiveSale(p) ? Number(p.sale_price) : null,
+            saleEndsAt: p.sale_ends_at,
+            isOnSale: hasActiveSale(p),
             image: p.images && p.images.length > 0 ? p.images[0] : fallbackCatalogImage,
             category: p.category || 'Indoor Plants',
             tags: p.tags || [],
@@ -89,6 +95,7 @@ const DiscoveryPage = () => {
       <Navbar />
       <main className="flex-grow">
         <DiscoveryHero />
+        <SaleBanner />
 
         {/* Active search query banner */}
         {searchQuery.trim() && (

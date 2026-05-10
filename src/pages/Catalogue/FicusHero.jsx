@@ -3,6 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 import { fallbackHeroImage } from '../../lib/localImages';
+import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 const FicusHero = ({ product }) => {
   const { addToBag } = useCart();
@@ -12,7 +13,9 @@ const FicusHero = ({ product }) => {
   const scientificName = product?.description || '';
   const info = product?.info || 'No description available for this specimen.';
   const provenance = product?.provenance || 'Origin unknown';
-  const price = product?.price ? `रू ${Number(product.price).toLocaleString('en-NP')}` : 'Price on request';
+  const onSale = hasActiveSale(product);
+  const price = product?.price ? formatRupees(getEffectivePrice(product)) : 'Price on request';
+  const originalPrice = onSale ? formatRupees(product.price) : null;
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : fallbackHeroImage;
@@ -26,7 +29,11 @@ const FicusHero = ({ product }) => {
   const handleAddToBag = async () => {
     if (!product) return;
     try {
-      const result = await addToBag(product);
+      const result = await addToBag({
+        ...product,
+        effectivePrice: getEffectivePrice(product),
+        salePrice: onSale ? Number(product.sale_price) : null,
+      });
       if (result?.success) {
         setAdded(true);
         setTimeout(() => setAdded(false), 1800);
@@ -108,7 +115,15 @@ const FicusHero = ({ product }) => {
             <div className="pt-12 border-t border-[#B1B3A9]/20 flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-end">
               <div>
                 <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Investment</p>
-                <p className="font-headline text-4xl text-[#31332C]">{price}</p>
+                <p className="font-headline text-4xl text-[#31332C]">
+                  {originalPrice && <span className="mb-1 block font-body text-sm text-[#5E6058]/50 line-through">{originalPrice}</span>}
+                  {price}
+                </p>
+                {onSale && (
+                  <p className="mt-2 font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#785A1A]">
+                    Limited sale
+                  </p>
+                )}
               </div>
               <div className="flex w-full gap-3 sm:w-auto">
                 <Motion.button

@@ -5,6 +5,7 @@ import HomePage from './pages/Home';
 import CataloguePage from './pages/Catalogue';
 import ArchivePage from './pages/Archive';
 import ManageInventory from './pages/ManageInventory';
+import PromotionsPage from './pages/Admin/Promotions';
 import DiscoveryPage from './pages/Discovery';
 import ProductCataloguePage from './pages/ProductCatalogue';
 import CartPage from './pages/Cart';
@@ -60,6 +61,7 @@ const AnimatedRoutes = () => {
         <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
         <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
         <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
+        <Route path="/admin/promotions" element={<AdminRoute><PromotionsPage /></AdminRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />

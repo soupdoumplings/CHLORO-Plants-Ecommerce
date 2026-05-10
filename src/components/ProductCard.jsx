@@ -46,6 +46,12 @@ const ProductCard = ({ product, delay = 0 }) => {
             <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
           </button>
 
+          {product.isOnSale && (
+            <span className="absolute left-4 top-4 z-20 bg-[#785A1A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-white">
+              Sale
+            </span>
+          )}
+
           <div className="absolute bottom-2 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
             <Motion.button
               onClick={(e) => {
@@ -67,8 +73,15 @@ const ProductCard = ({ product, delay = 0 }) => {
             <h3 className="font-headline text-[25px] leading-tight text-[#31332c] group-hover:text-[#785a1a] transition-colors">
               {product.name}
             </h3>
-            <p className="font-serif text-[#31332c] text-[18px] mt-1 whitespace-nowrap">
-              रू {product.price}
+            <p className="mt-1 whitespace-nowrap text-right font-serif text-[18px] text-[#31332c]">
+              {product.isOnSale && product.originalPrice ? (
+                <>
+                  <span className="block text-[12px] text-[#5e6058]/50 line-through">रू {product.originalPrice}</span>
+                  <span>रू {product.price}</span>
+                </>
+              ) : (
+                <>रू {product.price}</>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-3 opacity-60 mt-auto pt-4">

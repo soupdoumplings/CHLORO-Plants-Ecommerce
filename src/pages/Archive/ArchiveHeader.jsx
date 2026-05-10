@@ -39,6 +39,10 @@ const ArchiveHeader = () => {
         transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="flex flex-wrap gap-4 items-center w-full lg:w-auto"
       >
+        <Link to="/admin/promotions" className="border border-[#785A1A]/30 bg-white text-[#785A1A] px-6 md:px-8 py-3 font-label text-[11px] md:text-[12px] tracking-[1.2px] uppercase flex items-center justify-center gap-2 hover:bg-[#785A1A] hover:text-white transition-all transform hover:-translate-y-0.5 active:scale-95 flex-1 lg:flex-none">
+           <span className="material-symbols-outlined text-[15px]">sell</span>
+           Promotions
+        </Link>
         <Link to="/admin/add-plant" className="bg-[#5F5E5E] text-[#FAF7F6] px-6 md:px-8 py-3 font-label text-[11px] md:text-[12px] tracking-[1.2px] uppercase flex items-center justify-center gap-2 hover:bg-[#31332C] transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-lg shadow-black/5 flex-1 lg:flex-none">
            <span className="w-2 h-2 bg-[#FAF7F6] rounded-full"></span>
            Add Plant For Sale

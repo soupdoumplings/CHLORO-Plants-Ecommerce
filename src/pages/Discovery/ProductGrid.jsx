@@ -88,6 +88,12 @@ const DiscoveryProductCard = ({ product, index }) => {
             <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
           </button>
 
+          {product.isOnSale && (
+            <span className="absolute left-4 top-4 z-20 bg-[#785A1A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-white">
+              Sale
+            </span>
+          )}
+
           {/* View Product CTA - slides up from below the frame */}
           <Motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -145,8 +151,13 @@ const DiscoveryProductCard = ({ product, index }) => {
               {product.category}
             </p>
           </div>
-          <span className="font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap pt-0.5">
-            {product.price}
+          <span className="pt-0.5 text-right font-headline text-[16px] text-[#1A1A1A] whitespace-nowrap">
+            {product.isOnSale && product.originalPrice ? (
+              <>
+                <span className="block text-[12px] text-[#6B6B6B]/55 line-through">रू {Number(product.originalPrice).toFixed(2)}</span>
+                <span>{product.price}</span>
+              </>
+            ) : product.price}
           </span>
         </div>
       </Link>
