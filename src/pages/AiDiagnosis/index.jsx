@@ -1,15 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { AlertTriangle, Camera, Leaf, Loader2, LocateFixed, ShoppingBag, Sparkles, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { AlertTriangle, ArrowDown, Camera, Leaf, Loader2, LocateFixed, Sparkles, X } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import { analyzePlantImage, preparePlantImage } from '../../lib/gemini';
 import { useCart } from '../../lib/CartContext';
 import { useGeoLocation } from '../../lib/useGeoLocation';
-import { fallbackHeroImage } from '../../lib/localImages';
+import { productAssetImages } from '../../lib/localImages';
 
-const placeholderLeaf = fallbackHeroImage;
+const placeholderLeaf = productAssetImages.monstera;
+
+const treatmentPlaceholders = [
+  {
+    name: 'No 04 Foliar Mist',
+    category: 'Antifungal / Restorative',
+    reason: 'Treatment recommendations unlock after Gemini reviews your plant photo.',
+    image: productAssetImages.wateringCan,
+    locked: true,
+  },
+  {
+    name: 'No 12 Ionic Solution',
+    category: 'Vascular Stabilizer',
+    reason: 'Care products and tools will be matched from CHLORO inventory.',
+    image: productAssetImages.scissors,
+    locked: true,
+  },
+];
 
 const severityCopy = {
   low: 'Observation',
@@ -78,6 +95,13 @@ const getProtocol = (result) => {
   }));
 };
 
+const ReportMetric = ({ label, value }) => (
+  <div className="border-t border-[#11110E]/12 py-4">
+    <p className="font-label text-[8px] uppercase tracking-[0.26em] text-[#7A756A]">{label}</p>
+    <p className="mt-2 font-headline text-[22px] leading-tight text-[#11110E]">{value}</p>
+  </div>
+);
+
 const ProductCard = ({ product, index }) => {
   const { addToBag } = useCart();
   const [added, setAdded] = useState(false);
@@ -104,40 +128,40 @@ const ProductCard = ({ product, index }) => {
   const priceLabel = isRealProduct
     ? `रू ${Number(product.price || 0).toLocaleString('en-NP')}`
     : product.price;
+  const disabledLabel = product.locked ? 'Analysis Required' : 'Awaiting Inventory';
 
   const content = (
-    <article className="border border-[#11110E]/10 bg-[#FFFEFA] p-5 transition-transform duration-300 hover:-translate-y-1">
-      <div className="aspect-[1.12/1] overflow-hidden bg-[#E6E4DC]">
+    <article className="group">
+      <div className="aspect-[1.08/1] overflow-hidden border border-[#11110E]/10 bg-[#E6E4DC]">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+          <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.03]" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <Leaf className="h-7 w-7 text-[#456565]" />
           </div>
         )}
       </div>
-      <p className="mt-5 font-label text-[8px] uppercase tracking-[0.3em] text-[#8A6A21]">{product.category || product.priority || 'Apothecary'}</p>
-      <h3 className="mt-2 font-headline text-[28px] leading-tight text-[#11110E]">{product.name}</h3>
-      <p className="mt-3 min-h-[42px] font-body text-[12px] leading-relaxed text-[#6D695F]">{product.reason}</p>
-      <button
-        type="button"
-        onClick={handleAdd}
-        disabled={!isRealProduct}
-        className="mt-5 flex w-full items-center justify-center gap-2 bg-[#11110E] px-4 py-3 text-[#FBF9F4] transition-colors hover:bg-[#2F2A22] disabled:cursor-default disabled:bg-[#8F8B82]"
-      >
-        <ShoppingBag className="h-3.5 w-3.5" />
-        <span className="font-label text-[9px] uppercase tracking-[0.2em]">
-          {isRealProduct ? (added ? 'Added to Regimen' : `Add to Regimen - ${priceLabel}`) : 'Awaiting Inventory'}
-        </span>
-      </button>
+      <div className="mt-5 flex items-start justify-between gap-5">
+        <div className="min-w-0">
+          <p className="font-label text-[8px] uppercase tracking-[0.28em] text-[#7A756A]">{product.category || product.priority || 'Care Product'}</p>
+          <h3 className="mt-2 font-headline text-[28px] leading-[0.96] text-[#11110E]">{product.name}</h3>
+          <p className="mt-3 min-h-[42px] font-body text-[12px] leading-relaxed text-[#6D695F]">{product.reason}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!isRealProduct}
+          className="mt-1 shrink-0 border border-[#11110E] px-4 py-2.5 text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FBF9F4] disabled:cursor-default disabled:border-[#11110E]/25 disabled:text-[#11110E]/35"
+        >
+          <span className="font-label text-[8px] uppercase tracking-[0.18em]">
+            {isRealProduct ? (added ? 'Added' : `Add - ${priceLabel}`) : disabledLabel}
+          </span>
+        </button>
+      </div>
     </article>
   );
 
-  return isRealProduct ? (
-    <Link to={`/catalogue/${product.id}`} className="block">{content}</Link>
-  ) : (
-    <div className={index > 1 ? 'hidden' : ''}>{content}</div>
-  );
+  return <div className={index > 1 ? 'hidden' : ''}>{content}</div>;
 };
 
 const AiDiagnosisPage = () => {
@@ -149,8 +173,11 @@ const AiDiagnosisPage = () => {
   const [isPreparing, setIsPreparing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [specimenId, setSpecimenId] = useState(() => `#${Math.random().toString(16).slice(2, 6).toUpperCase()}-B`);
+  const [photoId, setPhotoId] = useState(() => `#${Math.random().toString(16).slice(2, 6).toUpperCase()}-B`);
   const [captureNotice, setCaptureNotice] = useState('');
+  const labRef = useRef(null);
+  const reportRef = useRef(null);
+  const protocolRef = useRef(null);
 
   const topProblem = useMemo(() => result?.likelyProblems?.[0] || null, [result]);
   const protocol = getProtocol(result);
@@ -158,12 +185,35 @@ const AiDiagnosisPage = () => {
   const clinicalState = useMemo(() => {
     if (isAnalyzing) return 'Reading Pigment & Structure';
     if (result) return 'Clinical Assessment Complete';
-    if (image) return 'Specimen Captured';
-    return 'Awaiting Specimen';
+    if (image) return 'Plant Photo Ready';
+    return 'Upload Plant Photo';
   }, [image, isAnalyzing, result]);
   const resultTitle = topProblem?.name || (result ? result.summary : image ? 'Ready for Clinical Analysis' : 'Awaiting Clinical Image');
   const confidenceLabel = result ? formatPercent(result.confidence) : image ? 'Ready' : 'Pending';
   const locationLabel = location ? getDetectedLocationLabel(location) : 'Nepal climate context';
+  const regionLabel = location ? locationLabel : 'Nepal Default';
+  const severityLabel = result ? severityCopy[result.severity] || 'Clinical Note' : image ? 'Prepared' : 'Standby';
+  const reportActionLabel = isAnalyzing
+    ? 'Analyzing Plant Photo'
+    : result
+      ? 'Export Full Lab Report'
+      : image
+        ? 'Begin Clinical Analysis'
+        : 'Upload Image To Begin';
+  const reportActionDisabled = !result && (!image || isPreparing || isAnalyzing);
+  const treatmentCards = result && displayProducts.length ? displayProducts.slice(0, 2) : treatmentPlaceholders;
+
+  const scrollToLab = useCallback(() => {
+    labRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const scrollToReport = useCallback(() => {
+    reportRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const scrollToProtocol = useCallback(() => {
+    protocolRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
 
   const handleFiles = useCallback(async (files, source = 'upload') => {
     const selected = files?.[0];
@@ -176,8 +226,8 @@ const AiDiagnosisPage = () => {
     try {
       const prepared = await preparePlantImage(selected);
       setImage(prepared);
-      setSpecimenId(`#${Math.random().toString(16).slice(2, 6).toUpperCase()}-B`);
-      setCaptureNotice(source === 'paste' ? 'Clipboard specimen captured.' : 'Specimen image captured.');
+      setPhotoId(`#${Math.random().toString(16).slice(2, 6).toUpperCase()}-B`);
+      setCaptureNotice(source === 'paste' ? 'Clipboard plant photo uploaded.' : 'Plant photo uploaded.');
     } catch (err) {
       setError(err.message || 'Could not load that image.');
     } finally {
@@ -191,6 +241,13 @@ const AiDiagnosisPage = () => {
     const timeout = window.setTimeout(() => setCaptureNotice(''), 2400);
     return () => window.clearTimeout(timeout);
   }, [captureNotice]);
+
+  useEffect(() => {
+    if (!result) return undefined;
+
+    const timeout = window.setTimeout(scrollToReport, 180);
+    return () => window.clearTimeout(timeout);
+  }, [result, scrollToReport]);
 
   useEffect(() => {
     const handlePaste = (event) => {
@@ -250,243 +307,273 @@ const AiDiagnosisPage = () => {
       <Navbar />
 
       <main className="pt-[82px]">
-        <section className="grid grid-cols-1 border-b border-[#11110E]/10 px-6 py-12 md:px-10 md:py-16 lg:grid-cols-[1fr_260px]">
-          <div>
-            <p className="font-label text-[9px] uppercase tracking-[0.55em] text-[#8A6A21]">Botanical Intelligence v.2.4</p>
-            <h1 className="mt-4 max-w-[1040px] font-headline text-[72px] leading-[0.78] md:text-[124px]">
-              Diagnostic <span className="italic">Atelier</span>
-            </h1>
-            <p className="mt-8 max-w-[620px] font-body text-[15px] leading-relaxed text-[#5E5A52]">
-              Upload a clear plant photograph. Gemini studies the visible symptoms, then returns a composed care protocol for Nepal homes and CHLORO inventory.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {['Upload', 'Drag', 'Paste'].map((item) => (
-                <span key={item} className="border border-[#11110E]/12 bg-[#FFFEFA] px-4 py-2 font-label text-[9px] uppercase tracking-[0.22em] text-[#6D695F]">
-                  {item}
-                </span>
-              ))}
+        <EditorialHero
+          eyebrow="Gemini Vision Lab"
+          title="AI Plant"
+          italic="Diagnosis"
+          copy="Upload a plant image, add field notes, and receive a visual assessment with likely causes, local Nepal care context, and recovery steps."
+          image={placeholderLeaf}
+          imageAlt="Monstera leaf detail for AI diagnosis"
+          objectPosition="center"
+          actions={(
+            <button
+              type="button"
+              onClick={scrollToLab}
+              className="border border-[#FBF9F4]/65 px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4] transition-colors hover:bg-[#FBF9F4] hover:text-[#0F3A3A]"
+            >
+              Open Diagnostic Bench
+            </button>
+          )}
+          meta={[
+            { label: 'Status', value: clinicalState },
+            { label: 'Region', value: regionLabel },
+            { label: 'Model', value: 'Gemini' },
+          ]}
+        />
+
+        <section ref={labRef} className="scroll-mt-[96px] border-b border-[#11110E]/10 bg-[#F7F3EA] px-6 pb-20 pt-16 md:px-10 md:pb-28 md:pt-20">
+          <div className="mx-auto max-w-[1380px]">
+            <div className="text-center">
+              <p className="font-label text-[8px] uppercase tracking-[0.42em] text-[#7A756A]">Diagnostic Module 0.1</p>
+              <h1 className="mx-auto mt-5 max-w-[820px] font-headline text-[54px] leading-[0.92] tracking-tight text-[#11110E] md:text-[82px]">
+                Plant Health Report
+              </h1>
+              <div className="mx-auto mt-10 h-20 w-px bg-[#11110E]/18" />
             </div>
-          </div>
-          <div className="mt-10 flex items-center justify-start lg:mt-0 lg:justify-center">
-            <div className="flex h-28 w-28 items-center justify-center border border-[#11110E] bg-[#11110E] text-[#F7F3EA]">
-              <Leaf className="h-9 w-9" />
+
+            <div className="mt-16 grid border border-[#11110E]/12 bg-[#FFFEFA] lg:grid-cols-[minmax(0,1.24fr)_minmax(390px,0.76fr)]">
+              <aside className="flex min-h-[520px] items-center justify-center border-b border-[#11110E]/12 p-6 md:p-10 lg:border-b-0 lg:border-r">
+                <label
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    setIsDragging(false);
+                    handleFiles(event.dataTransfer.files);
+                  }}
+                  className={`relative block aspect-[4/5] w-full max-w-[620px] cursor-pointer overflow-hidden bg-[#E6E4DC] transition-all duration-300 ${
+                    isDragging ? 'shadow-[0_26px_90px_rgba(17,17,14,0.18)] ring-1 ring-[#11110E]' : ''
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="sr-only"
+                    onChange={(event) => handleFiles(event.target.files)}
+                  />
+                  <img
+                    src={image?.previewUrl || placeholderLeaf}
+                    alt="Plant photo"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1600ms] hover:scale-[1.025]"
+                  />
+                  <div className="absolute inset-0 bg-[#11110E]/8" />
+                  <div className="pointer-events-none absolute inset-5 border border-white/45" />
+                  <div className="absolute left-6 top-6 border border-white/45 bg-black/72 px-4 py-3 text-[#F7F3EA] backdrop-blur-sm">
+                    <p className="font-label text-[8px] uppercase tracking-[0.22em]">Photo ID: {photoId}</p>
+                    <p className="mt-1 font-label text-[7px] uppercase tracking-[0.2em] text-[#F7F3EA]/65">Sample set 3A, 2026</p>
+                  </div>
+                  <div className="absolute bottom-6 right-6 bg-[#FFFEFA] px-4 py-3 text-right shadow-[0_16px_45px_rgba(17,17,14,0.12)]">
+                    <p className="font-label text-[7px] uppercase tracking-[0.18em] text-[#7A756A]">Confidence Score</p>
+                    <p className="mt-1 font-headline text-[22px] leading-none text-[#11110E]">{confidenceLabel}</p>
+                  </div>
+                  <div className={`absolute left-1/2 top-1/2 flex w-[240px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center border border-white/70 bg-[#FFFEFA]/94 px-5 py-8 text-center shadow-[0_18px_60px_rgba(24,24,18,0.12)] backdrop-blur-sm transition-opacity ${image ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
+                    {isPreparing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+                    <span className="mt-5 font-label text-[9px] uppercase tracking-[0.18em] text-[#565149]">
+                      {image ? 'Replace Photo' : 'Upload Plant Photo'}
+                    </span>
+                    <span className="mt-3 font-body text-[11px] leading-relaxed text-[#8A857A]">
+                      Click, drop, or paste image
+                    </span>
+                  </div>
+                  {(isPreparing || isAnalyzing) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#F7F3EA]/75">
+                      <Loader2 className="h-8 w-8 animate-spin text-[#11110E]" />
+                    </div>
+                  )}
+                </label>
+              </aside>
+
+              <section ref={reportRef} className="grid scroll-mt-[96px] divide-y divide-[#11110E]/12">
+                <div className="p-7 md:p-10">
+                  <p className="font-label text-[8px] font-bold uppercase tracking-[0.28em] text-[#A90000]">Severity: {severityLabel}</p>
+                  <h2 className="mt-5 font-headline text-[38px] leading-[0.96] text-[#11110E] md:text-[48px]">
+                    {resultTitle}
+                  </h2>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <span className="bg-[#E8E8E0] px-3 py-1.5 font-label text-[8px] uppercase tracking-[0.18em] text-[#686256]">Region: {regionLabel}</span>
+                    <span className="bg-[#E8E8E0] px-3 py-1.5 font-label text-[8px] uppercase tracking-[0.18em] text-[#686256]">{clinicalState}</span>
+                    <span className="bg-[#E8E8E0] px-3 py-1.5 font-label text-[8px] uppercase tracking-[0.18em] text-[#686256]">{result?.nepalNotes?.[0] ? 'Nepal Context' : 'Gemini Vision'}</span>
+                  </div>
+                </div>
+
+                <article className="p-7 md:p-10">
+                  <div className="flex items-start justify-between gap-5">
+                    <h3 className="font-label text-[9px] uppercase tracking-[0.32em] text-[#7A756A]">The Assessment</h3>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#11110E]/12 bg-[#F7F3EA]">
+                      {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-[#8A6A21]" />}
+                    </div>
+                  </div>
+                  <p className="mt-7 font-body text-[14px] leading-loose text-[#5E5A52]">
+                    {result?.summary || (image
+                      ? 'Your plant photo is ready. Begin analysis to receive likely causes, visible stress notes, and care steps for Nepal conditions.'
+                      : 'Upload a plant image to activate Gemini analysis. The report will stay grounded in visible evidence, field notes, and local climate context.')}
+                  </p>
+                  <div className="mt-8 grid gap-0 sm:grid-cols-2">
+                    <ReportMetric label="Pathogen Identification" value={topProblem?.name || 'Pending'} />
+                    <ReportMetric label="Metabolic Status" value={(topProblem?.evidence || result?.causes?.[0]) || 'Awaiting spectral reading'} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={result ? () => window.print() : handleAnalyze}
+                    disabled={reportActionDisabled}
+                    className="mt-8 flex w-full items-center justify-center gap-3 border border-[#11110E] px-5 py-4 font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] disabled:cursor-not-allowed disabled:border-[#11110E]/25 disabled:text-[#11110E]/35"
+                  >
+                    {isAnalyzing && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {reportActionLabel}
+                  </button>
+                  {captureNotice && (
+                    <p className="mt-4 border border-[#456565]/20 bg-[#456565]/5 px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#456565]">
+                      {captureNotice}
+                    </p>
+                  )}
+                  {result && (
+                    <Motion.button
+                      type="button"
+                      onClick={scrollToProtocol}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                      className="mt-5 flex w-full items-center justify-between gap-4 border border-[#456565]/25 bg-[#456565]/8 px-5 py-4 text-left transition-colors hover:border-[#456565] hover:bg-[#456565]/12"
+                    >
+                      <span>
+                        <span className="block font-label text-[8px] font-bold uppercase tracking-[0.24em] text-[#456565]">Assessment Ready</span>
+                        <span className="mt-2 block font-body text-[12px] leading-relaxed text-[#5E5A52]">
+                          Continue down to prescribed care, matched products, and the recovery protocol.
+                        </span>
+                      </span>
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#456565]/30 bg-[#FFFEFA] text-[#456565]">
+                        <ArrowDown className="h-4 w-4" />
+                      </span>
+                    </Motion.button>
+                  )}
+                </article>
+
+                <div className="grid gap-5 p-7 md:p-10">
+                  <div className="flex flex-col gap-4 border border-[#11110E]/12 bg-[#F7F3EA] p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <LocateFixed className="mt-0.5 h-4 w-4 shrink-0 text-[#8A6A21]" />
+                      <div>
+                        <p className="font-label text-[8px] uppercase tracking-[0.24em] text-[#6D695F]">Location Context</p>
+                        <p className="mt-2 font-body text-[12px] leading-relaxed text-[#5E5A52]">
+                          {locating
+                            ? 'Detecting your current plant-care climate...'
+                            : location
+                              ? `Using ${locationLabel} for local humidity, season, and light guidance.`
+                              : 'Allow location access for more accurate Nepal-specific diagnosis.'}
+                        </p>
+                        {locationError && (
+                          <p className="mt-2 font-label text-[9px] font-semibold tracking-[0.06em] text-[#A90000]">
+                            {locationError}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleUseCurrentLocation}
+                      disabled={!isSupported || locating}
+                      className="shrink-0 border border-[#11110E] px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      {locating ? 'Locating' : location ? 'Refresh' : 'Use Location'}
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="flex items-end justify-between gap-4">
+                      <label htmlFor="diagnosis-notes" className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">
+                        Field Notes
+                      </label>
+                      <p className="font-label text-[8px] uppercase tracking-[0.18em] text-[#A8A298]">Optional</p>
+                    </div>
+                    <textarea
+                      id="diagnosis-notes"
+                      value={notes}
+                      onChange={(event) => setNotes(event.target.value)}
+                      rows={4}
+                      placeholder="Yellow lower leaves, sticky residue, brown tips, recent repotting, balcony sun..."
+                      className="mt-4 w-full resize-none border border-[#11110E]/12 bg-[#FFFEFA] p-4 font-body text-sm leading-relaxed text-[#333029] outline-none placeholder:text-[#918B80] focus:border-[#11110E]"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="flex gap-3 border border-[#A90000]/25 bg-[#A90000]/5 px-4 py-3 text-[#A90000]">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                      <p className="font-body text-sm leading-relaxed">{error}</p>
+                    </div>
+                  )}
+
+                  {image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImage(null);
+                        setResult(null);
+                        setError('');
+                        setCaptureNotice('');
+                      }}
+                      className="inline-flex w-max items-center gap-2 border border-[#11110E]/12 bg-[#FFFEFA] px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#6D695F] transition-colors hover:border-[#11110E] hover:text-[#11110E]"
+                    >
+                      <X className="h-4 w-4" />
+                      Clear Photo
+                    </button>
+                  )}
+                </div>
+              </section>
             </div>
           </div>
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[42vw_1fr]">
-          <aside className="border-b border-[#11110E]/10 px-6 py-12 md:px-10 lg:min-h-[1200px] lg:border-b-0 lg:border-r">
-            <div className="flex max-w-[520px] items-center justify-between gap-5">
-              <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">01. Capture Specimen</p>
-              <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#8A6A21]">{clinicalState}</p>
-            </div>
-
-            <label
-              onDragOver={(event) => {
-                event.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setIsDragging(false);
-                handleFiles(event.dataTransfer.files);
-              }}
-              className={`relative mt-8 block aspect-[4/5] max-w-[520px] cursor-pointer overflow-hidden border bg-[#F0D0A4] transition-all duration-300 ${
-                isDragging ? 'border-[#11110E] shadow-[0_20px_80px_rgba(17,17,14,0.14)]' : 'border-[#D7C8AE]'
-              }`}
-            >
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="sr-only"
-                onChange={(event) => handleFiles(event.target.files)}
-              />
-              <img
-                src={image?.previewUrl || placeholderLeaf}
-                alt="Plant specimen"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-[#11110E]/10" />
-              <div className="absolute left-1/2 top-1/2 flex w-[230px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center border border-white/65 bg-[#FFFEFA]/92 px-5 py-8 text-center shadow-[0_18px_60px_rgba(24,24,18,0.12)] backdrop-blur-sm">
-                {isPreparing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
-                <span className="mt-5 font-label text-[9px] uppercase tracking-[0.18em] text-[#565149]">
-                  {image ? 'Replace Specimen' : 'Upload New Specimen'}
-                </span>
-                <span className="mt-3 font-body text-[11px] leading-relaxed text-[#8A857A]">
-                  Click, drop, or paste image
-                </span>
-              </div>
-              {(isPreparing || isAnalyzing) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#F7F3EA]/75">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#11110E]" />
-                </div>
-              )}
-            </label>
-            {captureNotice && (
-              <p className="mt-4 max-w-[520px] border border-[#456565]/20 bg-[#456565]/5 px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#456565]">
-                {captureNotice}
-              </p>
-            )}
-
-            <div className="mt-5 flex max-w-[520px] items-start justify-between gap-4">
+        <section className="bg-[#F7F3EA] px-6 py-20 md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1380px]">
+            <div className="flex flex-col justify-between gap-6 border-b border-[#11110E]/10 pb-7 md:flex-row md:items-end">
               <div>
-                <p className="font-headline text-[16px] leading-tight">Specimen ID: {specimenId}</p>
-                <p className="mt-1 font-label text-[8px] uppercase tracking-[0.18em] text-[#8A857A]">{result?.plantLikely || (image ? 'Pending Identification' : 'Awaiting Specimen')}</p>
+                <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Recommended Care</p>
+                <h2 className="mt-3 font-headline text-[38px] leading-none text-[#11110E] md:text-[52px]">Care Products For This Plant</h2>
               </div>
-              <div className="text-right">
-                <p className="font-headline text-[16px] leading-tight">{confidenceLabel}</p>
-                <p className="mt-1 font-label text-[8px] uppercase tracking-[0.18em] text-[#8A857A]">Confidence Score</p>
-              </div>
-            </div>
-
-            <div className="mt-10 max-w-[520px] border border-[#11110E]/12 bg-[#FFFEFA] p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <LocateFixed className="mt-0.5 h-4 w-4 shrink-0 text-[#8A6A21]" />
-                  <div>
-                    <p className="font-label text-[9px] uppercase tracking-[0.28em] text-[#6D695F]">Location Context</p>
-                    <p className="mt-2 font-body text-[12px] leading-relaxed text-[#5E5A52]">
-                      {locating
-                        ? 'Detecting your current plant-care climate...'
-                        : location
-                          ? `Using ${locationLabel} for local humidity, season, and light guidance.`
-                          : 'Allow location access for more accurate Nepal-specific diagnosis.'}
-                    </p>
-                    {locationError && (
-                      <p className="mt-2 font-label text-[9px] font-semibold tracking-[0.06em] text-[#A90000]">
-                        {locationError}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleUseCurrentLocation}
-                  disabled={!isSupported || locating}
-                  className="shrink-0 border border-[#11110E] px-4 py-3 font-label text-[9px] uppercase tracking-[0.18em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  {locating ? 'Locating' : location ? 'Refresh' : 'Use Location'}
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-10 max-w-[520px]">
-              <div className="flex items-end justify-between gap-4">
-                <label htmlFor="diagnosis-notes" className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">
-                  Field Notes
-                </label>
-                <p className="font-label text-[8px] uppercase tracking-[0.18em] text-[#A8A298]">Optional</p>
-              </div>
-              <textarea
-                id="diagnosis-notes"
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                rows={6}
-                placeholder="Yellow lower leaves, sticky residue, brown tips, recent repotting, balcony sun..."
-                className="mt-4 w-full resize-none border border-[#11110E]/12 bg-[#FFFEFA] p-4 font-body text-sm leading-relaxed text-[#333029] outline-none placeholder:text-[#918B80] focus:border-[#11110E]"
-              />
-              {error && (
-                <div className="mt-4 flex gap-3 border border-[#A90000]/25 bg-[#A90000]/5 px-4 py-3 text-[#A90000]">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                  <p className="font-body text-sm leading-relaxed">{error}</p>
-                </div>
-              )}
-              <div className="mt-5 grid grid-cols-[1fr_auto] gap-3">
-                <button
-                  type="button"
-                  onClick={handleAnalyze}
-                  disabled={!image || isPreparing || isAnalyzing}
-                  className="flex items-center justify-center gap-3 bg-[#11110E] px-6 py-4 text-[#F7F3EA] transition-colors hover:bg-[#2F2A22] disabled:cursor-not-allowed disabled:bg-[#A8A298]"
-                >
-                  {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                  <span className="font-label text-[10px] uppercase tracking-[0.2em]">
-                    {isAnalyzing ? 'Analyzing Specimen' : 'Begin Clinical Analysis'}
-                  </span>
-                </button>
-                {image && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImage(null);
-                      setResult(null);
-                      setError('');
-                      setCaptureNotice('');
-                    }}
-                    className="flex w-14 items-center justify-center border border-[#11110E]/12 bg-[#FFFEFA] text-[#6D695F] transition-colors hover:border-[#11110E] hover:text-[#11110E]"
-                    title="Clear specimen"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </aside>
-
-          <section className="px-6 py-12 md:px-12">
-            <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#8A6A21]">02. Analysis & Results</p>
-            <h2 className="mt-8 max-w-[820px] font-headline text-[48px] leading-[0.92] text-[#11110E] md:text-[68px]">
-              {resultTitle}
-            </h2>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <span className="bg-[#E8E8E0] px-3 py-1.5 font-label text-[8px] uppercase tracking-[0.18em] text-[#686256]">
-                {result ? severityCopy[result.severity] || 'Clinical Note' : image ? 'Prepared' : 'Standby'}
-              </span>
-              <span className="bg-[#E8E8E0] px-3 py-1.5 font-label text-[8px] uppercase tracking-[0.18em] text-[#686256]">
-                {result?.nepalNotes?.[0] ? 'Nepal Context' : 'Gemini Vision'}
-              </span>
-            </div>
-
-            <article className="mt-16 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-9 shadow-[0_1px_0_rgba(0,0,0,0.05)] md:px-12 md:py-11">
-              <h3 className="font-headline text-[34px] italic">The Assessment</h3>
-              <p className="mt-8 font-body text-[15px] leading-loose text-[#5E5A52]">
-                {result?.summary || (image
-                  ? 'The specimen is captured. Begin clinical analysis to receive a structured reading of pigmentation, visible stress, likely causes, and care steps for Nepal conditions.'
-                  : 'Awaiting a live specimen. Upload, drag, or paste a plant image to activate Gemini analysis. The assessment will remain grounded in visible evidence and local care context.')}
+              <p className="max-w-[330px] font-body text-[12px] leading-relaxed text-[#6D695F] md:text-right">
+                Targeted care products are selected from live CHLORO inventory after analysis.
               </p>
-              <p className="mt-7 font-body text-[14px] leading-loose text-[#6C675E]">
-                {(topProblem?.evidence || result?.causes?.[0]) || 'For best results, include affected leaves, healthy leaves, the stem base, pot, and soil surface. Notes about watering, light, and recent repotting sharpen the diagnosis.'}
-              </p>
-            </article>
-
-            <div className="mt-14 flex max-w-[760px] items-center justify-between border-b border-[#11110E]/10 pb-5">
-              <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">03. Prescribed Apothecary</p>
-              <Link to="/products-gifts" className="font-label text-[8px] uppercase tracking-[0.18em] text-[#8A6A21] underline underline-offset-4">
-                View Full Range
-              </Link>
             </div>
-            {result && displayProducts.length ? (
-              <div className="mt-8 grid max-w-[760px] grid-cols-1 gap-7 sm:grid-cols-2">
-                {displayProducts.slice(0, 2).map((product, index) => (
-                  <ProductCard key={product.id || product.name} product={product} index={index} />
-                ))}
-              </div>
-            ) : result ? (
-              <div className="mt-8 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-7">
-                <p className="font-headline text-[24px] italic text-[#181812]">No prescribed product yet.</p>
-                <p className="mt-3 font-body text-[13px] leading-relaxed text-[#6D695F]">
-                  Gemini did not find a matching item in CHLORO inventory. Add care products in the database to make this section recommend only real stock.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-8 max-w-[760px] border border-[#11110E]/10 bg-[#FFFEFA] px-8 py-7">
-                <p className="font-headline text-[24px] italic text-[#181812]">Prescriptions unlock after analysis.</p>
-                <p className="mt-3 font-body text-[13px] leading-relaxed text-[#6D695F]">
-                  The assistant will only recommend products that exist in your CHLORO product database.
-                </p>
-              </div>
+
+            <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+              {treatmentCards.map((product, index) => (
+                <ProductCard key={product.id || product.name} product={product} index={index} />
+              ))}
+            </div>
+
+            {result && !displayProducts.length && (
+              <p className="mt-6 border border-[#11110E]/10 bg-[#FFFEFA] px-5 py-4 font-body text-[13px] leading-relaxed text-[#6D695F]">
+                Gemini did not find a matching inventory item. Add care products in the admin inventory to make this section recommend real stock.
+              </p>
             )}
 
-            <div className="mt-16 max-w-[760px] border-t border-[#11110E]/10 pt-10">
-              <p className="font-label text-[9px] uppercase tracking-[0.35em] text-[#7A756A]">Recovery Protocol</p>
-              <div className="mt-7 space-y-7">
+            <div ref={protocolRef} className="mt-24 grid scroll-mt-[96px] gap-10 border-t border-[#11110E]/10 pt-12 lg:grid-cols-[320px_1fr]">
+              <div>
+                <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Logistics</p>
+                <h2 className="mt-3 font-headline text-[36px] leading-[0.95] text-[#11110E] md:text-[48px]">Recovery Protocol</h2>
+              </div>
+              <div className="divide-y divide-[#11110E]/10 border-t border-[#11110E]/10">
                 {protocol.slice(0, 4).map((item, index) => (
-                  <div key={`${item.label}-${item.text}`} className="grid grid-cols-[42px_1fr] gap-5">
-                    <p className="font-headline text-[22px] italic text-[#785A1A]">{String(index + 1).padStart(2, '0')}</p>
+                  <div key={`${item.label}-${item.text}`} className="grid gap-5 py-7 md:grid-cols-[64px_1fr_1.35fr]">
+                    <p className="font-label text-[22px] text-[#11110E]/28">{String(index + 1).padStart(2, '0')}</p>
                     <div>
-                      <p className="font-label text-[9px] uppercase tracking-[0.28em] text-[#6D695F]">{item.label}</p>
-                      <p className="mt-2 font-body text-[13px] leading-relaxed text-[#6D695F]">{item.text}</p>
+                      <p className="font-label text-[8px] uppercase tracking-[0.24em] text-[#7A756A]">{item.label}</p>
+                      <p className="mt-2 font-headline text-[24px] leading-none text-[#11110E]">{item.label}</p>
                     </div>
+                    <p className="font-body text-[13px] leading-relaxed text-[#5E5A52]">{item.text}</p>
                   </div>
                 ))}
               </div>
@@ -497,24 +584,26 @@ const AiDiagnosisPage = () => {
                 {result.disclaimer}
               </p>
             )}
-          </section>
+          </div>
         </section>
 
-        <section className="bg-[#11110E] px-6 py-24 text-center text-[#F7F3EA] md:px-10">
-          <h2 className="font-headline text-[52px] leading-[0.9] md:text-[70px]">
-            Care notes, <span className="italic">composed weekly.</span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-[430px] font-body text-[13px] leading-relaxed text-[#F7F3EA]/64">
-            Join our inner circle for clinical plant care insights and early access to the archive.
-          </p>
-          <form className="mx-auto mt-12 flex max-w-[440px] items-center border-b border-[#D8B56D]/60">
-            <input
-              type="email"
-              placeholder="EMAIL ADDRESS"
-              className="min-w-0 flex-1 bg-transparent py-3 font-label text-[9px] uppercase tracking-[0.2em] outline-none placeholder:text-[#F7F3EA]/40"
-            />
-            <button type="button" className="py-3 font-label text-[9px] uppercase tracking-[0.2em] text-[#D8B56D]">Submit</button>
-          </form>
+        <section className="bg-[#F7F3EA] px-6 pb-24 md:px-10">
+          <div className="mx-auto max-w-[1380px] border border-[#11110E]/14 bg-[#FFFEFA] px-6 py-20 text-center md:px-10">
+            <h2 className="font-headline text-[38px] leading-none text-[#11110E] md:text-[52px]">
+              Expertise delivered weekly.
+            </h2>
+            <p className="mx-auto mt-5 max-w-[430px] font-body text-[13px] leading-relaxed text-[#6D695F]">
+              Join our botanical registry for clinical insights, care protocols, and laboratory updates.
+            </p>
+            <form className="mx-auto mt-12 flex max-w-[440px] items-center border-b border-[#11110E]/30">
+              <input
+                type="email"
+                placeholder="EMAIL ADDRESS"
+                className="min-w-0 flex-1 bg-transparent py-3 font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E] outline-none placeholder:text-[#11110E]/40"
+              />
+              <button type="button" className="py-3 font-label text-[13px] text-[#11110E]">-&gt;</button>
+            </form>
+          </div>
         </section>
       </main>
 

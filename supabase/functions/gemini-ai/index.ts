@@ -180,7 +180,7 @@ const buildChatFallback = (rawText) => {
   return {
     reply: reply || 'I can help with plant care, gifts, and checkout. Please ask once more with one specific question.',
     productRecommendations: [],
-    suggestedActions: ['Open AI diagnosis', 'Find easy-care plants', 'Choose a gift'],
+    suggestedActions: ['Browse gift-ready products', 'Find easy-care plants', 'Checkout help'],
     recoveredFromMalformedJson: true,
   };
 };
@@ -211,7 +211,7 @@ const buildDiagnosisFallback = (rawText) => {
       'Wipe nearby leaves and inspect the undersides for pests.',
     ],
     carePlan: [
-      { timing: 'Today', step: 'Isolate the specimen and remove heavily damaged leaf tissue.' },
+      { timing: 'Today', step: 'Isolate the plant and remove heavily damaged leaf tissue.' },
       { timing: 'Next watering', step: 'Water only when the topsoil has dried; avoid letting the pot sit in water.' },
       { timing: 'This week', step: 'Improve airflow and bright indirect light, especially during humid Nepal weather.' },
     ],
@@ -400,10 +400,33 @@ const normalizeDiagnosisResult = (result) => ({
   recoveredFromMalformedJson: Boolean(result.recoveredFromMalformedJson),
 });
 
-const normalizeChatResult = (result) => ({
+const dedupeActions = (items) => (
+  [...new Set(asArray(items).map((item) => cleanText(item, 80)).filter(Boolean))].slice(0, 3)
+);
+
+const buildContextualChatActions = (latestMessage, actions) => {
+  const lower = cleanText(latestMessage, 500).toLowerCase();
+  const hasAny = (words) => words.some((word) => lower.includes(word));
+
+  if (hasAny(['gift', 'friend', 'send', 'present', 'birthday', 'housewarming'])) {
+    return ['Browse gift-ready products', 'Find easy-care plants', 'Checkout help'];
+  }
+
+  if (hasAny(['diagnosis', 'diagnose', 'yellow', 'drooping', 'pest', 'fungal', 'sick', 'spots'])) {
+    return ['Open AI diagnosis', 'Find care tools', 'Ask about watering'];
+  }
+
+  if (hasAny(['order', 'delivery', 'track', 'payment', 'checkout'])) {
+    return ['Open my orders', 'Checkout help', 'Browse gift-ready products'];
+  }
+
+  return dedupeActions(actions);
+};
+
+const normalizeChatResult = (result, latestMessage = '') => ({
   reply: cleanText(result.reply, 700) || 'I can help with plant care, products, gifts, and checkout.',
   productRecommendations: asArray(result.productRecommendations).slice(0, 2),
-  suggestedActions: asArray(result.suggestedActions).slice(0, 3).map((item) => cleanText(item, 80)),
+  suggestedActions: buildContextualChatActions(latestMessage, result.suggestedActions),
   recoveredFromMalformedJson: Boolean(result.recoveredFromMalformedJson),
 });
 
@@ -470,6 +493,7 @@ const handleChat = async (body) => {
   const transcript = messages
     .map((message) => `${message.sender === 'bot' ? 'Assistant' : 'Customer'}: ${cleanText(message.text, 520)}`)
     .join('\n');
+  const latestCustomerMessage = [...messages].reverse().find((message) => message.sender !== 'bot')?.text || '';
 
   const prompt = `
 You are Sprout, CHLORO's smart botanical shopping and care assistant for Nepal.
@@ -478,9 +502,12 @@ Answer the latest customer message using concise, friendly, practical guidance.
 Rules:
 - Be specific to Nepal when useful: Kathmandu valley, monsoon humidity, dry winter rooms, balcony sun, dust, and indoor watering.
 - For possible diseases or pests, give safe first steps and suggest the /ai-diagnosis image upload page when a visual diagnosis is needed.
+- For gift questions, use the recipient city, budget, occasion, and care level when provided. Suggest gift-ready or easy-care options and the /products-gifts page; do not suggest diagnosis unless the customer mentions symptoms or an image.
+- For delivery or checkout questions, say the recipient address can be entered at checkout, but do not promise coverage, timing, or fees unless product/order data says so.
 - Recommend only products from the CHLORO product list below. If none fit or the list is empty, return no product recommendations.
 - Do not invent stock, discounts, delivery promises, pesticides, or medical claims.
 - Keep the reply under 90 words unless the user asks for detail.
+- Suggested actions must match the latest customer intent. Avoid "Open AI diagnosis" for shopping, gifts, checkout, or order-tracking requests.
 - Return complete minified JSON only. No markdown.
 
 Current page/category context: ${context || 'General shop assistant'}
@@ -497,7 +524,7 @@ ${transcript || 'Customer: Hi'}
     maxOutputTokens: 2048,
     fallback: buildChatFallback,
   });
-  const normalized = normalizeChatResult(result);
+  const normalized = normalizeChatResult(result, latestCustomerMessage);
 
   return jsonResponse({
     ...normalized,
