@@ -41,7 +41,7 @@ const StockInfoBar = ({ products = [], loading }) => {
     {
       label: 'Out of Stock',
       value: loading ? '...' : stats.outOfStock.toString().padStart(2, '0'),
-      helper: 'Needs restock or archive',
+      helper: 'Needs restock or review',
       icon: 'production_quantity_limits',
       tone: stats.outOfStock ? 'text-[#9F403D]' : 'text-[#2F4F4F]',
     },
@@ -75,7 +75,7 @@ const StockInfoBar = ({ products = [], loading }) => {
           <h2 className="mt-3 font-headline text-4xl tracking-tighter text-[#31332C]">Stock Overview</h2>
         </div>
         <p className="max-w-[380px] font-body text-[13px] leading-relaxed text-[#5E6058]">
-          Quick stock health before the holdings table: restock risk, total quantity, and the value currently sitting in inventory.
+          Quick stock health before the inventory table: restock risk, total quantity, and the value currently sitting in inventory.
         </p>
       </div>
 

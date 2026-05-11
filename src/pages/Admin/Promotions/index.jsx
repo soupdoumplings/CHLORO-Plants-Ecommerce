@@ -3,8 +3,10 @@ import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
+import EditorialHero from '../../../components/EditorialHero';
 import { supabase } from '../../../supabase';
 import { formatRupees } from '../../../lib/pricing';
+import { productAssetImages } from '../../../lib/localImages';
 
 const initialForm = {
   product_id: '',
@@ -158,35 +160,43 @@ const PromotionsPage = () => {
   return (
     <div className="flex min-h-screen flex-col bg-[#FBF9F4] text-[#31332C]">
       <Navbar />
-      <main className="page-shell page-gutter mt-[82px] flex-grow pb-24 pt-16">
-        <div className="mb-12 flex flex-col gap-6 border-b border-[#31332C]/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <Link to="/archive" className="font-label text-[9px] font-bold uppercase tracking-[0.2em] text-[#785A1A] underline underline-offset-4">
-              Back to dashboard
-            </Link>
-            <h1 className="mt-5 font-headline text-[clamp(3rem,7vw,6.5rem)] leading-[0.9] tracking-tight">
-              Scheduled Discounts
-            </h1>
-            <p className="mt-5 max-w-2xl font-body text-sm leading-7 text-[#5E6058]">
-              Keep sales simple for the school build: schedule a product, discount percent, and end time.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="w-max bg-[#31332C] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#785A1A]"
-          >
-            Schedule Sale
-          </button>
-        </div>
+      <main className="mt-[82px] flex-grow pb-24">
+        <EditorialHero
+          eyebrow="Sales Control"
+          title="Scheduled"
+          italic="Discounts"
+          copy="Schedule product discounts, watch active offers, and end promotions cleanly without leaving the admin workspace."
+          image={productAssetImages.protea}
+          imageAlt="Protea product image"
+          objectPosition="center"
+          actions={(
+            <>
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="bg-[#FBF9F4] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A] transition-colors hover:bg-[#C6E9E9]"
+              >
+                Schedule Sale
+              </button>
+              <Link to="/archive" className="border border-[#FBF9F4]/65 px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4] transition-colors hover:bg-[#FBF9F4] hover:text-[#0F3A3A]">
+                Back to Dashboard
+              </Link>
+            </>
+          )}
+          meta={[
+            { label: 'Promos', value: loading ? '...' : promotions.length.toString().padStart(2, '0') },
+            { label: 'Limit', value: '90%' },
+          ]}
+        />
 
-        {error && (
-          <div className="mb-8 border border-[#9F403D]/20 bg-[#FAF2F2] p-5 font-body text-sm text-[#9F403D]">
-            {error}
-          </div>
-        )}
+        <div className="page-shell page-gutter pt-12">
+          {error && (
+            <div className="mb-8 border border-[#9F403D]/20 bg-[#FAF2F2] p-5 font-body text-sm text-[#9F403D]">
+              {error}
+            </div>
+          )}
 
-        <div className="overflow-hidden border border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5">
+          <div className="overflow-hidden border border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5">
           {loading ? (
             <div className="p-12 text-center font-label text-[10px] uppercase tracking-[0.2em] text-[#5E6058]">Loading promotions...</div>
           ) : promotions.length === 0 ? (
@@ -225,6 +235,7 @@ const PromotionsPage = () => {
               })}
             </div>
           )}
+          </div>
         </div>
       </main>
 

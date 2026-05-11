@@ -1,20 +1,63 @@
 /**
  * CHLORO — Admin Inventory CRUD Component
  */
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage } from '../../lib/localImages';
 
+const normalizeText = (value) => String(value || '').toLowerCase();
+
+const hasAny = (value, needles) => {
+  const text = normalizeText(value);
+  return needles.some((needle) => text.includes(needle));
+};
+
+const hasTag = (item, needles) => (
+  Array.isArray(item.tags)
+  && item.tags.some((tag) => hasAny(tag, needles))
+);
+
+const isCareTool = (item) => (
+  hasAny(item.category, ['care tools', 'plant care', 'gardening tools', 'equipment'])
+  || hasAny(item.description, ['tool', 'care spray', 'meter'])
+  || hasTag(item, ['tool', 'plant-care', 'ai-diagnosis', 'pest-care', 'root-care'])
+);
+
+const isPlanter = (item) => hasAny(item.category, ['pot', 'planter', 'ceramic', 'vessel']);
+const isFlower = (item) => hasAny(item.category, ['flower', 'fresh cut']);
+const isPlant = (item) => !isCareTool(item) && !isPlanter(item) && !isFlower(item);
+
+const filterProducts = (products, filterId) => {
+  if (filterId === 'plants') return products.filter(isPlant);
+  if (filterId === 'care-tools') return products.filter(isCareTool);
+  if (filterId === 'planters') return products.filter(isPlanter);
+  if (filterId === 'flowers') return products.filter(isFlower);
+  return products;
+};
+
 const InventoryTable = ({ products, loading, onRefresh }) => {
-  const [holdings, setHoldings] = useState([]);
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [activeFilter, setActiveFilter] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
-    setHoldings(products);
+    setInventoryItems(products);
   }, [products]);
+
+  const filteredInventory = useMemo(() => (
+    filterProducts(inventoryItems, activeFilter)
+  ), [activeFilter, inventoryItems]);
+
+  const filters = useMemo(() => [
+    { id: 'all', label: 'All Inventory', count: inventoryItems.length },
+    { id: 'plants', label: 'Plants', count: filterProducts(inventoryItems, 'plants').length },
+    { id: 'care-tools', label: 'Care Tools', count: filterProducts(inventoryItems, 'care-tools').length },
+    { id: 'planters', label: 'Pots & Planters', count: filterProducts(inventoryItems, 'planters').length },
+    { id: 'flowers', label: 'Flowers', count: filterProducts(inventoryItems, 'flowers').length },
+  ], [inventoryItems]);
 
   const confirmDelete = (id) => {
     setItemToDelete(id);
@@ -97,12 +140,22 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="flex justify-between items-center mb-12 border-b border-[#B1B3A9]/10 pb-10"
       >
-        <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Holdings</h2>
-        <div className="flex gap-8 items-center font-label text-[12px] uppercase tracking-widest">
-          <button className="text-[#785A1A] border-b border-[#785A1A] pb-1 font-bold">All Species</button>
-          <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">High Altitude</button>
-          <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Lowland</button>
-          <button className="text-[#5E6058] opacity-50 hover:opacity-100 transition-all pb-1 border-b border-transparent">Equipment</button>
+        <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Inventory</h2>
+        <div className="flex flex-wrap gap-2 items-center font-label text-[10px] uppercase tracking-[0.14em]">
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => setActiveFilter(filter.id)}
+              className={`px-4 py-2 font-bold transition-colors ${
+                activeFilter === filter.id
+                  ? 'bg-[#31332C] text-white'
+                  : 'bg-white text-[#5E6058] hover:bg-[#F5F4ED] hover:text-[#31332C]'
+              }`}
+            >
+              {filter.label} ({filter.count})
+            </button>
+          ))}
         </div>
       </Motion.div>
 
@@ -110,7 +163,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-[#B1B3A9]/20 font-label text-[10px] uppercase tracking-widest text-[#5E6058]/80 font-black">
-              <th className="py-6 px-4">Specimen Profile</th>
+              <th className="py-6 px-4">Product</th>
               <th className="py-6 px-4">Inventory ID</th>
               <th className="py-6 px-4">Status</th>
               <th className="py-6 px-4">Stock</th>
@@ -127,17 +180,23 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                   Syncing Inventory...
                 </td>
               </tr>
-            ) : holdings.length === 0 ? (
+            ) : inventoryItems.length === 0 ? (
               // State 2: Database returned no records
               <tr>
                 <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
-                  Database empty. Add plants to begin.
+                  Database empty. Add plants or care tools to begin.
+                </td>
+              </tr>
+            ) : filteredInventory.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
+                  No inventory found in this category.
                 </td>
               </tr>
             ) : (
-              // State 3: Dynamically render each specimen from the database
+              // State 3: Dynamically render each product from the database
               <AnimatePresence>
-                {holdings.map((item, i) => (
+                {filteredInventory.map((item, i) => (
                   <Motion.tr
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -152,7 +211,14 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                       </div>
                       <div>
                         <p className="font-headline text-2xl text-[#31332C] group-hover:text-[#785A1A] transition-colors">{item.name}</p>
-                        <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70 truncate max-w-[200px]">{item.description || "Indoor Selection"}</p>
+                        <p className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] opacity-70 truncate max-w-[240px]">
+                          {item.category || item.description || "Indoor Selection"}
+                        </p>
+                        {item.description && (
+                          <p className="mt-1 font-body text-xs text-[#5E6058]/70 truncate max-w-[240px]">
+                            {item.description}
+                          </p>
+                        )}
                       </div>
                     </td>
                     <td className="py-8 px-4">
@@ -160,11 +226,11 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                         {item.id.split('-')[0]}
                       </span>
                     </td>
-                    {/* Conditional health status indicator: green = active, red = archived */}
+                    {/* Product status indicator: green = active, red = inactive */}
                     <td className="py-8 px-4">
                       <div className="flex items-center gap-3">
                         <span className={`w-2 h-2 rounded-full ${item.is_active ? 'bg-[#456565]' : 'bg-[#9F403D]'}`}></span>
-                        <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.is_active ? 'Active' : 'Archived'}</p>
+                        <p className="font-body text-sm text-[#31332C] font-medium tracking-tight uppercase">{item.is_active ? 'Active' : 'Inactive'}</p>
                       </div>
                     </td>
                     {/* Stock count display */}

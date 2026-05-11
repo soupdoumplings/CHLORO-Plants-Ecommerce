@@ -3,8 +3,16 @@ import { motion as Motion } from 'framer-motion';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import { supabase } from '../../supabase';
-import { publicPlantImages } from '../../lib/localImages';
+import { productAssetImages, publicPlantImages } from '../../lib/localImages';
+
+const fallbackImageForCategory = (category) => {
+  const categoryLabel = String(category || '').toLowerCase();
+  if (categoryLabel.includes('care') || categoryLabel.includes('tool')) return productAssetImages.wateringCan;
+  if (categoryLabel.includes('pot') || categoryLabel.includes('planter')) return productAssetImages.vessel;
+  return publicPlantImages.orchid;
+};
 
 const ManageInventory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,7 +71,7 @@ const ManageInventory = () => {
     }
   }, [id, isEditMode]);
 
-  const handleAcquire = async () => {
+  const handleSaveProduct = async () => {
     if (!name || !price) {
       setErrorMsg("Name and Market Valuation are required.");
       return;
@@ -74,7 +82,7 @@ const ManageInventory = () => {
 
     const productImages = imageUrl.trim()
       ? [imageUrl.trim()]
-      : [publicPlantImages.orchid];
+      : [fallbackImageForCategory(category)];
 
     const productTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
 
@@ -120,7 +128,7 @@ const ManageInventory = () => {
 
       if (error) throw error;
 
-      navigate('/discovery');
+      navigate('/archive#inventory');
     } catch (err) {
       setErrorMsg(err.message || 'Error occurred while saving product.');
     } finally {
@@ -138,35 +146,28 @@ const ManageInventory = () => {
     >
       <Navbar />
 
-      <main className="w-full page-shell flex-grow pt-[140px] page-gutter pb-32">
-        <div className="max-w-6xl mx-auto w-full">
+      <main className="w-full flex-grow mt-[82px] pb-32">
+        <EditorialHero
+          eyebrow={isEditMode ? 'Edit Inventory Listing' : 'New Inventory Listing'}
+          title={isEditMode ? 'Update' : 'Add'}
+          italic="Inventory Item"
+          copy="Create plants, care tools, pots, and gift-ready products with stock, pricing, season, tags, and catalogue imagery in one place."
+          image={isEditMode ? productAssetImages.vessel : productAssetImages.wateringCan}
+          imageAlt="Inventory item"
+          objectPosition="center"
+          actions={(
+            <Link to="/archive#inventory" className="border border-[#FBF9F4]/65 px-6 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4] transition-colors hover:bg-[#FBF9F4] hover:text-[#0F3A3A]">
+              Back to Inventory
+            </Link>
+          )}
+          meta={[
+            { label: 'Category', value: category },
+            { label: 'Stock', value: String(stock || 0).padStart(2, '0') },
+          ]}
+        />
 
-           {/* Header Section */}
-           <Motion.div
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-             className="flex items-center gap-4 mb-6"
-           >
-               <Link to="/archive" className="material-symbols-outlined text-[#31332C]/60 hover:text-[#31332C] transition-colors bg-[#EFEEE6] p-2 rounded-full cursor-pointer hover:bg-[#E2E3D9]">arrow_back</Link>
-               <span className="font-label text-[11px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">{isEditMode ? 'Edit Plant Listing' : 'New Plant Listing'}</span>
-           </Motion.div>
-
-           <Motion.h1
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-             className="font-headline text-5xl md:text-6xl leading-tight text-[#31332C] tracking-tight mb-12"
-           >
-             {isEditMode ? 'Update Plant Details' : 'Add Plant for Sale'}
-           </Motion.h1>
-
-           <Motion.div
-             initial={{ scaleX: 0 }}
-             animate={{ scaleX: 1 }}
-             transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-             className="w-full h-[1px] bg-[#B1B3A9]/20 mb-14 origin-left"
-           />
+        <div className="page-shell page-gutter pt-14">
+          <div className="max-w-6xl mx-auto w-full">
 
            {/* Interactive Layout Section */}
            <Motion.div
@@ -187,21 +188,21 @@ const ManageInventory = () => {
                   {/* Section Label: Identity */}
                   <div className="flex items-center gap-3 pb-2 border-b border-[#B1B3A9]/15">
                     <span className="material-symbols-outlined text-[#785A1A] text-[18px]">eco</span>
-                    <span className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">Plant Identity</span>
+                    <span className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold">Product Identity</span>
                   </div>
 
                   <div className="flex flex-col gap-3 group">
-                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Specimen Common Name</label>
-                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Monstera Deliciosa" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Product Name</label>
+                     <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Monstera Deliciosa or Moisture Meter" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-2xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                   </div>
 
                   <div className="flex flex-col gap-3 group">
-                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Botanical/Scientific Name</label>
-                     <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Araceae Monstera" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-xl italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Short Descriptor</label>
+                     <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Araceae Monstera or Care Tool" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-xl italic text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
                   </div>
 
                   <div className="flex flex-col gap-3 group">
-                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Description / About the Plant</label>
+                     <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Description / About the Item</label>
                      <textarea value={info} onChange={e => setInfo(e.target.value)} placeholder="e.g. Known colloquially as the Swiss Cheese Plant, this architectural masterpiece..." rows="3" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[16px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full resize-none"></textarea>
                   </div>
 
@@ -226,6 +227,7 @@ const ManageInventory = () => {
                      <select value={category} onChange={e => setCategory(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
                         <option value="Indoor Plants">Indoor Plants</option>
                         <option value="Pots & Planters">Pots & Planters</option>
+                        <option value="Care Tools">Care Tools</option>
                         <option value="Gardening Tools">Gardening Tools</option>
                         <option value="Fresh Flowers">Fresh Flowers</option>
                         <option value="Outdoor Plants">Outdoor Plants</option>
@@ -315,7 +317,7 @@ const ManageInventory = () => {
                          <label className="relative inline-flex items-center cursor-pointer max-w-max">
                            <input type="checkbox" className="sr-only peer" checked={isFeatured} onChange={e => setIsFeatured(e.target.checked)} />
                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#785A1A]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5F5E5E]"></div>
-                           <span className="ml-3 font-body text-sm text-[#31332C]">{isFeatured ? 'Featured Specimen' : 'Standard Listing'}</span>
+                           <span className="ml-3 font-body text-sm text-[#31332C]">{isFeatured ? 'Featured Product' : 'Standard Listing'}</span>
                          </label>
                          <p className="font-body text-[10px] text-[#5E6058]/60 mt-1">Featured items appear at the top of the discovery grid.</p>
                       </div>
@@ -411,7 +413,7 @@ const ManageInventory = () => {
               <Motion.button
                 whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={handleAcquire}
+                onClick={handleSaveProduct}
                 disabled={isSubmitting}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -421,6 +423,7 @@ const ManageInventory = () => {
               </Motion.button>
            </Motion.div>
 
+          </div>
         </div>
       </main>
 
