@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
@@ -11,20 +11,44 @@ import SaleBanner from '../../components/SaleBanner';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
+import { getProductType, productMatchesType, productTypeLabels } from '../../lib/productTypes';
 
+const coreCategories = [
+  productTypeLabels.all,
+  productTypeLabels.plants,
+  productTypeLabels.care,
+  productTypeLabels.gifts,
+];
 
 const DiscoveryPage = () => {
   const [searchParams] = useSearchParams();
   const filterParam = searchParams.get('filter');
   const searchQuery = searchParams.get('q') || '';
-  const [activeCategory, setActiveCategory] = useState('All Objects');
+  const [activeCategory, setActiveCategory] = useState(productTypeLabels.all);
   const [activeSort, setActiveSort] = useState('Latest');
   const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const productsRef = useRef(null);
 
   useEffect(() => {
+    let active = true;
+
     const fetchProducts = async () => {
-      const { data, error } = await supabase.from('products').select('*');
-      if (!error && data) {
+      setLoading(true);
+      setError('');
+
+      const { data, error: fetchError } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!active) return;
+
+      if (fetchError) {
+        setError(fetchError.message || 'Could not load products.');
+        setAllProducts([]);
+      } else if (data) {
         setAllProducts(data.map(p => ({
             ...p,
             id: p.id,
@@ -38,13 +62,43 @@ const DiscoveryPage = () => {
             image: p.images && p.images.length > 0 ? p.images[0] : fallbackCatalogImage,
             category: p.category || 'Indoor Plants',
             tags: p.tags || [],
+            type: getProductType(p),
             is_featured: p.is_featured || false,
             season: p.season || 'All Year'
         })));
       }
+
+      setLoading(false);
     };
+
     fetchProducts();
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  const categories = useMemo(() => (
+    [
+      ...coreCategories,
+      ...new Set(
+        allProducts
+          .map(p => p.category)
+          .filter((category) => category && !coreCategories.includes(category))
+      ),
+    ]
+  ), [allProducts]);
+
+  const categoryCounts = useMemo(() => (
+    allProducts.reduce((counts, product) => {
+      counts[productTypeLabels.all] = (counts[productTypeLabels.all] || 0) + 1;
+      counts[product.type] = (counts[product.type] || 0) + 1;
+      if (product.category !== product.type) {
+        counts[product.category] = (counts[product.category] || 0) + 1;
+      }
+      return counts;
+    }, {})
+  ), [allProducts]);
 
   const filteredProducts = useMemo(() => {
     let items = [...allProducts];
@@ -54,35 +108,57 @@ const DiscoveryPage = () => {
       const q = searchQuery.trim().toLowerCase();
       items = items.filter(p =>
         p.name.toLowerCase().includes(q) ||
-        (p.category && p.category.toLowerCase().includes(q))
+        (p.category && p.category.toLowerCase().includes(q)) ||
+        (p.type && p.type.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.info && p.info.toLowerCase().includes(q)) ||
+        (p.tags || []).some((tag) => tag.toLowerCase().includes(q))
       );
       return items;
     }
 
     // Priority 1: Filter by Tags (from Homepage links like ?filter=Pet-Friendly)
     if (filterParam) {
-      items = items.filter(p => p.tags && p.tags.includes(filterParam));
+      items = items.filter((p) => (
+        p.type === filterParam
+        || p.category === filterParam
+        || (p.tags && p.tags.includes(filterParam))
+      ));
     }
 
     // Priority 2: Filter by Primary Category (Tabs)
-    if (activeCategory !== 'All Objects') {
-      items = items.filter((p) => p.category === activeCategory);
+    if (activeCategory !== productTypeLabels.all) {
+      items = coreCategories.includes(activeCategory)
+        ? items.filter((p) => productMatchesType(p, activeCategory))
+        : items.filter((p) => p.category === activeCategory);
     }
 
-    // Default top-level sort: Featured first
-    items.sort((a, b) => {
-      if (a.is_featured && !b.is_featured) return -1;
-      if (!a.is_featured && b.is_featured) return 1;
-      return 0;
-    });
-
-    if (activeSort === 'Price: Low to High') {
+    if (activeSort === 'Featured First') {
+      items.sort((a, b) => {
+        if (a.is_featured && !b.is_featured) return -1;
+        if (!a.is_featured && b.is_featured) return 1;
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+    } else if (activeSort === 'Price: Low to High') {
       items.sort((a, b) => a.rawPrice - b.rawPrice);
     } else if (activeSort === 'Price: High to Low') {
       items.sort((a, b) => b.rawPrice - a.rawPrice);
+    } else {
+      items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     }
     return items;
   }, [allProducts, activeCategory, activeSort, filterParam, searchQuery]);
+
+  const featuredProduct = useMemo(() => (
+    filteredProducts.find((product) => product.is_featured)
+    || filteredProducts[0]
+    || allProducts.find((product) => product.is_featured)
+    || allProducts[0]
+  ), [allProducts, filteredProducts]);
+
+  const scrollToProducts = () => {
+    productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <Motion.div
@@ -94,7 +170,11 @@ const DiscoveryPage = () => {
     >
       <Navbar />
       <main className="flex-grow">
-        <DiscoveryHero />
+        <DiscoveryHero
+          featuredProduct={featuredProduct}
+          totalCount={allProducts.length}
+          onBrowse={scrollToProducts}
+        />
         <SaleBanner />
 
         {/* Active search query banner */}
@@ -119,7 +199,8 @@ const DiscoveryPage = () => {
         {/* Category filter — hidden when searching */}
         {!searchQuery.trim() && (
           <CategoryFilter
-            categories={['All Objects', ...new Set(allProducts.map(p => p.category).filter(Boolean))]}
+            categories={categories}
+            categoryCounts={categoryCounts}
             activeCategory={activeCategory}
             onCategoryChange={(cat) => {
               setActiveCategory(cat);
@@ -132,10 +213,19 @@ const DiscoveryPage = () => {
             activeSort={activeSort}
             onSortChange={setActiveSort}
             productCount={filteredProducts.length}
+            totalCount={allProducts.length}
+            loading={loading}
           />
         )}
 
-        <ProductGrid products={filteredProducts} />
+        <section ref={productsRef} className="scroll-mt-[100px]">
+          <ProductGrid
+            products={filteredProducts}
+            loading={loading}
+            error={error}
+            activeCategory={searchQuery.trim() ? 'Search Results' : activeCategory}
+          />
+        </section>
         <Newsletter />
       </main>
       <Footer />

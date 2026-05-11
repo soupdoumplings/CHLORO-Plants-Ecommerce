@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { publicPlantImages } from '../../lib/localImages';
+import { productAssetImages, publicPlantImages } from '../../lib/localImages';
 
 const CATEGORIES = [
   {
@@ -17,15 +17,27 @@ const CATEGORIES = [
   },
   {
     id: 3,
+    title: 'Care Tools',
+    image: productAssetImages.wateringCan,
+    link: '/products-gifts?filter=Care%20Tools'
+  },
+  {
+    id: 4,
+    title: 'Gift Sets',
+    image: productAssetImages.terrarium,
+    link: '/products-gifts?filter=Gifts'
+  },
+  {
+    id: 5,
     title: 'Pet-Friendly',
     image: publicPlantImages.cat,
     link: '/discovery?filter=Pet-Friendly'
   },
   {
-    id: 4,
-    title: 'Gifts',
+    id: 6,
+    title: 'Pots & Vessels',
     image: publicPlantImages.lavender,
-    link: '/discovery?filter=Gifts'
+    link: '/products-gifts?filter=Gifts'
   }
 ];
 
@@ -50,11 +62,11 @@ const CategoryShelf = () => {
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="font-headline text-7xl md:text-8xl tracking-tighter text-[#31332C] leading-none"
           >
-            Find your perfect plant
+            Find your perfect fit
           </Motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {CATEGORIES.map((cat, i) => (
             <Motion.div
               key={cat.id}

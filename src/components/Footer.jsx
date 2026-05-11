@@ -52,7 +52,7 @@ const Footer = () => {
               CHLORO
             </h2>
             <p className="font-body text-[13px] md:text-[14px] leading-relaxed text-[#FBF9F4]/72 max-w-[400px] mt-4">
-              Shop living specimens, tools, vessels, and care support from our Kathmandu botanical studio.
+              Shop indoor plants, care tools, vessels, and plant support from our Kathmandu botanical studio.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 mt-5">
               <Link

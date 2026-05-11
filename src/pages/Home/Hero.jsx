@@ -71,7 +71,7 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
           className="font-body text-[16px] md:text-[18px] leading-relaxed text-white/78 max-w-[560px] mb-2"
         >
-          Shop curated living specimens, seasonal care tools, and quiet botanical support for refined homes.
+          Shop indoor plants, seasonal care tools, and quiet botanical support for refined homes.
         </Motion.p>
 
         <Motion.div
