@@ -7,7 +7,7 @@ const formatPrice = (product) => {
   if (!product) return 'Shop';
   const value = Number(product.rawPrice || product.salePrice || 0);
   if (!value) return product.price || 'View';
-  return `Rs ${value.toLocaleString('en-NP')}`;
+  return `रू ${value.toLocaleString('en-NP')}`;
 };
 
 const productCode = (product) => {

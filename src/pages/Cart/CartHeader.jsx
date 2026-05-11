@@ -13,7 +13,7 @@ const CartHeader = ({ itemCount = 0, total = 0 }) => {
       imageAlt="Plant care watering can"
       meta={[
         { label: 'Items', value: itemCount.toString().padStart(2, '0') },
-        { label: 'Subtotal', value: `Rs ${Number(total || 0).toLocaleString('en-NP')}` },
+        { label: 'Subtotal', value: `रू ${Number(total || 0).toLocaleString('en-NP')}` },
       ]}
     />
   );

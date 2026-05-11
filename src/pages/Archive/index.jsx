@@ -59,7 +59,7 @@ const ArchivePage = () => {
     return {
       orders: ordersLoading ? '...' : orders.length.toLocaleString('en-NP'),
       inventory: loading ? '...' : `${products.length.toLocaleString('en-NP')} items`,
-      statistics: ordersLoading ? '...' : `Rs ${paidRevenue.toLocaleString('en-NP')}`,
+      statistics: ordersLoading ? '...' : `रू ${paidRevenue.toLocaleString('en-NP')}`,
       inventoryHelper: loading ? 'Reading stock' : `${lowStock} low stock`,
     };
   }, [loading, orders, ordersLoading, products]);

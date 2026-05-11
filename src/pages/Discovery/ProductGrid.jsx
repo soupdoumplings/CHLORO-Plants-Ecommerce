@@ -4,7 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 
-const money = (value) => `Rs ${Number(value || 0).toLocaleString('en-NP', {
+const money = (value) => `रू ${Number(value || 0).toLocaleString('en-NP', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })}`;
