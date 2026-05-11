@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
+import { productAssetImages } from '../../lib/localImages';
 
 const WishlistPage = () => {
   const wishlist = useWishlist();
@@ -19,19 +21,26 @@ const WishlistPage = () => {
       className="flex min-h-screen flex-col bg-[#FBF9F4]"
     >
       <Navbar />
-      <main className="w-full flex-grow page-shell page-gutter pb-24 pt-24 lg:pt-32 mt-[82px]">
-        <section className="mb-12 grid gap-8 border-b border-[#1A1A1A]/10 pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div>
-            <p className="mb-5 font-label text-[10px] font-bold uppercase tracking-[0.24em] text-[#785A1A]">Member Area</p>
-            <h1 className="font-headline text-[clamp(3rem,7vw,6.75rem)] leading-[0.9] text-[#1A1A1A]">
-              Wishlist
-            </h1>
-          </div>
-          <Link to="/orders" className="w-max border border-[#0F3A3A] px-6 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A] transition-colors hover:bg-[#0F3A3A] hover:text-white">
-            My Orders
-          </Link>
-        </section>
+      <main className="w-full flex-grow page-shell page-gutter pb-24 mt-[82px]">
+        <EditorialHero
+          eyebrow="Member Area"
+          title="Saved"
+          italic="Wishlist"
+          copy="Keep plants, tools, and gifts close while you compare care needs, prices, and future room plans."
+          image={productAssetImages.lycaste}
+          imageAlt="Lycaste orchid"
+          actions={(
+            <Link to="/orders" className="w-max border border-[#FBF9F4]/65 px-6 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4] transition-colors hover:bg-[#FBF9F4] hover:text-[#0F3A3A]">
+              My Orders
+            </Link>
+          )}
+          meta={[
+            { label: 'Saved', value: wishlist.loading ? '...' : wishlist.items.length.toString().padStart(2, '0') },
+            { label: 'Signal', value: 'Preferences' },
+          ]}
+        />
 
+        <section className="pt-14 lg:pt-16">
         {wishlist.loading ? (
           <div className="border border-[#B0B0A8]/20 bg-white p-12 text-center font-label text-[10px] uppercase tracking-[0.2em] text-[#5E6058]">
             Loading wishlist...
@@ -100,6 +109,7 @@ const WishlistPage = () => {
             ))}
           </div>
         )}
+        </section>
       </main>
       <Footer />
     </Motion.div>

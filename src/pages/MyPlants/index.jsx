@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import { useAuth } from '../../lib/AuthContext';
 import { fetchUserPlants, markPlantWatered, setEmailNotifications } from '../../lib/wateringReminders';
+import { productAssetImages } from '../../lib/localImages';
 
 const formatDate = (date) => {
   if (!date) return 'Not scheduled';
@@ -72,16 +74,21 @@ const MyPlantsPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full page-shell page-gutter pt-16 lg:pt-24 pb-24 mt-[82px]">
-        <div className="mb-12">
-          <p className="font-label text-[10px] tracking-[0.2em] uppercase text-[#785A1A] font-bold mb-4">
-            Personal Care Calendar
-          </p>
-          <h1 className="font-headline text-[clamp(3rem,8vw,7rem)] leading-[0.85] text-[#1A1A1A]">
-            My Plants
-          </h1>
-        </div>
+      <main className="flex-grow w-full page-shell page-gutter pb-24 mt-[82px]">
+        <EditorialHero
+          eyebrow="Personal Care Calendar"
+          title="My"
+          italic="Plants"
+          copy="A living reminder board for watering cadence, email nudges, and the small rituals that keep each plant steady."
+          image={productAssetImages.succulents}
+          imageAlt="Potted succulents"
+          meta={[
+            { label: 'Schedules', value: loading ? '...' : plants.length.toString().padStart(2, '0') },
+            { label: 'Reminder', value: 'Email Care' },
+          ]}
+        />
 
+        <section className="pt-14 lg:pt-16">
         {loading && (
           <p className="font-label text-[11px] tracking-[0.18em] uppercase text-[#5E6058]">Loading watering schedules...</p>
         )}
@@ -173,6 +180,7 @@ const MyPlantsPage = () => {
             );
           })}
         </div>
+        </section>
       </main>
 
       <Footer />

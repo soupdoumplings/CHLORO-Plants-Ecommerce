@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import { fetchPlantDetail, searchPlantNames } from '../../lib/kindwise';
+import { productAssetImages } from '../../lib/localImages';
 
 const topicCards = [
   {
@@ -227,7 +229,22 @@ const JournalPage = () => {
     >
       <Navbar />
 
-      <main className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-5 pb-20 pt-[116px] lg:grid-cols-[320px_1fr] lg:px-10">
+      <main className="w-full pb-20 pt-[82px]">
+        <EditorialHero
+          eyebrow="CHLORO Journal"
+          title="The Botanical"
+          italic="Index"
+          copy="Search plant care guides, watering hints, family details, and propagation notes before choosing what fits your home."
+          image={selected.heroImage || productAssetImages.monstera}
+          imageAlt={selected.title}
+          objectPosition="center"
+          meta={[
+            { label: 'Search', value: query || 'Monstera' },
+            { label: 'Source', value: 'Kindwise' },
+          ]}
+        />
+
+        <section className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-5 pt-12 lg:grid-cols-[320px_1fr] lg:px-10">
         <aside className="h-fit pr-0 lg:sticky lg:top-[112px] lg:border-r lg:border-[#11110E]/10 lg:pr-8">
           <div className="space-y-2">
             <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#8A6A21]">CHLORO Journal</p>
@@ -324,7 +341,7 @@ const JournalPage = () => {
 
               <div className="mt-7 grid gap-4 sm:grid-cols-2">
                 <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
-                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Taxonomic rank</p>
+                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Plant type</p>
                   <p className="mt-2 font-headline text-[31px] leading-none text-[#11110E] capitalize">{selected.rank}</p>
                 </div>
                 <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
@@ -466,18 +483,19 @@ const JournalPage = () => {
                   </p>
                 </div>
                 <div>
-                  <h5 className="font-headline text-[28px] italic leading-none text-[#1D241F]">Taxonomy</h5>
+                  <h5 className="font-headline text-[28px] italic leading-none text-[#1D241F]">Plant Family Details</h5>
                   <p className="mt-2 font-body text-[13px] leading-6 text-[#1D241F]/62">
                     {Object.entries(selected.taxonomy).length
                       ? Object.entries(selected.taxonomy)
                           .map(([k, v]) => `${k}: ${v}`)
                           .join(' | ')
-                      : 'No taxonomy data available.'}
+                      : 'No plant family details available.'}
                   </p>
                 </div>
               </div>
             </aside>
           </section>
+        </section>
         </section>
       </main>
 

@@ -76,7 +76,7 @@ const CheckoutPage = () => {
       <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[82px] lg:mt-[100px]">
         <CheckoutHeader />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 xl:gap-32 items-start relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 xl:gap-32 items-start relative pt-14 lg:pt-16">
           <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -3,9 +3,9 @@ import { motion as Motion } from 'framer-motion';
 import { fallbackHeroImage } from '../../lib/localImages';
 
 const HeritageSection = ({ product }) => {
-  const name = product?.name || 'This Specimen';
+  const name = product?.name || 'This Plant';
   const info = product?.info || '';
-  const curatorQuote = product?.curator_quote || `"To live with a ${name} is to curate a dialogue between the wild and the domestic. It is the architectural pulse of the room."`;
+  const curatorQuote = product?.curator_quote || `"${name} brings a calm, sculptural green presence to the room when matched with the right light and watering rhythm."`;
   const provenance = product?.provenance || '';
 
   // Use second image if available, otherwise first image, otherwise fallback
@@ -21,13 +21,13 @@ const HeritageSection = ({ product }) => {
       return info;
     }
     if (provenance) {
-      return `Before gracing the curated interiors of collectors and connoisseurs, the ${name} thrived in the wild landscapes of ${provenance}. Its evolution in these conditions bestowed it with a fierce resilience and an unmistakable character that sets it apart from ordinary houseplants.`;
+      return `${name} comes from plant lines associated with ${provenance}. That background helps explain its preferred light, humidity, and care rhythm at home.`;
     }
-    return `Centuries before it graced the galleries and living rooms of discerning collectors, the ${name} thrived in its native habitat. Its evolution bestowed it with a fierce resilience and an upward-reaching ambition that makes it a prized specimen.`;
+    return `${name} is selected for everyday homes, with care notes that help you understand where it should sit, how often to water, and what to expect as it grows.`;
   };
 
   const getHeritageSecondary = () => {
-    return `Today, we curate these specimens not just for their aesthetic grace, but as living links to a primordial ecosystem. Each leaf is a record of light captured and air filtered.`;
+    return `Use this section as a plain-language guide before buying: match the plant to your room, light level, and routine so it has the best chance to thrive.`;
   };
 
   return (
@@ -105,7 +105,7 @@ const HeritageSection = ({ product }) => {
                 </div>
                 <div className="space-y-1">
                    <p className="font-label text-[10px] tracking-[2px] uppercase text-[#31332C] font-black">Petals & Pots</p>
-                   <p className="font-body text-xs text-[#5E6058] italic font-bold">Botanical Curation Team</p>
+                   <p className="font-body text-xs text-[#5E6058] italic font-bold">Plant Care Team</p>
                 </div>
              </div>
           </Motion.div>

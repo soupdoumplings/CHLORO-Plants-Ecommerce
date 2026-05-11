@@ -47,7 +47,7 @@ export const CartProvider = ({ children }) => {
         originalPrice: Number(item.products.price || 0),
         quantity: item.quantity,
         image: item.products.images?.[0] || fallbackCatalogImage,
-        variant: 'STUDIO SPECIMEN' // Default variant for simplicity
+        variant: 'STUDIO PICK' // Default variant for simplicity
       }));
 
       setCartItems(formattedItems);

@@ -9,7 +9,7 @@ const CareSection = ({ product }) => {
   const [reminderSaved, setReminderSaved] = useState(false);
   const optimalPlace = product?.optimal_place || 'Bright Indirect Light';
   const waterFrequency = product?.water_frequency || 'Every 7 Days';
-  const plantName = product?.name || 'This specimen';
+  const plantName = product?.name || 'This plant';
 
   // Derive illumination description from optimal_place
   const getIlluminationDesc = (place) => {
@@ -20,7 +20,7 @@ const CareSection = ({ product }) => {
     if (lower.includes('low') || lower.includes('shade')) {
       return `${plantName} adapts well to low-light conditions. It can be placed in interior rooms with minimal natural light, though growth may slow.`;
     }
-    return `${plantName} thrives in bright, filtered light. Direct sun may scorch the delicate broad-leaf membranes, while deep shade will cause the specimen to stretch and lose its sculptural density.`;
+    return `${plantName} thrives in bright, filtered light. Direct sun may scorch the leaves, while deep shade can slow growth and make the plant stretch.`;
   };
 
   // Derive environment hints from optimal_place
@@ -29,7 +29,7 @@ const CareSection = ({ product }) => {
     if (lower.includes('outdoor') || lower.includes('full sun')) {
       return `${plantName} prefers outdoor conditions with good air circulation. Protect from frost and extreme wind exposure for best results.`;
     }
-    return `${plantName} loathes drafts and sudden temperature shifts. Place in a stable, humid corner away from vents or doorways. It is a creature of habit.`;
+    return `${plantName} prefers stable room conditions. Keep it away from strong drafts, hot vents, and sudden temperature changes.`;
   };
 
   // Derive environment checklist from optimal_place
@@ -83,8 +83,8 @@ const CareSection = ({ product }) => {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="flex flex-col md:flex-row justify-between items-baseline mb-16 border-b border-[#B1B3A9]/10 pb-8 gap-8"
       >
-        <h2 className="font-headline text-5xl italic text-[#31332C]">Cultivation & Preservation</h2>
-        <p className="font-label text-[11px] tracking-[0.1rem] uppercase text-[#5E6058] mt-4 md:mt-0 font-bold opacity-80">Technical Care Specifications</p>
+        <h2 className="font-headline text-5xl italic text-[#31332C]">Plant Care Guide</h2>
+        <p className="font-label text-[11px] tracking-[0.1rem] uppercase text-[#5E6058] mt-4 md:mt-0 font-bold opacity-80">Light, Water & Room Tips</p>
       </Motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-[#B1B3A9]/10">
@@ -122,7 +122,7 @@ const CareSection = ({ product }) => {
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="bg-white p-10 border border-[#B1B3A9]/15 shadow-2xl shadow-black/5 transform group-hover:-translate-y-2 transition-transform duration-500"
               >
-                 <p className="font-label text-[9px] tracking-[0.1rem] uppercase mb-6 opacity-60 font-black text-[#31332C]">Botanical Management</p>
+                 <p className="font-label text-[9px] tracking-[0.1rem] uppercase mb-6 opacity-60 font-black text-[#31332C]">Care Reminder</p>
                  <h4 className="font-headline italic text-2xl text-[#31332C] mb-6">Set Watering Reminder</h4>
                  <div className="space-y-6">
                     <div className="flex justify-between items-center border-b border-[#B1B3A9]/10 pb-3">

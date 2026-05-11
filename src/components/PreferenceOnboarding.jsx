@@ -27,7 +27,7 @@ const steps = [
     key: 'space',
     eyebrow: 'Space',
     title: 'Where will your plant mostly live?',
-    copy: 'Scale matters: shelf plants and floor specimens solve different problems.',
+    copy: 'Scale matters: shelf plants and floor plants solve different problems.',
   },
 ];
 
@@ -104,7 +104,7 @@ const PreferenceOnboarding = () => {
                     Plant Fit
                   </p>
                   <h2 className="font-headline text-[32px] leading-none">
-                    Personalise your archive.
+                    Personalise your plant picks.
                   </h2>
                 </div>
                 <div className="space-y-3">

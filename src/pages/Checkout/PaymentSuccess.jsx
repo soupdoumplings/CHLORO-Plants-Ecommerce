@@ -3,11 +3,13 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
 import WateringReminderModal from '../../components/WateringReminderModal';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { parseEsewaResponse } from '../../lib/paymentUtils';
 import { supabase } from '../../supabase';
+import { productAssetImages } from '../../lib/localImages';
 
 const fallbackValue = 'Pending';
 
@@ -98,7 +100,7 @@ const timelineSteps = [
   },
   {
     icon: 'local_florist',
-    title: 'Specimen check',
+    title: 'Plant care check',
     copy: 'Each item is inspected, cleaned, and packed for a safe handoff.',
   },
   {
@@ -217,8 +219,32 @@ const PaymentSuccess = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full page-shell page-gutter pt-16 lg:pt-24 pb-24 mt-[82px]">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch">
+      <main className="flex-grow w-full pb-24 mt-[82px]">
+        <EditorialHero
+          eyebrow="Payment Successful"
+          title="Order"
+          italic="Rooted"
+          copy={`We confirmed your ${transaction.method} order. Receipt details, fulfilment state, and plant-care next steps are ready below.`}
+          image={productAssetImages.lycaste}
+          imageAlt="Lycaste orchid"
+          objectPosition="center"
+          actions={(
+            <>
+              <Link to="/orders" className="bg-[#FBF9F4] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A] transition-colors hover:bg-[#C6E9E9]">
+                View Orders
+              </Link>
+              <Link to="/discovery" className="border border-[#FBF9F4]/65 px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4] transition-colors hover:bg-[#FBF9F4] hover:text-[#0F3A3A]">
+                Continue Shopping
+              </Link>
+            </>
+          )}
+          meta={[
+            { label: 'Status', value: transaction.status },
+            { label: 'Bag', value: cartCleared ? 'Cleared' : 'Syncing' },
+          ]}
+        />
+
+        <section className="page-shell page-gutter grid grid-cols-1 gap-10 pt-14 lg:grid-cols-12 lg:gap-16 lg:pt-16 items-stretch">
           <Motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
@@ -268,7 +294,7 @@ const PaymentSuccess = () => {
                 className="font-body text-[15px] sm:text-[16px] leading-relaxed text-[#5E6058] max-w-[560px] mb-10"
               >
                 We have confirmed your order through {transaction.method}. A receipt and fulfilment
-                update will be sent shortly, and your bag has been cleared for your next curation.
+                update will be sent shortly, and your bag has been cleared for your next order.
               </Motion.p>
 
               <Motion.div

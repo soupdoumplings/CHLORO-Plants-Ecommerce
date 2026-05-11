@@ -24,7 +24,7 @@ export const initialCartItems = [
 export const crossSellProduct = {
   id: 'prod_cross',
   name: 'Botanical Growth Serum',
-  description: 'The essential companion for your Heritage Planter. A cold-pressed organic nutrient blend designed for indoor specimens.',
+  description: 'The essential companion for your Heritage Planter. A cold-pressed organic nutrient blend designed for indoor plants.',
   price: 28.00,
   image: scissors, // using placeholder image
 };

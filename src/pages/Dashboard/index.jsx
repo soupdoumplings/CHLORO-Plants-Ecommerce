@@ -24,7 +24,7 @@ const DashboardPage = () => {
     >
       <Navbar />
 
-      <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[72px] lg:mt-[90px]">
+      <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[82px]">
         <ProfileHeader />
         <ProfileDetails />
       </main>

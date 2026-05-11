@@ -10,7 +10,7 @@ const CatalogueHero = () => {
       <div className="w-full md:w-[410px] flex flex-col items-start pt-10 gap-8 text-left">
         <div className="space-y-4">
           <span className="font-sans text-[10px] tracking-[0.32em] uppercase text-[#785A1A]">
-            Specimen No. 1042
+            Featured Plant
           </span>
           <h1 className="font-headline text-[96px] leading-[100%] text-[#31332C] tracking-tighter">
             Himalayan <br /> Orchid

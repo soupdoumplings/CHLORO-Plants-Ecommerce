@@ -3,7 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { fallbackHeroImage } from '../../lib/localImages';
 
 const AnatomySection = ({ product }) => {
-  const name = product?.name || 'This Specimen';
+  const name = product?.name || 'This Plant';
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : fallbackHeroImage;
@@ -15,16 +15,16 @@ const AnatomySection = ({ product }) => {
 
     const detail1 = {
       title: 'Leaf',
-      subtitle: 'Structure',
-      description: `The ${name}'s foliage exhibits a refined architecture — each leaf a testament to its evolutionary lineage, capturing light with precision.`,
+      subtitle: 'Details',
+      description: `${name} has distinctive foliage. Use the image and notes here to understand its shape, texture, and how it may look in your space.`,
     };
 
     const detail2 = {
       title: 'Growth',
-      subtitle: 'Pattern',
+      subtitle: 'Habit',
       description: optimalPlace
         ? `Thriving in ${optimalPlace.toLowerCase()} conditions${waterFrequency ? ` with ${waterFrequency.toLowerCase()} hydration` : ''}, the ${name} develops its signature form over time.`
-        : `Each leaf tapers and unfurls with deliberate grace, mirroring the natural rhythms of its ancestral habitat.`,
+        : `New leaves open gradually as the plant settles into the right light, water, and room conditions.`,
     };
 
     return [detail1, detail2];
@@ -44,7 +44,7 @@ const AnatomySection = ({ product }) => {
       >
         <img
           src={heroImage}
-          alt={`${name} Anatomy`}
+          alt={`${name} details`}
           className="w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-[#456565]/10 mix-blend-multiply opacity-30"></div>
@@ -55,7 +55,7 @@ const AnatomySection = ({ product }) => {
           transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
         >
-             <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/70 border border-white/20 px-8 py-3 backdrop-blur-md pointer-events-none">{name} Anatomy</span>
+             <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/70 border border-white/20 px-8 py-3 backdrop-blur-md pointer-events-none">{name} Details</span>
         </Motion.div>
       </Motion.div>
 

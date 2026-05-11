@@ -488,7 +488,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#1A1A1A] mb-2">Cash on Delivery</h3>
-              <p className="font-body text-[#4A4A4A] text-[13px]">You will pay the courier when your botanical specimen is safely delivered.</p>
+              <p className="font-body text-[#4A4A4A] text-[13px]">You will pay the courier when your plant order is safely delivered.</p>
             </Motion.div>
           )}
         </AnimatePresence>

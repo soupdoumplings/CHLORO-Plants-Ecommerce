@@ -55,7 +55,7 @@ const CataloguePage = () => {
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             className="w-10 h-10 border-t-2 border-[#785A1A] rounded-full"
           />
-          <p className="font-label text-[11px] tracking-[0.2em] uppercase text-[#5E6058] font-bold">Loading Specimen Data</p>
+          <p className="font-label text-[11px] tracking-[0.2em] uppercase text-[#5E6058] font-bold">Loading Product Details</p>
         </div>
       </div>
     );
@@ -67,12 +67,12 @@ const CataloguePage = () => {
         <Navbar />
         <div className="flex flex-col items-center gap-6 mt-48 px-6 text-center">
           <span className="material-symbols-outlined text-[48px] text-[#B1B3A9]">psychiatry</span>
-          <h2 className="font-headline text-4xl text-[#31332C]">Specimen Not Found</h2>
+          <h2 className="font-headline text-4xl text-[#31332C]">Product Not Found</h2>
           <p className="font-body text-[#5E6058] max-w-md">
             {error || 'No plant data available. Add a plant from the admin panel to see it here.'}
           </p>
           <a href="/discovery" className="mt-4 bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[11px] tracking-[0.2em] uppercase hover:bg-[#31332C] transition-all shadow-lg">
-            Browse Discovery
+            Browse Plants
           </a>
         </div>
         <Footer />

@@ -40,9 +40,9 @@ const CartPage = () => {
       <Navbar />
 
       <main className="flex-grow w-full page-shell page-gutter pb-32">
-        <CartHeader />
+        <CartHeader itemCount={items.length} total={total} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 mt-12 lg:mt-16 items-start relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 mt-14 lg:mt-16 items-start relative">
           {/* Left Column: Cart Items & Cross-Sell */}
           <div className="lg:col-span-7 xl:col-span-8 w-full flex flex-col h-full">
             <div className="flex flex-col">

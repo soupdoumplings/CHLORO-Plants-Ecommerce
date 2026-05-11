@@ -50,7 +50,7 @@ const OrderHistory = () => {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="font-label text-[9px] tracking-[0.2em] uppercase text-[#C5A059] font-medium mb-4">
-              Member Archive
+              Your Orders
             </p>
             <h2 className="font-headline text-[32px] md:text-[40px] leading-none text-[#1A1A1A]">
               Order History.
