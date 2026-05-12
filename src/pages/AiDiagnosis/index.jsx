@@ -81,11 +81,11 @@ const getProtocol = (result) => {
     ];
   }
 
-  const carePlan = result.carePlan || [];
+  const carePlan = result.recoveryProtocol?.length ? result.recoveryProtocol : result.carePlan || [];
   if (carePlan.length) {
     return carePlan.map((item) => ({
-      label: item.timing,
-      text: item.step,
+      label: item.timing || item.label,
+      text: item.step || item.text,
     }));
   }
 
@@ -201,7 +201,7 @@ const AiDiagnosisPage = () => {
         ? 'Begin Clinical Analysis'
         : 'Upload Image To Begin';
   const reportActionDisabled = !result && (!image || isPreparing || isAnalyzing);
-  const treatmentCards = result && displayProducts.length ? displayProducts.slice(0, 2) : treatmentPlaceholders;
+  const treatmentCards = result ? displayProducts.slice(0, 2) : treatmentPlaceholders;
 
   const scrollToLab = useCallback(() => {
     labRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
