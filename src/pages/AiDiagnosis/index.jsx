@@ -77,11 +77,11 @@ const getProtocol = (result) => {
     ];
   }
 
-  const carePlan = result.carePlan || [];
+  const carePlan = result.recoveryProtocol?.length ? result.recoveryProtocol : result.carePlan || [];
   if (carePlan.length) {
     return carePlan.map((item) => ({
-      label: item.timing,
-      text: item.step,
+      label: item.timing || item.label,
+      text: item.step || item.text,
     }));
   }
 
