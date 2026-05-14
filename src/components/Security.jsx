@@ -38,7 +38,7 @@ export const GuestRoute = ({ children, redirectTo = '/' }) => {
   if (loading) return <SecurityLoading />;
   if (session) {
     if (isAdmin === null) return <SecurityLoading />;
-    return <Navigate to={isAdmin ? '/archive' : returnTo} replace />;
+    return <Navigate to={isAdmin ? '/archive' : '/'} replace />;
   }
   return children;
 };
