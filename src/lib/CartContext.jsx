@@ -14,6 +14,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
+  const userId = session?.user?.id;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,7 +23,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const fetchCart = useCallback(async () => {
-    if (!session?.user) {
+    if (!userId) {
       setCartItems([]);
       setLoading(false);
       return;
@@ -35,7 +36,7 @@ export const CartProvider = ({ children }) => {
           *,
           products (*)
         `)
-        .eq('user_id', session.user.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -56,14 +57,14 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true, error: 'Please log in to add items to your bag.' };
     }
@@ -106,7 +107,7 @@ export const CartProvider = ({ children }) => {
         const { error } = await supabase
           .from('cart_items')
           .insert([{
-            user_id: session.user.id,
+            user_id: userId,
             product_id: product.id,
             quantity: quantity,
             price_snapshot: priceValue
@@ -117,7 +118,7 @@ export const CartProvider = ({ children }) => {
 
       // Create a notification for the added item
       await supabase.from('notifications').insert([{
-        user_id: session.user.id,
+        user_id: userId,
         type: 'SYSTEM',
         message: `You added ${quantity}x ${product.name || 'item'} to your bag.`,
         link: '/cart'
@@ -134,7 +135,7 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (id, newQty) => {
     if (newQty < 1) return removeFromBag(id);
 
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return;
     }
@@ -153,7 +154,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromBag = async (id) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return;
     }
@@ -172,7 +173,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearBag = async () => {
-    if (!session?.user) {
+    if (!userId) {
       setCartItems([]);
       return;
     }
@@ -180,7 +181,7 @@ export const CartProvider = ({ children }) => {
       const { error } = await supabase
         .from('cart_items')
         .delete()
-        .eq('user_id', session.user.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
       setCartItems([]);

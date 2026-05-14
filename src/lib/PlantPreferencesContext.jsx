@@ -15,13 +15,14 @@ const mergePreferences = (preferences) => ({
 
 export const PlantPreferencesProvider = ({ children }) => {
   const { user, isAdmin } = useAuth();
+  const userId = user?.id;
   const [preferences, setPreferences] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const loadPreferences = useCallback(async () => {
-    if (!user || isAdmin) {
+    if (!userId || isAdmin) {
       setPreferences(null);
       setLoading(false);
       return;
@@ -30,13 +31,13 @@ export const PlantPreferencesProvider = ({ children }) => {
     setLoading(true);
     setError('');
 
-    const localFallback = window.localStorage.getItem(storageKey(user.id));
+    const localFallback = window.localStorage.getItem(storageKey(userId));
 
     try {
       const { data, error: fetchError } = await supabase
         .from('users')
         .select('plant_preferences')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (fetchError) throw fetchError;
@@ -58,22 +59,22 @@ export const PlantPreferencesProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isAdmin, user]);
+  }, [isAdmin, userId]);
 
   useEffect(() => {
     loadPreferences();
   }, [loadPreferences]);
 
   useEffect(() => {
-    if (!user || isAdmin) return undefined;
+    if (!userId || isAdmin) return undefined;
 
     const channel = supabase
-      .channel(`plant-preferences-${user.id}`)
+      .channel(`plant-preferences-${userId}`)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'users',
-        filter: `id=eq.${user.id}`,
+        filter: `id=eq.${userId}`,
       }, (payload) => {
         if (payload.new?.plant_preferences) {
           setPreferences(mergePreferences(payload.new.plant_preferences));
@@ -84,10 +85,10 @@ export const PlantPreferencesProvider = ({ children }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isAdmin, user]);
+  }, [isAdmin, userId]);
 
   const savePreferences = useCallback(async (nextPreferences) => {
-    if (!user) return { success: false, error: 'Please log in to save preferences.' };
+    if (!userId) return { success: false, error: 'Please log in to save preferences.' };
 
     const payload = {
       ...mergePreferences(nextPreferences),
@@ -101,15 +102,15 @@ export const PlantPreferencesProvider = ({ children }) => {
       const { error: updateError } = await supabase
         .from('users')
         .update({ plant_preferences: payload })
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (updateError) throw updateError;
 
-      window.localStorage.setItem(storageKey(user.id), JSON.stringify(payload));
+      window.localStorage.setItem(storageKey(userId), JSON.stringify(payload));
       setPreferences(payload);
       return { success: true };
     } catch (err) {
-      window.localStorage.setItem(storageKey(user.id), JSON.stringify(payload));
+      window.localStorage.setItem(storageKey(userId), JSON.stringify(payload));
       setPreferences(payload);
       const message = err.message || 'Saved locally. Add plant_preferences JSONB to Supabase to sync.';
       setError(message);
@@ -117,7 +118,7 @@ export const PlantPreferencesProvider = ({ children }) => {
     } finally {
       setSaving(false);
     }
-  }, [user]);
+  }, [userId]);
 
   const value = useMemo(() => ({
     preferences,

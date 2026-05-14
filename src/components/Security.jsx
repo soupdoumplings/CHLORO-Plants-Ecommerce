@@ -39,7 +39,7 @@ export const GuestRoute = ({ children, redirectTo = '/' }) => {
   if (session && isPasswordRecovery) return children;
   if (session) {
     if (isAdmin === null) return <SecurityLoading />;
-    return <Navigate to={isAdmin ? '/archive' : '/'} replace />;
+    return <Navigate to={isAdmin ? '/archive' : returnTo} replace />;
   }
   return children;
 };

@@ -1,11 +1,10 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { DetailHeader } from "./components/plant/detail-header";
 import { ProductHero } from "./components/plant/product-hero";
-import { samplePlant } from "../../lib/plant-data";
 import { supabase } from "../../supabase";
 
 const ProductDetailPage = () => {
@@ -44,7 +43,7 @@ const ProductDetailPage = () => {
   if (!product) return <div className="min-h-screen flex items-center justify-center italic opacity-50">Specimen not found.</div>;
 
   return (
-    <motion.div 
+    <Motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -57,7 +56,7 @@ const ProductDetailPage = () => {
         <ProductHero product={product} />
       </main>
       <Footer />
-    </motion.div>
+    </Motion.div>
   );
 };
 

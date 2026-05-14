@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabase';
 
 const AuthContext = createContext({});
@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(null); // null means role is currently being fetched
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [loading, setLoading] = useState(true);
+  const hydratedUserIdRef = useRef(null);
 
   useEffect(() => {
     const fetchRole = async (currentUser) => {
@@ -72,8 +73,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(false); // instantly unblock global loading
 
       if (session?.user) {
+        hydratedUserIdRef.current = session.user.id;
         hydrateUserMeta(session.user);
       } else {
+        hydratedUserIdRef.current = null;
         setIsAdmin(false);
       }
     }).catch((err) => {
@@ -85,17 +88,30 @@ export const AuthProvider = ({ children }) => {
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        const nextUser = session?.user ?? null;
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(nextUser);
         setLoading(false); // ensure global loading is false
 
-        if (session?.user) {
+        if (nextUser) {
           setIsPasswordRecovery(event === 'PASSWORD_RECOVERY');
-          if (event === 'SIGNED_IN') {
+          const shouldHydrate = (
+            hydratedUserIdRef.current !== nextUser.id
+            || event === 'SIGNED_IN'
+            || event === 'USER_UPDATED'
+            || event === 'PASSWORD_RECOVERY'
+          );
+
+          if (event === 'SIGNED_IN' && hydratedUserIdRef.current !== nextUser.id) {
             setIsAdmin(null); // Re-fetch role on new login
           }
-          hydrateUserMeta(session.user);
+
+          if (shouldHydrate) {
+            hydratedUserIdRef.current = nextUser.id;
+            hydrateUserMeta(nextUser);
+          }
         } else {
+          hydratedUserIdRef.current = null;
           setIsPasswordRecovery(false);
           setIsAdmin(false);
         }

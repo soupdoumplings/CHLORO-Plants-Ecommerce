@@ -51,6 +51,7 @@ const attachProductsToWishlist = async (wishlistItems) => {
 
 export const WishlistProvider = ({ children }) => {
   const { session } = useAuth();
+  const userId = session?.user?.id;
   const navigate = useNavigate();
   const location = useLocation();
   const [items, setItems] = useState([]);
@@ -62,7 +63,7 @@ export const WishlistProvider = ({ children }) => {
   }, [location.pathname, location.search, navigate]);
 
   const fetchWishlist = useCallback(async () => {
-    if (!session?.user) {
+    if (!userId) {
       setItems([]);
       setLoading(false);
       return;
@@ -75,7 +76,7 @@ export const WishlistProvider = ({ children }) => {
       const { data, error: fetchError } = await supabase
         .from('wishlist')
         .select('id, product_id')
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .order('id', { ascending: false });
 
       if (fetchError) throw fetchError;
@@ -87,7 +88,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     fetchWishlist();
@@ -98,7 +99,7 @@ export const WishlistProvider = ({ children }) => {
   const isWishlisted = useCallback((productId) => productIds.has(String(productId)), [productIds]);
 
   const addToWishlist = useCallback(async (product) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true };
     }
@@ -110,7 +111,7 @@ export const WishlistProvider = ({ children }) => {
       const { error: insertError } = await supabase
         .from('wishlist')
         .upsert({
-          user_id: session.user.id,
+          user_id: userId,
           product_id: productId,
         }, { onConflict: 'user_id,product_id' });
 
@@ -121,10 +122,10 @@ export const WishlistProvider = ({ children }) => {
       setError(err.message || 'Could not save wishlist item.');
       return { success: false, error: err.message };
     }
-  }, [fetchWishlist, redirectToLogin, session]);
+  }, [fetchWishlist, redirectToLogin, userId]);
 
   const removeFromWishlist = useCallback(async (productId) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true };
     }
@@ -133,7 +134,7 @@ export const WishlistProvider = ({ children }) => {
       const { error: deleteError } = await supabase
         .from('wishlist')
         .delete()
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .eq('product_id', productId);
 
       if (deleteError) throw deleteError;
@@ -143,7 +144,7 @@ export const WishlistProvider = ({ children }) => {
       setError(err.message || 'Could not remove wishlist item.');
       return { success: false, error: err.message };
     }
-  }, [redirectToLogin, session]);
+  }, [redirectToLogin, userId]);
 
   const toggleWishlist = useCallback(async (product) => {
     const productId = product?.id || product?.productId;
