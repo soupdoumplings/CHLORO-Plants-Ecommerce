@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 
 const Editorial = () => {
@@ -40,17 +41,22 @@ const Editorial = () => {
           >
             Born in the foothills of the Langtang range, Verdant is more than a boutique. It is an archival project dedicated to preserving the botanical heritage of Nepal through modern care and conscious commerce.
           </Motion.p>
-          <Motion.button
+          <Motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}
             whileTap={{ scale: 0.97 }}
-            className="border border-[#31332c] px-14 py-5 text-[10px] font-bold uppercase tracking-[0.25em] hover:bg-[#31332c] hover:text-[#fbf9f4] transition-all shadow-xl shadow-black/5"
+            className="inline-flex shadow-xl shadow-black/5"
           >
-            Read the Article
-          </Motion.button>
+            <Link
+              to="/journal"
+              className="border border-[#31332c] px-14 py-5 text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-[#31332c] hover:text-[#fbf9f4]"
+            >
+              Read the Journal
+            </Link>
+          </Motion.div>
         </Motion.div>
 
         <Motion.div

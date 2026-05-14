@@ -175,6 +175,8 @@ const AiDiagnosisPage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [photoId, setPhotoId] = useState(() => `#${Math.random().toString(16).slice(2, 6).toUpperCase()}-B`);
   const [captureNotice, setCaptureNotice] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState('');
   const labRef = useRef(null);
   const reportRef = useRef(null);
   const protocolRef = useRef(null);
@@ -294,6 +296,27 @@ const AiDiagnosisPage = () => {
 
   const handleUseCurrentLocation = async () => {
     await requestLocation();
+  };
+
+  const handleNewsletterSubmit = (event) => {
+    event.preventDefault();
+    const normalizedEmail = newsletterEmail.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setNewsletterStatus('Enter a valid email address.');
+      return;
+    }
+
+    try {
+      const current = JSON.parse(window.localStorage.getItem('chloro_newsletter_signups') || '[]');
+      const next = Array.from(new Set([...current, normalizedEmail]));
+      window.localStorage.setItem('chloro_newsletter_signups', JSON.stringify(next));
+    } catch {
+      // The sign-up still succeeds visually if local storage is unavailable.
+    }
+
+    setNewsletterEmail('');
+    setNewsletterStatus('Subscribed. Botanical care notes are saved for this browser.');
   };
 
   return (
@@ -589,20 +612,32 @@ const AiDiagnosisPage = () => {
 
         <section className="bg-[#F7F3EA] px-6 pb-24 md:px-10">
           <div className="mx-auto max-w-[1380px] border border-[#11110E]/14 bg-[#FFFEFA] px-6 py-20 text-center md:px-10">
-            <h2 className="font-headline text-[38px] leading-none text-[#11110E] md:text-[52px]">
+            <h2 className="font-headline text-[clamp(2.15rem,5vw,3.25rem)] leading-[0.95] text-[#11110E]">
               Expertise delivered weekly.
             </h2>
             <p className="mx-auto mt-5 max-w-[430px] font-body text-[13px] leading-relaxed text-[#6D695F]">
               Join our botanical registry for clinical insights, care protocols, and laboratory updates.
             </p>
-            <form className="mx-auto mt-12 flex max-w-[440px] items-center border-b border-[#11110E]/30">
+            <form onSubmit={handleNewsletterSubmit} className="mx-auto mt-12 flex max-w-[520px] flex-col gap-4 sm:flex-row sm:items-end sm:border-b sm:border-[#11110E]/30">
               <input
                 type="email"
+                value={newsletterEmail}
+                onChange={(event) => {
+                  setNewsletterEmail(event.target.value);
+                  setNewsletterStatus('');
+                }}
                 placeholder="EMAIL ADDRESS"
-                className="min-w-0 flex-1 bg-transparent py-3 font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E] outline-none placeholder:text-[#11110E]/40"
+                className="min-w-0 flex-1 border-b border-[#11110E]/30 bg-transparent py-3 font-label text-[10px] uppercase tracking-[0.16em] text-[#11110E] outline-none placeholder:text-[#11110E]/40 sm:border-b-0"
               />
-              <button type="button" className="py-3 font-label text-[13px] text-[#11110E]">-&gt;</button>
+              <button type="submit" className="border border-[#11110E] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] sm:border-0 sm:px-0">
+                Submit
+              </button>
             </form>
+            {newsletterStatus && (
+              <p className="mx-auto mt-4 max-w-[520px] font-body text-[12px] leading-relaxed text-[#5E5A52]">
+                {newsletterStatus}
+              </p>
+            )}
           </div>
         </section>
       </main>

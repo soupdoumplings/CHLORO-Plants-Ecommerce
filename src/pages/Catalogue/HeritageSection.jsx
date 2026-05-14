@@ -104,7 +104,7 @@ const HeritageSection = ({ product }) => {
                    <span className="material-symbols-outlined text-[28px] text-[#5E6058]">psychiatry</span>
                 </div>
                 <div className="space-y-1">
-                   <p className="font-label text-[10px] tracking-[2px] uppercase text-[#31332C] font-black">Petals & Pots</p>
+                   <p className="font-label text-[10px] tracking-[2px] uppercase text-[#31332C] font-black">CHLORO</p>
                    <p className="font-body text-xs text-[#5E6058] italic font-bold">Plant Care Team</p>
                 </div>
              </div>

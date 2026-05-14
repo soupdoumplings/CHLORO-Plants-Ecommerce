@@ -1,11 +1,14 @@
 import { motion as Motion } from "framer-motion";
 import { RatingStars } from "./rating-stars";
-import { SocialLinks } from "./social-links";
 import { FeatureCard } from "./feature-card";
 import { useCart } from "../../../../lib/CartContext";
+import { useWishlist } from "../../../../lib/WishlistContext";
 
 export function ProductHero({ product }) {
   const { addToBag } = useCart();
+  const wishlist = useWishlist();
+  const saved = wishlist.isWishlisted(product.id);
+
   return (
     <Motion.section 
       initial={{ opacity: 0, y: 20 }}
@@ -64,10 +67,9 @@ export function ProductHero({ product }) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 w-full"
+          className="flex items-center justify-center gap-4 mt-6 w-full"
         >
           <RatingStars rating={product.rating} />
-          <SocialLinks />
         </Motion.div>
       </div>
 
@@ -128,14 +130,29 @@ export function ProductHero({ product }) {
                 )}
               </div>
             </div>
-            <Motion.button 
-              whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(45,122,78,0.25)' }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => addToBag(product)}
-              className="w-full sm:w-auto px-10 py-4 bg-[#2D7A4E] text-white text-xs tracking-[0.2em] font-medium uppercase rounded-full hover:bg-[#235F3D] shadow-lg shadow-[#2D7A4E]/20 transition-all duration-500 active:scale-95"
-            >
-              Add to Bag
-            </Motion.button>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Motion.button 
+                whileHover={{ y: -2, boxShadow: '0 14px 30px rgba(45,122,78,0.18)' }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => addToBag(product)}
+                className="w-full rounded-full bg-[#2D7A4E] px-10 py-4 text-xs font-medium uppercase tracking-[0.2em] text-white shadow-lg shadow-[#2D7A4E]/15 transition-colors duration-200 hover:bg-[#235F3D] sm:w-auto"
+              >
+                Add to Bag
+              </Motion.button>
+              <button
+                type="button"
+                onClick={() => wishlist.toggleWishlist(product)}
+                className={`flex h-[48px] w-full items-center justify-center rounded-full border transition-colors duration-200 sm:w-[54px] ${
+                  saved
+                    ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
+                    : 'border-[#0F3A3A]/25 bg-white text-[#0F3A3A] hover:border-[#0F3A3A]'
+                }`}
+                aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+                title={saved ? 'Saved to wishlist' : 'Save to wishlist'}
+              >
+                <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
+              </button>
+            </div>
           </Motion.div>
         </div>
       </div>

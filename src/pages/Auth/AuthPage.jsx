@@ -6,6 +6,7 @@ import { FaGoogle } from 'react-icons/fa';
 import { useAuth } from '../../lib/AuthContext';
 
 const fieldClass = 'w-full border-b border-[#2F4F4F]/15 bg-transparent pb-3 font-body text-[14px] text-[#31332c] outline-none transition-colors duration-300 placeholder:text-[#31332c]/20 focus:border-[#2F4F4F]/60';
+const phoneAuthEnabled = import.meta.env.VITE_ENABLE_PHONE_AUTH === 'true';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -108,10 +109,13 @@ const AuthPage = () => {
         setSuccessMsg('Account created. Check your email if confirmation is enabled, then sign in.');
       }
     } catch (err) {
-      if (err.message?.toLowerCase().includes('rate limit')) {
+      const message = err.message || '';
+      if (message.toLowerCase().includes('rate limit')) {
         setErrorMsg('Supabase rate limit exceeded. Try again in a few minutes.');
+      } else if (message.toLowerCase().includes('unsupported phone') || message.toLowerCase().includes('phone provider')) {
+        setErrorMsg('Phone OTP needs a Supabase SMS provider. Use email and password for this build.');
       } else {
-        setErrorMsg(err.message || 'An error occurred during authentication.');
+        setErrorMsg(message || 'An error occurred during authentication.');
       }
     } finally {
       setIsLoading(false);
@@ -130,6 +134,12 @@ const AuthPage = () => {
   };
 
   const changeLoginMethod = (method) => {
+    if (method === 'phone' && !phoneAuthEnabled) {
+      setErrorMsg('Phone OTP needs a Supabase SMS provider. Use email and password for this build.');
+      setSuccessMsg('');
+      return;
+    }
+
     setLoginMethod(method);
     setOtpSent(false);
     setOtpToken('');
@@ -229,14 +239,17 @@ const AuthPage = () => {
                   <div className="mb-5 grid grid-cols-2 border border-[#2F4F4F]/12 bg-white/45 p-1">
                     {[
                       { id: 'email', label: 'Password' },
-                      { id: 'phone', label: 'Phone' },
+                      { id: 'phone', label: 'Phone', disabled: !phoneAuthEnabled },
                     ].map((method) => (
                       <button
                         key={method.id}
                         type="button"
                         onClick={() => changeLoginMethod(method.id)}
+                        disabled={method.disabled}
                         className={`py-2.5 font-label text-[9px] font-bold uppercase tracking-[0.16em] transition-colors ${
-                          loginMethod === method.id ? 'bg-[#2F4F4F] text-[#FBF9F4]' : 'text-[#456565]/60 hover:text-[#2F4F4F]'
+                          method.disabled
+                            ? 'cursor-not-allowed text-[#456565]/25'
+                            : loginMethod === method.id ? 'bg-[#2F4F4F] text-[#FBF9F4]' : 'text-[#456565]/60 hover:text-[#2F4F4F]'
                         }`}
                       >
                         {method.label}

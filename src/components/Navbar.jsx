@@ -38,16 +38,25 @@ const Navbar = () => {
   const notificationsRef = useRef(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Close search on route change
   useEffect(() => {
-    const closeSearch = window.setTimeout(() => setSearchOpen(false), 0);
-    return () => window.clearTimeout(closeSearch);
+    const closeRouteUi = window.setTimeout(() => {
+      setSearchOpen(false);
+      setMobileMenuOpen(false);
+    }, 0);
+    return () => window.clearTimeout(closeRouteUi);
   }, [location.pathname]);
 
   // Escape key closes search
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setSearchOpen(false); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -78,6 +87,15 @@ const Navbar = () => {
   const border = "border-[#FBF9F4]/20";
   const accentText = "text-[#c6e9e9]";
   const hoverAccent = "hover:text-[#F58700]";
+  const mobileLinks = isAdmin
+    ? [{ label: 'Admin', to: '/archive', icon: 'admin_panel_settings' }]
+    : [
+      { label: 'Home', to: '/', icon: 'home' },
+      { label: 'Shop', to: '/discovery', icon: 'local_florist' },
+      { label: 'Gifts', to: '/products-gifts', icon: 'redeem' },
+      { label: 'AI Diagnosis', to: '/ai-diagnosis', icon: 'psychiatry' },
+      ...(user ? [{ label: 'Journal', to: '/journal', icon: 'article' }] : []),
+    ];
 
   return (
     <>
@@ -151,6 +169,18 @@ const Navbar = () => {
 
         {/* Utilities */}
         <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className={`md:hidden ${text} hover:text-[#C6E9E9] transition-colors`}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            <span className="material-symbols-outlined text-[28px]">
+              {mobileMenuOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+
           {!isAdmin && (
             <Motion.button
               onClick={() => setSearchOpen(true)}
@@ -304,6 +334,82 @@ const Navbar = () => {
           </div>
         </div>
       </Motion.nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <Motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed left-0 right-0 top-[82px] z-40 border-b border-[#FBF9F4]/15 bg-[#0F3A3A] shadow-2xl shadow-black/20 md:hidden"
+          >
+            <div className="page-gutter-tight py-5">
+              <div className="grid gap-2">
+                {mobileLinks.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 transition-colors ${
+                      location.pathname === item.to ? 'bg-[#FBF9F4] text-[#0F3A3A]' : 'text-[#FBF9F4]/82 hover:bg-[#FBF9F4]/8'
+                    }`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">{item.label}</span>
+                    </span>
+                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                  </Link>
+                ))}
+              </div>
+
+              {!isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="mt-3 flex w-full items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 text-[#FBF9F4]/82 transition-colors hover:bg-[#FBF9F4]/8"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[18px]">search</span>
+                    <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">Search Catalogue</span>
+                  </span>
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-3 border-t border-[#FBF9F4]/12 pt-4">
+                {!user ? (
+                  <Link
+                    to="/login"
+                    className="bg-[#FBF9F4] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A]"
+                  >
+                    Login
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="bg-[#FBF9F4] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A]"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="border border-[#FBF9F4]/40 px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4]"
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search Overlay — rendered outside nav so it covers full screen */}
       <AnimatePresence>

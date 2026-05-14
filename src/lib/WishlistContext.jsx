@@ -31,6 +31,22 @@ const normalizeWishlistItem = (item) => {
   };
 };
 
+const createOptimisticWishlistItem = (product, userId) => {
+  const productId = product?.id || product?.productId;
+  return normalizeWishlistItem({
+    id: `optimistic-${userId}-${productId}`,
+    product_id: productId,
+    created_at: new Date().toISOString(),
+    product: {
+      ...product,
+      id: productId,
+      image: product?.image || product?.images?.[0] || fallbackImage,
+      price: product?.rawPrice || product?.effectivePrice || product?.price || 0,
+      rawPrice: product?.rawPrice || product?.effectivePrice || product?.price || 0,
+    },
+  });
+};
+
 const attachProductsToWishlist = async (wishlistItems) => {
   const productIds = [...new Set((wishlistItems || []).map((item) => item.product_id).filter(Boolean))];
   if (!productIds.length) return wishlistItems || [];
@@ -107,6 +123,17 @@ export const WishlistProvider = ({ children }) => {
     const productId = product?.id || product?.productId;
     if (!productId) return { success: false, error: 'Missing product id.' };
 
+    const optimisticItem = createOptimisticWishlistItem(product, userId);
+    let addedOptimistically = false;
+
+    setItems((current) => {
+      if (current.some((item) => String(item.productId) === String(productId))) {
+        return current;
+      }
+      addedOptimistically = true;
+      return [optimisticItem, ...current];
+    });
+
     try {
       const { error: insertError } = await supabase
         .from('wishlist')
@@ -116,19 +143,27 @@ export const WishlistProvider = ({ children }) => {
         }, { onConflict: 'user_id,product_id' });
 
       if (insertError) throw insertError;
-      await fetchWishlist();
       return { success: true };
     } catch (err) {
+      if (addedOptimistically) {
+        setItems((current) => current.filter((item) => String(item.productId) !== String(productId)));
+      }
       setError(err.message || 'Could not save wishlist item.');
       return { success: false, error: err.message };
     }
-  }, [fetchWishlist, redirectToLogin, userId]);
+  }, [redirectToLogin, userId]);
 
   const removeFromWishlist = useCallback(async (productId) => {
     if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true };
     }
+
+    let previousItems = [];
+    setItems((current) => {
+      previousItems = current;
+      return current.filter((item) => String(item.productId) !== String(productId));
+    });
 
     try {
       const { error: deleteError } = await supabase
@@ -138,9 +173,9 @@ export const WishlistProvider = ({ children }) => {
         .eq('product_id', productId);
 
       if (deleteError) throw deleteError;
-      setItems((current) => current.filter((item) => String(item.productId) !== String(productId)));
       return { success: true };
     } catch (err) {
+      setItems(previousItems);
       setError(err.message || 'Could not remove wishlist item.');
       return { success: false, error: err.message };
     }

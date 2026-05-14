@@ -15,14 +15,14 @@ const ProductCard = ({ product, delay = 0 }) => {
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
         className="group cursor-pointer block h-full flex flex-col"
       >
         <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-[#e2e3d9]/30">
           <Motion.img
             initial={{ scale: 1.05 }}
             whileHover={{ scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             src={product.image}
             alt={product.name}
             className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0"
@@ -52,7 +52,7 @@ const ProductCard = ({ product, delay = 0 }) => {
             </span>
           )}
 
-          <div className="absolute bottom-2 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex justify-center">
+          <div className="absolute bottom-2 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out flex justify-center">
             <Motion.button
               onClick={(e) => {
                 e.preventDefault();

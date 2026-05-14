@@ -1,25 +1,6 @@
-import React from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import HomePage from './pages/Home';
-import CataloguePage from './pages/Catalogue';
-import ArchivePage from './pages/Archive';
-import ManageInventory from './pages/ManageInventory';
-import PromotionsPage from './pages/Admin/Promotions';
-import DiscoveryPage from './pages/Discovery';
-import ProductCataloguePage from './pages/ProductCatalogue';
-import ProductDetailPage from './pages/Product';
-import CartPage from './pages/Cart';
-import CheckoutPage from './pages/Checkout';
-import DashboardPage from './pages/Dashboard';
-import AuthPage from './pages/Auth/AuthPage';
-import AiDiagnosisPage from './pages/AiDiagnosis';
-import JournalPage from './pages/Journal';
-import MyPlantsPage from './pages/MyPlants';
-import PaymentSuccess from './pages/Checkout/PaymentSuccess';
-import PaymentFailure from './pages/Checkout/PaymentFailure';
-import OrdersPage from './pages/Orders';
-import WishlistPage from './pages/Wishlist';
 import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './components/Security';
 
 import { AuthProvider, useAuth } from './lib/AuthContext';
@@ -31,10 +12,47 @@ import { PlantPreferencesProvider } from './lib/PlantPreferencesContext';
 import PreferenceOnboarding from './components/PreferenceOnboarding';
 import ProfileOnboarding from './components/ProfileOnboarding';
 
+const HomePage = lazy(() => import('./pages/Home'));
+const CataloguePage = lazy(() => import('./pages/Catalogue'));
+const ArchivePage = lazy(() => import('./pages/Archive'));
+const ManageInventory = lazy(() => import('./pages/ManageInventory'));
+const PromotionsPage = lazy(() => import('./pages/Admin/Promotions'));
+const DiscoveryPage = lazy(() => import('./pages/Discovery'));
+const ProductCataloguePage = lazy(() => import('./pages/ProductCatalogue'));
+const ProductDetailPage = lazy(() => import('./pages/Product'));
+const CartPage = lazy(() => import('./pages/Cart'));
+const CheckoutPage = lazy(() => import('./pages/Checkout'));
+const DashboardPage = lazy(() => import('./pages/Dashboard'));
+const AuthPage = lazy(() => import('./pages/Auth/AuthPage'));
+const AiDiagnosisPage = lazy(() => import('./pages/AiDiagnosis'));
+const JournalPage = lazy(() => import('./pages/Journal'));
+const MyPlantsPage = lazy(() => import('./pages/MyPlants'));
+const PaymentSuccess = lazy(() => import('./pages/Checkout/PaymentSuccess'));
+const PaymentFailure = lazy(() => import('./pages/Checkout/PaymentFailure'));
+const OrdersPage = lazy(() => import('./pages/Orders'));
+const WishlistPage = lazy(() => import('./pages/Wishlist'));
+
 const HomeRouteWrapper = () => {
   const { session, isAdmin } = useAuth();
   if (session && isAdmin === null) return <SecurityLoading />;
   return isAdmin ? <Navigate to="/archive" replace /> : <HomePage />;
+};
+
+const unscaledAuthRoutes = new Set(['/login', '/register', '/signup']);
+
+const ContentScaleController = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const shouldDescaleContent = !unscaledAuthRoutes.has(pathname);
+    document.body.classList.toggle('chloro-content-descaled', shouldDescaleContent);
+
+    return () => {
+      document.body.classList.remove('chloro-content-descaled');
+    };
+  }, [pathname]);
+
+  return null;
 };
 
 const AnimatedRoutes = () => {
@@ -42,35 +60,37 @@ const AnimatedRoutes = () => {
 
   return (
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' })}>
-      <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
-        <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
-        <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
+      <Suspense fallback={<SecurityLoading />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/login" element={<GuestRoute><AuthPage /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><AuthPage /></GuestRoute>} />
+          <Route path="/signup" element={<GuestRoute><AuthPage /></GuestRoute>} />
 
-        {/* Public Routes */}
-        <Route path="/" element={<HomeRouteWrapper />} />
-        <Route path="/catalogue" element={<CataloguePage />} />
-        <Route path="/catalogue/:id" element={<CataloguePage />} />
-        <Route path="/discovery" element={<DiscoveryPage />} />
-        <Route path="/products-gifts" element={<ProductCataloguePage />} />
-        <Route path="/product/:id" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/payment/failure" element={<PaymentFailure />} />
+          {/* Public Routes */}
+          <Route path="/" element={<HomeRouteWrapper />} />
+          <Route path="/catalogue" element={<CataloguePage />} />
+          <Route path="/catalogue/:id" element={<CataloguePage />} />
+          <Route path="/discovery" element={<DiscoveryPage />} />
+          <Route path="/products-gifts" element={<ProductCataloguePage />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/failure" element={<PaymentFailure />} />
 
-        {/* Protected Routes */}
-        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-        <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
-        <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
-        <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
-        <Route path="/admin/promotions" element={<AdminRoute><PromotionsPage /></AdminRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-        <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
-        <Route path="/my-plants" element={<ProtectedRoute><MyPlantsPage /></ProtectedRoute>} />
-        <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
-        <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
-      </Routes>
+          {/* Protected Routes */}
+          <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+          <Route path="/archive" element={<AdminRoute><ArchivePage /></AdminRoute>} />
+          <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
+          <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
+          <Route path="/admin/promotions" element={<AdminRoute><PromotionsPage /></AdminRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+          <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
+          <Route path="/my-plants" element={<ProtectedRoute><MyPlantsPage /></ProtectedRoute>} />
+          <Route path="/ai-diagnosis" element={<ProtectedRoute><AiDiagnosisPage /></ProtectedRoute>} />
+          <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 };
@@ -82,6 +102,7 @@ import SiteConsent from './components/SiteConsent';
 function App() {
   return (
     <Router>
+      <ContentScaleController />
       <AuthProvider>
         <PlantPreferencesProvider>
           <NotificationProvider>

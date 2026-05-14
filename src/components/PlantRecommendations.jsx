@@ -51,29 +51,8 @@ const PlantRecommendations = ({ surface = 'home' }) => {
   const [orderSignals, setOrderSignals] = useState({ orderedProductIds: [], orderedCategories: [] });
 
   useEffect(() => {
-    let isMounted = true;
-
-    const maybeRequestLocation = async () => {
-      if (surface !== 'home' || location || !isSupported || getLocationPromptSeen()) {
-        setLocationReady(true);
-        return;
-      }
-
-      const result = await requestLocation();
-      setLocationPromptSeen();
-      if (isMounted) setLocationReady(true);
-
-      if (!result.success) {
-        console.warn('Using fallback region for seasonal recommendations:', result.error);
-      }
-    };
-
-    maybeRequestLocation();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isSupported, location, requestLocation, surface]);
+    setLocationReady(true);
+  }, [location, surface]);
 
   const activePreferences = useMemo(() => (
     preferences || DEFAULT_PLANT_PREFERENCES
