@@ -11,6 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [loading, setLoading] = useState(true);
   const hydratedUserIdRef = useRef(null);
+  const currentSessionUserIdRef = useRef(null);
+  const currentSessionAccessTokenRef = useRef(null);
 
   useEffect(() => {
     const fetchRole = async (currentUser) => {
@@ -68,6 +70,8 @@ export const AuthProvider = ({ children }) => {
 
     // Get initial session quickly; hydrate role/profile in background
     supabase.auth.getSession().then(({ data: { session } }) => {
+      currentSessionUserIdRef.current = session?.user?.id ?? null;
+      currentSessionAccessTokenRef.current = session?.access_token ?? null;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false); // instantly unblock global loading
@@ -89,20 +93,36 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         const nextUser = session?.user ?? null;
+        const nextUserId = nextUser?.id ?? null;
+        const nextAccessToken = session?.access_token ?? null;
+        const isDuplicateFocusEvent = Boolean(
+          nextUserId
+          && nextUserId === currentSessionUserIdRef.current
+          && nextAccessToken === currentSessionAccessTokenRef.current
+          && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        );
+
+        if (isDuplicateFocusEvent) {
+          setLoading(false);
+          return;
+        }
+
+        currentSessionUserIdRef.current = nextUserId;
+        currentSessionAccessTokenRef.current = nextAccessToken;
         setSession(session);
         setUser(nextUser);
         setLoading(false); // ensure global loading is false
 
         if (nextUser) {
-          setIsPasswordRecovery(event === 'PASSWORD_RECOVERY');
+          if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true);
+          const isNewUser = hydratedUserIdRef.current !== nextUser.id;
           const shouldHydrate = (
-            hydratedUserIdRef.current !== nextUser.id
-            || event === 'SIGNED_IN'
+            isNewUser
             || event === 'USER_UPDATED'
             || event === 'PASSWORD_RECOVERY'
           );
 
-          if (event === 'SIGNED_IN' && hydratedUserIdRef.current !== nextUser.id) {
+          if (event === 'SIGNED_IN' && isNewUser) {
             setIsAdmin(null); // Re-fetch role on new login
           }
 
