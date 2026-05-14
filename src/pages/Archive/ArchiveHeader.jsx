@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const ArchiveHeader = () => {
   return (
@@ -13,17 +14,6 @@ const ArchiveHeader = () => {
       </div>
 
       {/* Primary Actions */}
-<<<<<<< Updated upstream
-      <div className="flex gap-4 items-center">
-        <Link to="/admin/add-plant" className="bg-[#5F5E5E] text-[#FAF7F6] px-8 py-3 font-label text-[12px] tracking-[1.2px] uppercase flex items-center gap-2 hover:bg-[#31332C] transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-lg shadow-black/5">
-           <span className="w-2 h-2 bg-[#FAF7F6] rounded-full"></span>
-           Add Plant For Sale
-        </Link>
-        <button className="bg-[#E8E9E0] border border-[#797c73]/10 text-[#31332C] px-8 py-3 font-label text-[12px] tracking-[1.2px] uppercase hover:bg-[#dbddd0] transition-all transform hover:-translate-y-0.5 active:scale-95">
-           Generate Report
-        </button>
-      </div>
-=======
       <motion.div 
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -49,7 +39,6 @@ const ArchiveHeader = () => {
                </button>
            </div>
       </motion.div>
->>>>>>> Stashed changes
     </div>
   );
 };
