@@ -8,6 +8,7 @@ import ManageInventory from './pages/ManageInventory';
 import PromotionsPage from './pages/Admin/Promotions';
 import DiscoveryPage from './pages/Discovery';
 import ProductCataloguePage from './pages/ProductCatalogue';
+import ProductDetailPage from './pages/Product';
 import CartPage from './pages/Cart';
 import CheckoutPage from './pages/Checkout';
 import DashboardPage from './pages/Dashboard';
@@ -52,6 +53,7 @@ const AnimatedRoutes = () => {
         <Route path="/catalogue/:id" element={<CataloguePage />} />
         <Route path="/discovery" element={<DiscoveryPage />} />
         <Route path="/products-gifts" element={<ProductCataloguePage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/failure" element={<PaymentFailure />} />
