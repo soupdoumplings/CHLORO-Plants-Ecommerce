@@ -8,6 +8,7 @@ import WateringReminderModal from '../../components/WateringReminderModal';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { parseEsewaResponse } from '../../lib/paymentUtils';
+import { sendOrderEmailNotification } from '../../lib/orderNotifications';
 import { supabase } from '../../supabase';
 import { productAssetImages } from '../../lib/localImages';
 
@@ -36,8 +37,10 @@ const formatAmount = (amount) => {
 const getTransactionFromParams = (searchParams) => {
   const esewaData = searchParams.get('data');
   const khaltiPidx = searchParams.get('pidx');
-  const codOrderId = searchParams.get('order_id');
+  const orderId = searchParams.get('order_id');
   const method = searchParams.get('method');
+  const reference = searchParams.get('ref');
+  const amount = searchParams.get('amount');
 
   if (esewaData) {
     const parsed = parseEsewaResponse(esewaData);
@@ -46,11 +49,21 @@ const getTransactionFromParams = (searchParams) => {
       return {
         method: methodLabels.esewa,
         transactionCode: parsed.transaction_code || parsed.transaction_uuid || fallbackValue,
-        orderReference: parsed.transaction_uuid || parsed.product_code || fallbackValue,
+        orderReference: orderId || parsed.transaction_uuid || parsed.product_code || fallbackValue,
         amount: parsed.total_amount || fallbackValue,
         status: parsed.status || 'Complete',
       };
     }
+  }
+
+  if (method === 'esewa' && orderId) {
+    return {
+      method: methodLabels.esewa,
+      transactionCode: reference || orderId,
+      orderReference: orderId,
+      amount: amount || fallbackValue,
+      status: 'Complete',
+    };
   }
 
   if (khaltiPidx) {
@@ -66,12 +79,22 @@ const getTransactionFromParams = (searchParams) => {
     };
   }
 
-  if (method === 'cod' && codOrderId) {
+  if (method === 'khalti' && orderId) {
+    return {
+      method: methodLabels.khalti,
+      transactionCode: reference || orderId,
+      orderReference: orderId,
+      amount: amount || fallbackValue,
+      status: searchParams.get('status') || 'Complete',
+    };
+  }
+
+  if (method === 'cod' && orderId) {
     return {
       method: methodLabels.cod,
-      transactionCode: codOrderId,
-      orderReference: codOrderId,
-      amount: searchParams.get('amount') || fallbackValue,
+      transactionCode: reference || orderId,
+      orderReference: orderId,
+      amount: amount || fallbackValue,
       status: 'Confirmed',
     };
   }
@@ -91,6 +114,31 @@ const detailRows = (transaction) => [
   ['Payment Method', transaction.method],
   ['Amount', formatAmount(transaction.amount)],
 ];
+
+const statusLabels = {
+  completed: 'Complete',
+  pending: 'Pending',
+  failed: 'Failed',
+  refunded: 'Refunded',
+  cancelled: 'Cancelled',
+};
+
+const getTransactionFromOrder = (order, baseTransaction) => {
+  if (!order) return baseTransaction;
+
+  const methodKey = String(order.payment_method || '').toLowerCase();
+  const reference = baseTransaction.transactionCode !== fallbackValue
+    ? baseTransaction.transactionCode
+    : order.payment_reference || order.id || fallbackValue;
+
+  return {
+    method: methodLabels[methodKey] || baseTransaction.method,
+    transactionCode: reference,
+    orderReference: order.id || baseTransaction.orderReference,
+    amount: baseTransaction.amount !== fallbackValue ? baseTransaction.amount : order.total_amount,
+    status: statusLabels[String(order.payment_status || '').toLowerCase()] || baseTransaction.status,
+  };
+};
 
 const timelineSteps = [
   {
@@ -117,10 +165,14 @@ const PaymentSuccess = () => {
   const [cartCleared, setCartCleared] = useState(false);
   const [purchasedPlants, setPurchasedPlants] = useState([]);
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
   const hasClearedCart = useRef(false);
   const orderId = searchParams.get('order_id');
 
-  const transaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
+  const paramTransaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
+  const transaction = useMemo(() => (
+    getTransactionFromOrder(orderDetails, paramTransaction)
+  ), [orderDetails, paramTransaction]);
 
   useEffect(() => {
     let isMounted = true;
@@ -168,11 +220,27 @@ const PaymentSuccess = () => {
     const reconcilePayment = async () => {
       if (!user || !orderId) return;
 
-      const method = searchParams.get('method');
+      const { data: order, error: loadError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (loadError) {
+        console.warn('Could not load order for payment confirmation:', loadError.message);
+        return;
+      }
+
+      setOrderDetails(order);
+
+      const method = searchParams.get('method') || order.payment_method;
       const isCod = method === 'cod';
       const nextPaymentStatus = isCod ? 'pending' : 'completed';
       const nextOrderStatus = isCod ? 'processing' : 'processing';
-      const reference = transaction.transactionCode === fallbackValue ? null : transaction.transactionCode;
+      const reference = paramTransaction.transactionCode === fallbackValue
+        ? order.payment_reference || null
+        : paramTransaction.transactionCode;
 
       const { error: orderError } = await supabase
         .from('orders')
@@ -186,6 +254,13 @@ const PaymentSuccess = () => {
 
       if (orderError) {
         console.warn('Could not reconcile order payment status:', orderError.message);
+      } else {
+        setOrderDetails({
+          ...order,
+          payment_status: nextPaymentStatus,
+          status: nextOrderStatus,
+          payment_reference: reference,
+        });
       }
 
       const { error: paymentError } = await supabase
@@ -204,10 +279,15 @@ const PaymentSuccess = () => {
       if (paymentError) {
         console.warn('Could not reconcile payment row:', paymentError.message);
       }
+
+      await sendOrderEmailNotification({
+        orderId,
+        enabled: Boolean(order.email_order_updates),
+      });
     };
 
     reconcilePayment();
-  }, [orderId, searchParams, transaction.transactionCode, user]);
+  }, [orderId, paramTransaction.transactionCode, searchParams, user]);
 
   return (
     <Motion.div

@@ -30,7 +30,7 @@ const CheckoutPage = () => {
       postalCode: '',
     },
     sameAsShipping: true,
-    emailOrderUpdates: true,
+    emailOrderUpdates: false,
     marketingEmails: false,
   });
 

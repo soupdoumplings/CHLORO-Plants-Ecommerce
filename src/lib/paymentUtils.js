@@ -22,6 +22,8 @@ const KHALTI_CONFIG = {
   secretKey: import.meta.env.VITE_KHALTI_SECRET_KEY || '',
 };
 
+export const isKhaltiConfigured = () => Boolean(KHALTI_CONFIG.secretKey);
+
 /**
  * Generate HMAC-SHA256 signature for eSewa
  * @param {string} message - The message to sign (comma-separated values)
@@ -121,8 +123,8 @@ export const initiateKhaltiPayment = async ({
   websiteUrl,
 }) => {
   try {
-    if (!KHALTI_CONFIG.secretKey) {
-      throw new Error('Khalti secret key is not configured.');
+    if (!isKhaltiConfigured()) {
+      throw new Error('Khalti checkout is not configured yet. Add VITE_KHALTI_SECRET_KEY for local sandbox testing, or use eSewa/COD.');
     }
 
     // In dev, use Vite proxy to bypass CORS. In production, use the direct endpoint or your backend.

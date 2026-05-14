@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../supabase';
-import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl } from '../../lib/paymentUtils';
+import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl, isKhaltiConfigured } from '../../lib/paymentUtils';
 import { saveCheckoutBillingDetails } from '../../lib/customerProfile';
+import { sendOrderEmailNotification } from '../../lib/orderNotifications';
 
 const paymentLabels = {
   card: { text: 'Pay Securely', color: '#1A1A1A' },
@@ -66,18 +67,6 @@ const createOrderWithConsentFallback = async (payload) => {
   return insertOrder(compatiblePayload);
 };
 
-const sendOrderEmailNotification = async ({ orderId, enabled }) => {
-  if (!enabled) return;
-
-  const { error } = await supabase.functions.invoke('order-email-notifications', {
-    body: { orderId },
-  });
-
-  if (error) {
-    console.warn('Order email notification was not sent:', error.message);
-  }
-};
-
 const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
@@ -103,7 +92,12 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     }
 
     if (paymentMethod === 'card') {
-      setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
+      setError('Card payments are coming soon. Please use eSewa or COD.');
+      return;
+    }
+
+    if (paymentMethod === 'khalti' && !isKhaltiConfigured()) {
+      setError('Khalti is not configured for this local build yet. Add a sandbox key or use eSewa/COD.');
       return;
     }
 
@@ -174,11 +168,6 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
 
-      await sendOrderEmailNotification({
-        orderId: order.id,
-        enabled: visibleCheckoutDetails.emailOrderUpdates,
-      });
-
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
           totalAmount: total,
@@ -187,16 +176,16 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
-          failureUrl: `${baseUrl}/payment/failure`,
+          successUrl: `${baseUrl}/payment/success?method=esewa&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
+          failureUrl: `${baseUrl}/payment/failure?order_id=${order.id}`,
         });
       } else if (paymentMethod === 'khalti') {
         try {
           const result = await initiateKhaltiPayment({
             amount: total * 100, // Convert to paisa
             purchaseOrderId: transactionId,
-            purchaseOrderName: `Petals & Pots Order ${transactionId}`,
-            returnUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
+            purchaseOrderName: `CHLORO Order ${transactionId}`,
+            returnUrl: `${baseUrl}/payment/success?method=khalti&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
             websiteUrl: baseUrl,
           });
 
@@ -211,6 +200,10 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           setProcessing(false);
         }
       } else if (paymentMethod === 'cod') {
+        await sendOrderEmailNotification({
+          orderId: order.id,
+          enabled: visibleCheckoutDetails.emailOrderUpdates,
+        });
         await clearBag();
         navigate(`/payment/success?method=cod&order_id=${order.id}&ref=${transactionId}&amount=${total}`);
       }

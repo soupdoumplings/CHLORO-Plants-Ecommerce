@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useGeoLocation } from '../../lib/useGeoLocation';
+import { isKhaltiConfigured } from '../../lib/paymentUtils';
 
 const emptyAddress = {
   addressLine: '',
@@ -31,10 +32,10 @@ const getDetectedLocationLabel = (detectedLocation) => {
 
 const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setCheckoutDetails }) => {
   const { location, loading: locating, error: locationError, isSupported, requestLocation } = useGeoLocation();
-  const hasRequestedLocation = useRef(false);
   const sameAsShipping = checkoutDetails.sameAsShipping;
   const shippingAddress = checkoutDetails.shippingAddress;
   const billingAddress = checkoutDetails.billingAddress;
+  const khaltiReady = isKhaltiConfigured();
 
   const updateDetails = (patch) => {
     setCheckoutDetails((current) => ({ ...current, ...patch }));
@@ -82,15 +83,6 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
       };
     });
   }, [setCheckoutDetails]);
-
-  useEffect(() => {
-    if (!location && !hasRequestedLocation.current && isSupported) {
-      hasRequestedLocation.current = true;
-      requestLocation().then((result) => {
-        if (result.success) fillAddressFromLocation(result.location);
-      });
-    }
-  }, [fillAddressFromLocation, location, isSupported, requestLocation]);
 
   const handleUseCurrentLocation = async () => {
     const result = await requestLocation();
@@ -357,15 +349,15 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         </div>
 
         <div className="flex flex-col gap-4 mb-8">
-          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'card' ? 'border-[#1A1A1A] bg-white shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+          <label className="relative flex items-center justify-between cursor-not-allowed border border-[#B0B0A8]/20 bg-transparent p-6 opacity-55 transition-all duration-300 overflow-hidden group">
             <div className="flex items-center gap-5 relative z-10">
-              <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#1A1A1A] w-4 h-4" />
+              <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} disabled className="accent-[#1A1A1A] w-4 h-4" />
               <div className="flex flex-col">
-                <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'card' ? 'text-[#1A1A1A]' : 'text-[#4A4A4A]'}`}>Pay Securely</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Credit / Debit Card</span>
+                <span className="font-headline italic text-[18px] text-[#4A4A4A]">Pay Securely</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Credit / Debit Card - Coming Soon</span>
               </div>
             </div>
-            <div className={`relative z-10 transition-opacity ${paymentMethod === 'card' ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}>
+            <div className="relative z-10 opacity-40">
               <span className="material-symbols-outlined text-[28px] text-[#1A1A1A]">credit_card</span>
             </div>
           </label>
@@ -383,12 +375,20 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             </div>
           </label>
 
-          <label className={`relative flex items-center justify-between cursor-pointer border p-6 transition-all duration-500 overflow-hidden group ${paymentMethod === 'khalti' ? 'border-[#5C2D91]/40 bg-[#5C2D91]/5 shadow-md' : 'border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'}`}>
+          <label className={`relative flex items-center justify-between border p-6 transition-all duration-300 overflow-hidden group ${
+            !khaltiReady
+              ? 'cursor-not-allowed border-[#B0B0A8]/20 bg-transparent opacity-55'
+              : paymentMethod === 'khalti'
+                ? 'cursor-pointer border-[#5C2D91]/40 bg-[#5C2D91]/5 shadow-md'
+                : 'cursor-pointer border-[#B0B0A8]/20 bg-transparent hover:border-[#B0B0A8]/50 hover:bg-white/50'
+          }`}>
             <div className="flex items-center gap-5 relative z-10">
-              <input type="radio" name="payment" value="khalti" checked={paymentMethod === 'khalti'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#5C2D91] w-4 h-4" />
+              <input type="radio" name="payment" value="khalti" checked={paymentMethod === 'khalti'} disabled={!khaltiReady} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#5C2D91] w-4 h-4" />
               <div className="flex flex-col">
                 <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'khalti' ? 'text-[#3D1A68]' : 'text-[#4A4A4A] group-hover:text-[#3D1A68]'}`}>Pay with Khalti</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Digital Wallet</span>
+                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">
+                  {khaltiReady ? 'Digital Wallet' : 'Sandbox key required'}
+                </span>
               </div>
             </div>
             <div className={`relative z-10 transition-opacity ${paymentMethod === 'khalti' ? 'opacity-100' : 'opacity-60 group-hover:opacity-80'}`}>
