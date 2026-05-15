@@ -98,7 +98,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
   };
 
   return (
-    <div className="flex flex-col gap-14 lg:gap-20 w-full max-w-[640px]">
+    <div className="flex w-full max-w-[880px] flex-col gap-14 lg:gap-20">
       {/* ----------------- STEP 1: SHIPPING ----------------- */}
       <Motion.section
         initial={{ opacity: 0, y: 15 }}
@@ -107,18 +107,18 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="flex justify-between items-end border-b border-[#B0B0A8]/20 pb-4 mb-8">
-          <h2 className="font-headline text-[24px] italic text-[#1A1A1A] leading-none">Contact & Shipping</h2>
-          <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-medium mb-1 relative top-[1px]">Step 01 / 02</span>
+          <h2 className="font-headline text-[30px] italic leading-none text-[#1A1A1A]">Contact & Shipping</h2>
+          <span className="relative top-[1px] mb-1 font-label text-[10px] font-medium uppercase tracking-[0.15em] text-[#6B6B6B]">Step 01 / 02</span>
         </div>
 
         <div className="bg-[#F3F1EA] border border-[#B0B0A8]/20 p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <span className="material-symbols-outlined text-[#0F3A3A] text-[20px] mt-0.5">my_location</span>
             <div>
-              <p className="font-label text-[9px] tracking-[0.16em] uppercase text-[#1A1A1A] font-bold mb-1">
+              <p className="mb-1 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#1A1A1A]">
                 Location Autofill
               </p>
-              <p className="font-body text-[12px] leading-relaxed text-[#5E6058]">
+              <p className="font-body text-[14px] leading-relaxed text-[#5E6058]">
                 {locating
                   ? 'Detecting your current location...'
                   : location
@@ -126,7 +126,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                     : 'Allow location access to fill your shipping and billing address.'}
               </p>
               {locationError && (
-                <p className="font-label text-[9px] tracking-[0.06em] text-[#9F403D] font-semibold mt-2">
+                <p className="mt-2 font-label text-[10px] font-semibold tracking-[0.06em] text-[#9F403D]">
                   {locationError}
                 </p>
               )}
@@ -136,7 +136,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             type="button"
             onClick={handleUseCurrentLocation}
             disabled={!isSupported || locating}
-            className="border border-[#0F3A3A] text-[#0F3A3A] px-5 py-3 font-label text-[9px] tracking-[0.16em] uppercase font-bold hover:bg-[#0F3A3A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            className="shrink-0 border border-[#0F3A3A] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A] transition-colors hover:bg-[#0F3A3A] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {locating ? 'Locating...' : 'Use Location'}
           </button>
@@ -144,7 +144,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Email Address</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Email Address</label>
             <input
               type="email"
               name="email"
@@ -152,11 +152,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               placeholder="julian@example.com"
               value={checkoutDetails.email}
               onChange={(e) => updateDetails({ email: e.target.value })}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Phone Number</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Phone Number</label>
             <input
               type="tel"
               name="tel"
@@ -164,38 +164,38 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               placeholder="+977 98..."
               value={checkoutDetails.phone}
               onChange={(e) => updateDetails({ phone: e.target.value })}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">First Name</label>
             <input
               type="text"
               name="given-name"
               autoComplete="given-name"
               value={checkoutDetails.firstName}
               onChange={(e) => updateDetails({ firstName: e.target.value })}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Last Name</label>
             <input
               type="text"
               name="family-name"
               autoComplete="family-name"
               value={checkoutDetails.lastName}
               onChange={(e) => updateDetails({ lastName: e.target.value })}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-2.5 mb-6">
-          <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Shipping Address</label>
+          <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Shipping Address</label>
           <input
             type="text"
             name="shipping street-address"
@@ -203,42 +203,42 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             placeholder="Street name and house number"
             value={shippingAddress.addressLine}
             onChange={(e) => handleShippingChange('addressLine', e.target.value)}
-            className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+            className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors placeholder:text-[#B0B0A8] focus:border-[#1A1A1A]"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">City</label>
             <input
               type="text"
               name="shipping address-level2"
               autoComplete="shipping address-level2"
               value={shippingAddress.city}
               onChange={(e) => handleShippingChange('city', e.target.value)}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Country</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Country</label>
             <input
               type="text"
               name="shipping country-name"
               autoComplete="shipping country-name"
               value={shippingAddress.country}
               onChange={(e) => handleShippingChange('country', e.target.value)}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
           <div className="flex flex-col gap-2.5">
-            <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
+            <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Postal Code</label>
             <input
               type="text"
               name="shipping postal-code"
               autoComplete="shipping postal-code"
               value={shippingAddress.postalCode}
               onChange={(e) => handleShippingChange('postalCode', e.target.value)}
-              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+              className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
             />
           </div>
         </div>
@@ -257,7 +257,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
             }}
             className="w-4 h-4 accent-[#1A1A1A] border-[#B0B0A8]/40 bg-transparent cursor-pointer"
           />
-          <label htmlFor="sameAsShipping" className="font-label text-[10px] tracking-[0.1em] uppercase text-[#4A4A4A] cursor-pointer pt-[2px]">
+          <label htmlFor="sameAsShipping" className="cursor-pointer pt-[2px] font-label text-[11px] uppercase tracking-[0.1em] text-[#4A4A4A]">
             Billing address is same as shipping
           </label>
         </div>
@@ -276,56 +276,56 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col gap-2.5">
-                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">First Name</label>
-                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">First Name</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]" />
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Last Name</label>
-                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm" />
+                    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Last Name</label>
+                    <input type="text" className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]" />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2.5 mb-6">
-                  <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Billing Address</label>
+                  <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Billing Address</label>
                   <input
                     type="text"
                     placeholder="Street name and house number"
                     autoComplete="billing street-address"
                     value={billingAddress.addressLine}
                     onChange={(e) => handleBillingChange('addressLine', e.target.value)}
-                    className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                    className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors placeholder:text-[#B0B0A8] focus:border-[#1A1A1A]"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex flex-col gap-2.5">
-                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">City</label>
+                    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">City</label>
                     <input
                       type="text"
                       autoComplete="billing address-level2"
                       value={billingAddress.city}
                       onChange={(e) => handleBillingChange('city', e.target.value)}
-                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
                     />
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Country</label>
+                    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Country</label>
                     <input
                       type="text"
                       autoComplete="billing country-name"
                       value={billingAddress.country}
                       onChange={(e) => handleBillingChange('country', e.target.value)}
-                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
                     />
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Postal Code</label>
+                    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Postal Code</label>
                     <input
                       type="text"
                       autoComplete="billing postal-code"
                       value={billingAddress.postalCode}
                       onChange={(e) => handleBillingChange('postalCode', e.target.value)}
-                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] outline-none focus:border-[#1A1A1A] transition-colors shadow-sm"
+                      className="border border-[#B0B0A8]/40 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] shadow-sm outline-none transition-colors focus:border-[#1A1A1A]"
                     />
                   </div>
                 </div>
@@ -344,8 +344,8 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
         className="bg-[#F3F1EA] p-8 lg:p-12 border border-[#B0B0A8]/10"
       >
         <div className="flex justify-between items-end mb-8 relative">
-          <h2 className="font-headline text-[24px] italic text-[#1A1A1A] leading-none">Payment Details</h2>
-          <span className="font-label text-[9px] tracking-[0.15em] uppercase text-[#6B6B6B] font-medium mb-1 relative top-[1px]">Step 02 / 02</span>
+          <h2 className="font-headline text-[30px] italic leading-none text-[#1A1A1A]">Payment Details</h2>
+          <span className="relative top-[1px] mb-1 font-label text-[10px] font-medium uppercase tracking-[0.15em] text-[#6B6B6B]">Step 02 / 02</span>
         </div>
 
         <div className="flex flex-col gap-4 mb-8">
@@ -354,7 +354,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} disabled className="accent-[#1A1A1A] w-4 h-4" />
               <div className="flex flex-col">
                 <span className="font-headline italic text-[18px] text-[#4A4A4A]">Pay Securely</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Credit / Debit Card - Coming Soon</span>
+                <span className="mt-1 font-label text-[10px] uppercase tracking-[0.15em] text-[#6B6B6B]">Credit / Debit Card - Coming Soon</span>
               </div>
             </div>
             <div className="relative z-10 opacity-40">
@@ -367,7 +367,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               <input type="radio" name="payment" value="esewa" checked={paymentMethod === 'esewa'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#60BB46] w-4 h-4" />
               <div className="flex flex-col">
                 <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'esewa' ? 'text-[#2C5E1D]' : 'text-[#4A4A4A] group-hover:text-[#2C5E1D]'}`}>Pay with eSewa</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Digital Wallet</span>
+                <span className="mt-1 font-label text-[10px] uppercase tracking-[0.15em] text-[#6B6B6B]">Digital Wallet</span>
               </div>
             </div>
             <div className={`relative z-10 transition-opacity ${paymentMethod === 'esewa' ? 'opacity-100' : 'opacity-60 group-hover:opacity-80'}`}>
@@ -386,7 +386,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               <input type="radio" name="payment" value="khalti" checked={paymentMethod === 'khalti'} disabled={!khaltiReady} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#5C2D91] w-4 h-4" />
               <div className="flex flex-col">
                 <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'khalti' ? 'text-[#3D1A68]' : 'text-[#4A4A4A] group-hover:text-[#3D1A68]'}`}>Pay with Khalti</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">
+                <span className="mt-1 font-label text-[10px] uppercase tracking-[0.15em] text-[#6B6B6B]">
                   {khaltiReady ? 'Digital Wallet' : 'Sandbox key required'}
                 </span>
               </div>
@@ -401,7 +401,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-[#2F4F4F] w-4 h-4" />
               <div className="flex flex-col">
                 <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'cod' ? 'text-[#1A2E2E]' : 'text-[#4A4A4A] group-hover:text-[#1A2E2E]'}`}>Cash on Delivery</span>
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] mt-1">Pay at Doorstep</span>
+                <span className="mt-1 font-label text-[10px] uppercase tracking-[0.15em] text-[#6B6B6B]">Pay at Doorstep</span>
               </div>
             </div>
             <div className={`relative z-10 transition-opacity ${paymentMethod === 'cod' ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}>
@@ -419,7 +419,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10 overflow-hidden"
             >
               <div className="flex justify-between items-center mb-6">
-                <label className="font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">Card Information</label>
+                <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">Card Information</label>
                 <div className="flex gap-2">
                   <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
                   <span className="w-[34px] h-[22px] bg-[#F3F1EA] rounded-[3px]"></span>
@@ -432,7 +432,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                   <input
                     type="text"
                     placeholder="Card Number"
-                    className="w-full border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                    className="w-full border border-[#B0B0A8]/30 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] outline-none transition-colors placeholder:text-[#B0B0A8] focus:border-[#1A1A1A]"
                     defaultValue=""
                   />
                   <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#B0B0A8] text-[20px]">
@@ -444,12 +444,12 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
                   <input
                     type="text"
                     placeholder="MM / YY"
-                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] outline-none transition-colors placeholder:text-[#B0B0A8] focus:border-[#1A1A1A]"
                   />
                   <input
                     type="text"
                     placeholder="CVC"
-                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-3.5 font-body text-[14px] text-[#1A1A1A] placeholder:text-[#B0B0A8] outline-none focus:border-[#1A1A1A] transition-colors"
+                    className="w-1/2 border border-[#B0B0A8]/30 bg-transparent px-4 py-4 font-body text-[15px] text-[#1A1A1A] outline-none transition-colors placeholder:text-[#B0B0A8] focus:border-[#1A1A1A]"
                   />
                 </div>
               </div>
@@ -464,7 +464,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-[#60B246]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#60B246]/30 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#2C5E1D] mb-2">Pay with eSewa</h3>
-              <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to the eSewa portal to complete your transaction securely.</p>
+              <p className="font-body text-[14px] text-[#4A4A4A]">You will be redirected to the eSewa portal to complete your transaction securely.</p>
             </Motion.div>
           )}
 
@@ -476,7 +476,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-[#5C2D91]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#5C2D91]/30 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#3D1A68] mb-2">Pay with Khalti</h3>
-              <p className="font-body text-[#4A4A4A] text-[13px]">You will be redirected to Khalti's secure checkout page to complete your payment.</p>
+              <p className="font-body text-[14px] text-[#4A4A4A]">You will be redirected to Khalti's secure checkout page to complete your payment.</p>
             </Motion.div>
           )}
 
@@ -488,7 +488,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-white p-7 lg:p-10 shadow-sm mb-6 border border-[#B0B0A8]/10 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#1A1A1A] mb-2">Cash on Delivery</h3>
-              <p className="font-body text-[#4A4A4A] text-[13px]">You will pay the courier when your plant order is safely delivered.</p>
+              <p className="font-body text-[14px] text-[#4A4A4A]">You will pay the courier when your plant order is safely delivered.</p>
             </Motion.div>
           )}
         </AnimatePresence>
@@ -502,10 +502,10 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="mt-1 h-4 w-4 accent-[#0F3A3A]"
             />
             <span>
-              <span className="block font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
+              <span className="block font-label text-[10px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
                 Email me order updates
               </span>
-              <span className="mt-1 block font-body text-[12px] leading-relaxed text-[#5E6058]">
+              <span className="mt-1 block font-body text-[14px] leading-relaxed text-[#5E6058]">
                 We will only send purchase, payment, and delivery updates for this order.
               </span>
             </span>
@@ -519,10 +519,10 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="mt-1 h-4 w-4 accent-[#785A1A]"
             />
             <span>
-              <span className="block font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
+              <span className="block font-label text-[10px] font-bold uppercase tracking-[0.14em] text-[#1A1A1A]">
                 Send plant care tips and offers
               </span>
-              <span className="mt-1 block font-body text-[12px] leading-relaxed text-[#5E6058]">
+              <span className="mt-1 block font-body text-[14px] leading-relaxed text-[#5E6058]">
                 Optional. Leave this off if you only want essential order emails.
               </span>
             </span>

@@ -244,25 +244,25 @@ const JournalPage = () => {
           ]}
         />
 
-        <section className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-5 pt-12 lg:grid-cols-[320px_1fr] lg:px-10">
+        <section className="mx-auto grid w-[90vw] max-w-[1720px] grid-cols-1 gap-10 pt-12 lg:grid-cols-[340px_1fr]">
         <aside className="h-fit pr-0 lg:sticky lg:top-[112px] lg:border-r lg:border-[#11110E]/10 lg:pr-8">
           <div className="space-y-2">
-            <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#8A6A21]">CHLORO Journal</p>
-            <p className="font-headline text-[42px] leading-[0.88] text-[#11110E]">The Botanical Index</p>
-            <p className="max-w-[260px] font-body text-[13px] leading-relaxed text-[#6E6A60]">
+            <p className="font-label text-[10px] uppercase tracking-[0.32em] text-[#8A6A21]">CHLORO Journal</p>
+            <p className="font-headline text-[46px] leading-[0.88] text-[#11110E]">The Botanical Index</p>
+            <p className="max-w-[290px] font-body text-[14px] leading-relaxed text-[#6E6A60]">
               Live plant intelligence, edited into a quiet care reference.
             </p>
           </div>
 
           <div className="mt-10">
-            <label className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Search plant name</label>
+            <label className="font-label text-[10px] uppercase tracking-[0.24em] text-[#11110E]/45">Search plant name</label>
             <div className="mt-3 flex items-center gap-2 border border-[#11110E]/15 bg-[#FFFEFA] px-4 py-3">
               <span className="material-symbols-outlined text-[18px] text-[#11110E]/65">search</span>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Try: aloe vera"
-                className="w-full bg-transparent font-body text-[13px] text-[#11110E] outline-none placeholder:text-[#11110E]/35"
+                className="w-full bg-transparent font-body text-[15px] text-[#11110E] outline-none placeholder:text-[#11110E]/35"
               />
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -271,7 +271,7 @@ const JournalPage = () => {
                   key={item}
                   type="button"
                   onClick={() => setQuery(item)}
-                  className="border border-[#11110E]/12 bg-[#EFEAE0] px-3 py-2 text-left font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#6E6A60] transition-colors hover:border-[#11110E] hover:bg-[#FFFEFA]"
+                  className="border border-[#11110E]/12 bg-[#EFEAE0] px-3 py-2 text-left font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#6E6A60] transition-colors hover:border-[#11110E] hover:bg-[#FFFEFA]"
                 >
                   {item}
                 </button>
@@ -280,7 +280,7 @@ const JournalPage = () => {
           </div>
 
           <div className="mt-8 space-y-2">
-            <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Matches</p>
+            <p className="font-label text-[10px] uppercase tracking-[0.24em] text-[#11110E]/45">Matches</p>
             <div className="max-h-[380px] space-y-2 overflow-auto pr-1">
               {visibleResults.map((item) => {
                 const active = item.access_token === selectedToken;
@@ -295,7 +295,7 @@ const JournalPage = () => {
                     }`}
                   >
                     <p className="font-headline text-[24px] leading-none">{item.entity_name}</p>
-                    <p className={`mt-1 font-label text-[9px] uppercase tracking-[0.15em] ${active ? 'text-[#F4F2EC]/75' : 'text-[#1D241F]/45'}`}>
+                    <p className={`mt-1 font-label text-[10px] uppercase tracking-[0.15em] ${active ? 'text-[#F4F2EC]/75' : 'text-[#1D241F]/45'}`}>
                       indexed by {item.matched_in_type || 'name'}
                     </p>
                   </button>
@@ -303,22 +303,22 @@ const JournalPage = () => {
               })}
 
               {!searchLoading && !visibleResults.length && (
-                <p className="font-body text-[12px] text-[#11110E]/60">No items found.</p>
+                <p className="font-body text-[14px] text-[#11110E]/60">No items found.</p>
               )}
             </div>
           </div>
 
           <div className="mt-8 border border-[#11110E]/12 bg-[#FFFEFA] p-5">
-            <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">Status</p>
+            <p className="font-label text-[10px] uppercase tracking-[0.24em] text-[#11110E]/45">Status</p>
             {apiKeyMissing && (
-              <p className="mt-2 font-body text-[12px] leading-5 text-[#9F403D]">
+              <p className="mt-2 font-body text-[14px] leading-6 text-[#9F403D]">
                 Missing `VITE_KINDWISE_API_KEY` in `.env`.
               </p>
             )}
-            {!apiKeyMissing && searchLoading && <p className="mt-2 font-body text-[12px] text-[#11110E]/65">Searching Kindwise...</p>}
-            {!apiKeyMissing && detailLoading && <p className="mt-2 font-body text-[12px] text-[#11110E]/65">Loading care details...</p>}
-            {searchError && <p className="mt-2 font-body text-[12px] text-[#9F403D]">{searchError}</p>}
-            {detailError && <p className="mt-2 font-body text-[12px] text-[#9F403D]">{detailError}</p>}
+            {!apiKeyMissing && searchLoading && <p className="mt-2 font-body text-[14px] text-[#11110E]/65">Searching Kindwise...</p>}
+            {!apiKeyMissing && detailLoading && <p className="mt-2 font-body text-[14px] text-[#11110E]/65">Loading care details...</p>}
+            {searchError && <p className="mt-2 font-body text-[14px] text-[#9F403D]">{searchError}</p>}
+            {detailError && <p className="mt-2 font-body text-[14px] text-[#9F403D]">{detailError}</p>}
           </div>
         </aside>
 
@@ -329,23 +329,23 @@ const JournalPage = () => {
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="border-b border-[#11110E]/15 pb-7"
           >
-            <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#8A6A21]">Dynamic Plant Wiki</p>
+            <p className="font-label text-[10px] uppercase tracking-[0.32em] text-[#8A6A21]">Dynamic Plant Wiki</p>
             <h1 className="mt-5 max-w-[980px] font-headline text-[62px] leading-[0.84] text-[#11110E] md:text-[104px]">{selected.title}</h1>
-            <p className="mt-5 font-body text-[15px] text-[#6E6A60]">{selected.commonNames}</p>
+            <p className="mt-5 font-body text-[16px] text-[#6E6A60]">{selected.commonNames}</p>
           </Motion.div>
 
           <div className="grid gap-8 xl:grid-cols-[1fr_360px]">
             <article className="border border-[#11110E]/10 bg-[#FFFEFA] p-7 md:p-10">
-              <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#11110E]/45">About this plant</p>
-              <p className="mt-6 font-body text-[15px] leading-8 text-[#4F4B43]">{selected.description}</p>
+              <p className="font-label text-[10px] uppercase tracking-[0.24em] text-[#11110E]/45">About this plant</p>
+              <p className="mt-6 font-body text-[17px] leading-8 text-[#4F4B43]">{selected.description}</p>
 
               <div className="mt-7 grid gap-4 sm:grid-cols-2">
                 <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
-                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Plant type</p>
+                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-[#11110E]/45">Plant type</p>
                   <p className="mt-2 font-headline text-[31px] leading-none text-[#11110E] capitalize">{selected.rank}</p>
                 </div>
                 <div className="border border-[#11110E]/10 bg-[#F7F3EA] p-5">
-                  <p className="font-label text-[9px] uppercase tracking-[0.2em] text-[#11110E]/45">Family</p>
+                  <p className="font-label text-[10px] uppercase tracking-[0.2em] text-[#11110E]/45">Family</p>
                   <p className="mt-2 font-headline text-[31px] leading-none text-[#11110E]">{selected.taxonomy.family || 'Unknown'}</p>
                 </div>
               </div>
@@ -367,7 +367,7 @@ const JournalPage = () => {
               <img src={selected.heroImage} alt={selected.title} className="h-[470px] w-full object-cover grayscale-[18%]" />
             ) : (
               <div className="flex h-[470px] items-center justify-center border border-[#11110E]/10 bg-[#EFEAE0]">
-                <p className="font-body text-[13px] text-[#11110E]/55">No image returned by API for this plant.</p>
+                <p className="font-body text-[14px] text-[#11110E]/55">No image returned by API for this plant.</p>
               </div>
             )}
           </div>

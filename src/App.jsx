@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AdminRoute, GuestRoute, ProtectedRoute, SecurityLoading } from './components/Security';
@@ -36,23 +36,6 @@ const HomeRouteWrapper = () => {
   const { session, isAdmin } = useAuth();
   if (session && isAdmin === null) return <SecurityLoading />;
   return isAdmin ? <Navigate to="/archive" replace /> : <HomePage />;
-};
-
-const unscaledAuthRoutes = new Set(['/login', '/register', '/signup']);
-
-const ContentScaleController = () => {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    const shouldDescaleContent = !unscaledAuthRoutes.has(pathname);
-    document.body.classList.toggle('chloro-content-descaled', shouldDescaleContent);
-
-    return () => {
-      document.body.classList.remove('chloro-content-descaled');
-    };
-  }, [pathname]);
-
-  return null;
 };
 
 const AnimatedRoutes = () => {
@@ -102,7 +85,6 @@ import SiteConsent from './components/SiteConsent';
 function App() {
   return (
     <Router>
-      <ContentScaleController />
       <AuthProvider>
         <PlantPreferencesProvider>
           <NotificationProvider>

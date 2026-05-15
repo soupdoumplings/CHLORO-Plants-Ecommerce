@@ -85,7 +85,7 @@ const SaleBanner = () => {
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-30 border-y border-[#785A1A]/15 bg-[#31332C] px-5 py-4 text-[#FBF9F4]"
       >
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+        <div className="mx-auto flex w-[90vw] max-w-[1720px] flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
           <div>
             <p className="font-label text-[9px] font-bold uppercase tracking-[0.28em] text-[#FBD185]">
               Seasonal Sale Event

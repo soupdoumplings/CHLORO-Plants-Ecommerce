@@ -43,9 +43,9 @@ const CATEGORIES = [
 
 const CategoryShelf = () => {
   return (
-    <section className="w-full py-32 page-gutter bg-[#FBF9F4]">
+    <section className="w-full bg-[#FBF9F4] py-20 page-gutter md:py-24">
       <div className="page-shell">
-        <div className="space-y-4 mb-20 text-left">
+        <div className="mb-12 space-y-4 text-left md:mb-14">
           <Motion.span
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ const CategoryShelf = () => {
           </Motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {CATEGORIES.map((cat, i) => (
             <Motion.div
               key={cat.id}
@@ -75,7 +75,7 @@ const CategoryShelf = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="group cursor-pointer relative aspect-[14/19] overflow-hidden"
+              className="group relative aspect-[16/11] max-h-[420px] cursor-pointer overflow-hidden md:aspect-[5/4] xl:aspect-[4/3]"
               onClick={() => window.location.href = cat.link}
             >
               <img

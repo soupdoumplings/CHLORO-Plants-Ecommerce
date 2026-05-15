@@ -15,11 +15,11 @@ import {
   upsertCustomerProfile,
 } from '../../lib/customerProfile';
 
-const inputClass = 'border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3 font-body text-[14px] text-[#1A1A1A] outline-none transition-colors focus:border-[#1A1A1A]';
+const inputClass = 'border-b border-[#B0B0A8]/40 bg-transparent px-1 py-3.5 font-body text-[15px] text-[#1A1A1A] outline-none transition-colors focus:border-[#1A1A1A]';
 
 const Field = ({ label, children }) => (
   <div className="flex flex-col gap-2.5">
-    <label className="font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">
+    <label className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">
       {label}
     </label>
     {children}
@@ -195,11 +195,11 @@ const ProfileDetails = () => {
 
         <div className="bg-[#EDEBE4] p-7 lg:p-8">
           <h3 className="mb-4 font-headline text-[22px] leading-snug text-[#1A1A1A]">Saved Checkout</h3>
-          <p className="mb-6 font-body text-[12px] leading-relaxed text-[#6B6B6B]">
+          <p className="mb-6 font-body text-[14px] leading-relaxed text-[#6B6B6B]">
             These details are reused during checkout so returning customers do not retype billing information.
           </p>
           <div className="border-t border-[#B0B0A8]/25 pt-4">
-            <p className="font-label text-[9px] font-semibold uppercase tracking-[0.15em] text-[#6B6B6B]">Default address</p>
+            <p className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#6B6B6B]">Default address</p>
             <p className="mt-2 font-body text-sm leading-6 text-[#31332C]">
               {formatAddress({
                 address_line: profile.address_line,
@@ -209,7 +209,7 @@ const ProfileDetails = () => {
               }) || 'Not saved yet'}
             </p>
           </div>
-          <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
+          <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
             My Orders
             <span className="material-symbols-outlined text-[16px]">east</span>
           </Link>
@@ -229,12 +229,12 @@ const ProfileDetails = () => {
                   : 'text-[#31332C] hover:bg-[#F5F4ED]'
               }`}
             >
-              <span className={`block font-label text-[8px] font-bold uppercase tracking-[0.2em] ${
+              <span className={`block font-label text-[9px] font-bold uppercase tracking-[0.2em] ${
                 activeTab === tab.id ? 'text-[#D8B56D]' : 'text-[#785A1A]'
               }`}>
                 {tab.eyebrow}
               </span>
-              <span className="mt-1 block font-headline text-[21px] leading-tight">{tab.label}</span>
+              <span className="mt-1 block font-headline text-[24px] leading-tight">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -250,11 +250,11 @@ const ProfileDetails = () => {
             <div className="mb-9 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="font-headline text-[30px] leading-none text-[#1A1A1A] lg:text-[34px]">Profile & Billing</h2>
-                <p className="mt-3 font-body text-[13px] text-[#6B6B6B]">
+                <p className="mt-3 font-body text-[15px] text-[#6B6B6B]">
                   Edit saved account and checkout details.
                 </p>
               </div>
-              <Link to="/wishlist" className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#785A1A] underline underline-offset-4">
+              <Link to="/wishlist" className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#785A1A] underline underline-offset-4">
                 Open Wishlist
               </Link>
             </div>
@@ -291,7 +291,7 @@ const ProfileDetails = () => {
                 </div>
 
                 {(message || error) && (
-                  <div className={`mb-6 border px-4 py-3 font-body text-[13px] ${error ? 'border-[#D94F4F]/20 bg-[#FAF2F2] text-[#9F403D]' : 'border-[#C6E9E9] bg-[#C6E9E9]/25 text-[#244545]'}`}>
+                  <div className={`mb-6 border px-4 py-3 font-body text-[14px] ${error ? 'border-[#D94F4F]/20 bg-[#FAF2F2] text-[#9F403D]' : 'border-[#C6E9E9] bg-[#C6E9E9]/25 text-[#244545]'}`}>
                     {error || message}
                   </div>
                 )}

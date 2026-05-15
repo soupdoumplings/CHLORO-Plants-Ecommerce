@@ -159,7 +159,7 @@ const PromotionsPage = () => {
     >
       <Navbar />
       
-      <main className="w-full max-w-[1440px] mx-auto flex-grow mt-[120px] px-6 md:px-12 pb-24">
+      <main className="mx-auto mt-[120px] w-[90vw] max-w-[1720px] flex-grow pb-24">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16">
           <div>

@@ -52,7 +52,7 @@ const ProductDetailPage = () => {
     >
       <Navbar />
       <DetailHeader />
-      <main className="max-w-7xl mx-auto w-full px-6 md:px-12 py-12 mt-[82px] flex-grow">
+      <main className="mx-auto mt-[82px] w-[90vw] max-w-[1720px] flex-grow py-12">
         <ProductHero product={product} />
       </main>
       <Footer />

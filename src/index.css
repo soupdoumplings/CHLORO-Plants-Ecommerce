@@ -68,22 +68,6 @@
   --radius-xl: 0px;
 }
 
-:root {
-  --chloro-content-scale: 1;
-}
-
-@media (min-width: 768px) {
-  :root {
-    --chloro-content-scale: 0.9;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --chloro-content-scale: 0.8;
-  }
-}
-
 @layer base {
   body {
     background-color: #fbf9f4;
@@ -91,34 +75,6 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  body.chloro-content-descaled main {
-    zoom: var(--chloro-content-scale);
-  }
-
-  @supports not (zoom: 1) {
-    body.chloro-content-descaled main {
-      transform: scale(var(--chloro-content-scale));
-      transform-origin: top center;
-      width: 125%;
-      margin-left: -12.5%;
-    }
-
-    @media (max-width: 1023px) {
-      body.chloro-content-descaled main {
-        width: 111.1111%;
-        margin-left: -5.5556%;
-      }
-    }
-
-    @media (max-width: 767px) {
-      body.chloro-content-descaled main {
-        width: 100%;
-        margin-left: 0;
-        transform: none;
-      }
-    }
   }
 }
 
@@ -134,11 +90,11 @@
 }
 
 .page-gutter {
-  padding-inline: clamp(1.25rem, 7vw, 9rem);
+  padding-inline: max(1.25rem, 5vw);
 }
 
 .page-gutter-tight {
-  padding-inline: clamp(1.25rem, 3vw, 3rem);
+  padding-inline: max(1.25rem, 5vw);
 }
 
 .page-shell {

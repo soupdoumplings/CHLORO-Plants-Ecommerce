@@ -355,7 +355,7 @@ const AiDiagnosisPage = () => {
         />
 
         <section ref={labRef} className="scroll-mt-[96px] border-b border-[#11110E]/10 bg-[#F7F3EA] px-6 pb-20 pt-16 md:px-10 md:pb-28 md:pt-20">
-          <div className="mx-auto max-w-[1380px]">
+          <div className="mx-auto w-full max-w-[1720px] md:w-[90vw]">
             <div className="text-center">
               <p className="font-label text-[8px] uppercase tracking-[0.42em] text-[#7A756A]">Diagnostic Module 0.1</p>
               <h1 className="mx-auto mt-5 max-w-[820px] font-headline text-[54px] leading-[0.92] tracking-tight text-[#11110E] md:text-[82px]">
@@ -560,7 +560,7 @@ const AiDiagnosisPage = () => {
         </section>
 
         <section className="bg-[#F7F3EA] px-6 py-20 md:px-10 md:py-28">
-          <div className="mx-auto max-w-[1380px]">
+          <div className="mx-auto w-full max-w-[1720px] md:w-[90vw]">
             <div className="flex flex-col justify-between gap-6 border-b border-[#11110E]/10 pb-7 md:flex-row md:items-end">
               <div>
                 <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Recommended Care</p>
@@ -611,7 +611,7 @@ const AiDiagnosisPage = () => {
         </section>
 
         <section className="bg-[#F7F3EA] px-6 pb-24 md:px-10">
-          <div className="mx-auto max-w-[1380px] border border-[#11110E]/14 bg-[#FFFEFA] px-6 py-20 text-center md:px-10">
+          <div className="mx-auto w-full max-w-[1720px] border border-[#11110E]/14 bg-[#FFFEFA] px-6 py-20 text-center md:w-[90vw] md:px-10">
             <h2 className="font-headline text-[clamp(2.15rem,5vw,3.25rem)] leading-[0.95] text-[#11110E]">
               Expertise delivered weekly.
             </h2>

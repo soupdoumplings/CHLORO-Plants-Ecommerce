@@ -26,8 +26,8 @@ const VALUE_PROPS = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="pt-12 pb-32 page-gutter bg-[#FBF9F4] border-t border-[#31332c]/5">
-      <div className="page-shell grid grid-cols-1 lg:grid-cols-2 gap-24 items-start pt-20">
+    <section className="border-t border-[#31332c]/5 bg-[#FBF9F4] pb-24 pt-10 page-gutter">
+      <div className="page-shell grid grid-cols-1 items-start gap-16 pt-14 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-20">
 
         {/* Left Side: Editorial Image */}
         <Motion.div
@@ -35,9 +35,9 @@ const WhyChooseUs = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="relative group lg:sticky lg:top-32"
+          className="group relative lg:sticky lg:top-32"
         >
-          <div className="aspect-[4/5] overflow-hidden shadow-2xl shadow-black/10">
+          <div className="aspect-[4/3] max-h-[520px] overflow-hidden shadow-2xl shadow-black/10 lg:aspect-[5/4]">
             <img
               src="/ful.jpg"
               alt="Botanical Care"

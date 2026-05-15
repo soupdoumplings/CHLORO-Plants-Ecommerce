@@ -103,11 +103,11 @@ const ProductTile = ({ product, index }) => {
         <div className={`relative overflow-hidden bg-[#E8E8E0] ${large ? 'aspect-[1.48/1]' : 'aspect-[4/5]'}`}>
           <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.035]" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-            <span className="bg-[#FFFEFA]/94 px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#11110E] backdrop-blur-sm">
+            <span className="bg-[#FFFEFA]/94 px-3 py-1.5 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#11110E] backdrop-blur-sm">
               {product.type}
             </span>
             {product.isOnSale && (
-              <span className="bg-[#785A1A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.16em] text-[#FBF9F4]">
+              <span className="bg-[#785A1A] px-3 py-1.5 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#FBF9F4]">
                 Sale
               </span>
             )}
@@ -127,26 +127,26 @@ const ProductTile = ({ product, index }) => {
         <div className="p-5 md:p-6">
           <div className="flex items-start justify-between gap-5">
             <div className="min-w-0">
-              <p className="font-label text-[8px] font-bold uppercase tracking-[0.22em] text-[#797C73]">{product.category}</p>
-              <h2 className="mt-2 font-headline text-[29px] leading-[0.95] text-[#11110E] transition-colors group-hover:text-[#785A1A]">
+              <p className="font-label text-[9px] font-bold uppercase tracking-[0.22em] text-[#797C73]">{product.category}</p>
+              <h2 className="mt-2 font-headline text-[32px] leading-[0.95] text-[#11110E] transition-colors group-hover:text-[#785A1A]">
                 {product.name}
               </h2>
             </div>
             <div className="shrink-0 text-right">
               {product.isOnSale && (
-                <p className="font-body text-[11px] text-[#797C73]/55 line-through">{formatRupees(product.originalPrice)}</p>
+                <p className="font-body text-[12px] text-[#797C73]/55 line-through">{formatRupees(product.originalPrice)}</p>
               )}
               <p className="font-headline text-[18px] text-[#11110E]">{product.displayPrice}</p>
             </div>
           </div>
 
-          <p className="mt-4 min-h-[42px] font-body text-[13px] leading-relaxed text-[#5E6058]">
+          <p className="mt-4 min-h-[46px] font-body text-[14px] leading-relaxed text-[#5E6058]">
             {product.info || product.description || 'Ready for gifting, collecting, or everyday plant care.'}
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2">
             {(product.tags || []).slice(0, 3).map((tag) => (
-              <span key={`${product.id}-${tag}`} className="bg-[#E8E8E0] px-2.5 py-1 font-label text-[8px] uppercase tracking-[0.14em] text-[#4F4B43]">
+              <span key={`${product.id}-${tag}`} className="bg-[#E8E8E0] px-2.5 py-1 font-label text-[9px] uppercase tracking-[0.14em] text-[#4F4B43]">
                 {tag}
               </span>
             ))}
@@ -158,7 +158,7 @@ const ProductTile = ({ product, index }) => {
             className="mt-6 flex w-full items-center justify-center gap-2 bg-[#11110E] px-4 py-3.5 text-[#FBF9F4] transition-colors hover:bg-[#0F3A3A]"
           >
             <ShoppingBag className="h-4 w-4" />
-            <span className="font-label text-[9px] font-bold uppercase tracking-[0.18em]">{added ? 'Added' : 'Add to Bag'}</span>
+            <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">{added ? 'Added' : 'Add to Bag'}</span>
           </button>
         </div>
       </Link>
@@ -272,13 +272,13 @@ const ProductCataloguePage = () => {
 
       <main className="pt-[82px]">
         <section className="relative overflow-hidden border-b border-[#11110E]/10 bg-[#F8F6F1]">
-          <div className="mx-auto grid min-h-[calc(100vh-82px)] max-w-[1500px] grid-cols-1 lg:grid-cols-[minmax(0,0.88fr)_minmax(520px,1.12fr)]">
+          <div className="mx-auto grid min-h-[calc(100vh-82px)] w-[90vw] max-w-[1720px] grid-cols-1 lg:grid-cols-[minmax(0,0.88fr)_minmax(560px,1.12fr)]">
             <div className="flex flex-col justify-center px-6 py-16 md:px-10 lg:px-16">
               <Motion.p
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                className="font-label text-[9px] uppercase tracking-[0.34em] text-[#6D695F]"
+                className="font-label text-[10px] uppercase tracking-[0.34em] text-[#6D695F]"
               >
                 Gift Plants, Care Tools & Home Pieces
               </Motion.p>
@@ -295,7 +295,7 @@ const ProductCataloguePage = () => {
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-9 max-w-[520px] font-body text-[15px] leading-8 text-[#4F4B43]"
+                className="mt-9 max-w-[620px] font-body text-[17px] leading-8 text-[#4F4B43]"
               >
                 Shop gift-ready plants, care tools, vessels, and small botanical pieces that feel polished enough to send and simple enough to keep alive.
               </Motion.p>
@@ -331,13 +331,13 @@ const ProductCataloguePage = () => {
               />
               <div className="absolute inset-0 bg-[#F8F6F1]/18" />
               <div className="absolute bottom-8 left-6 right-6 border border-[#11110E]/14 bg-[#FFFEFA]/94 p-5 shadow-[0_26px_80px_rgba(17,17,14,0.16)] backdrop-blur-sm md:left-auto md:right-10 md:w-[360px]">
-                <p className="font-label text-[8px] uppercase tracking-[0.24em] text-[#6D695F]">Featured Gift Pick</p>
+                <p className="font-label text-[9px] uppercase tracking-[0.24em] text-[#6D695F]">Featured Gift Pick</p>
                 <h2 className="mt-3 font-headline text-[36px] leading-[0.95] text-[#11110E]">{heroProduct?.name || 'Terrarium Gift Set'}</h2>
-                <p className="mt-3 font-body text-[12px] leading-relaxed text-[#5E6058]">
+                <p className="mt-3 font-body text-[14px] leading-relaxed text-[#5E6058]">
                   {heroProduct?.info || heroProduct?.description || 'A compact botanical gift with a clean silhouette and easy care rhythm.'}
                 </p>
                 <div className="mt-5 flex items-center justify-between border-t border-[#11110E]/10 pt-4">
-                  <span className="font-label text-[8px] uppercase tracking-[0.2em] text-[#6D695F]">{heroProduct?.type || 'Gifts'}</span>
+                  <span className="font-label text-[9px] uppercase tracking-[0.2em] text-[#6D695F]">{heroProduct?.type || 'Gifts'}</span>
                   <span className="font-headline text-[20px] text-[#11110E]">{heroProduct?.displayPrice || 'Shop'}</span>
                 </div>
               </div>
@@ -352,12 +352,12 @@ const ProductCataloguePage = () => {
         </section>
 
         <section id="gift-shop" className="scroll-mt-[96px] bg-[#F8F6F1] px-6 py-14 md:px-10 md:py-20">
-          <div className="mx-auto grid max-w-[1380px] gap-10 lg:grid-cols-[300px_1fr]">
+          <div className="mx-auto grid w-[90vw] max-w-[1720px] gap-10 lg:grid-cols-[330px_1fr]">
             <aside className="h-fit border border-[#11110E]/12 bg-[#FFFEFA] p-6 lg:sticky lg:top-[104px]">
               <div className="flex items-center justify-between border-b border-[#11110E]/12 pb-5">
                 <div>
-                  <p className="font-label text-[8px] uppercase tracking-[0.32em] text-[#6D695F]">Shop Filters</p>
-                  <h2 className="mt-2 font-headline text-[34px] leading-none text-[#11110E]">Find The Right Gift</h2>
+                  <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#6D695F]">Shop Filters</p>
+                  <h2 className="mt-2 font-headline text-[38px] leading-none text-[#11110E]">Find The Right Gift</h2>
                 </div>
                 <SlidersHorizontal className="h-4 w-4 text-[#6D695F]" />
               </div>
@@ -380,11 +380,11 @@ const ProductCataloguePage = () => {
                       <span className="flex items-center justify-between gap-3">
                         <span className="flex items-center gap-3">
                           <Icon className="h-4 w-4" />
-                          <span className="font-label text-[9px] font-bold uppercase tracking-[0.18em]">{option.label}</span>
+                          <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">{option.label}</span>
                         </span>
-                        <span className="font-body text-[12px] opacity-65">{counts[option.id] || 0}</span>
+                        <span className="font-body text-[13px] opacity-65">{counts[option.id] || 0}</span>
                       </span>
-                      <span className={`mt-3 block font-body text-[12px] leading-relaxed ${active ? 'text-[#FBF9F4]/70' : 'text-[#5E6058]'}`}>
+                      <span className={`mt-3 block font-body text-[14px] leading-relaxed ${active ? 'text-[#FBF9F4]/70' : 'text-[#5E6058]'}`}>
                         {option.copy}
                       </span>
                     </button>
@@ -406,7 +406,7 @@ const ProductCataloguePage = () => {
                 <select
                   value={activeSort}
                   onChange={(event) => setActiveSort(event.target.value)}
-                  className="w-full bg-transparent font-label text-[10px] font-bold uppercase tracking-[0.14em] text-[#31332C] outline-none"
+                  className="w-full bg-transparent font-label text-[11px] font-bold uppercase tracking-[0.14em] text-[#31332C] outline-none"
                 >
                   {sortOptions.map((sort) => (
                     <option key={sort} value={sort}>{sort}</option>
@@ -418,7 +418,7 @@ const ProductCataloguePage = () => {
             <div>
               <div className="mb-8 flex flex-col gap-4 border-b border-[#11110E]/12 pb-6 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#6D695F]">{activeFilterMeta.label}</p>
+                  <p className="font-label text-[10px] uppercase tracking-[0.32em] text-[#6D695F]">{activeFilterMeta.label}</p>
                   <h2 className="mt-3 font-headline text-[44px] leading-none text-[#11110E] md:text-[64px]">
                     {loading ? 'Loading products' : `${filteredProducts.length} item${filteredProducts.length === 1 ? '' : 's'} ready`}
                   </h2>
