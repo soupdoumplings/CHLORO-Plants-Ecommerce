@@ -36,14 +36,16 @@ const ProductCard = ({ product, delay = 0 }) => {
               e.stopPropagation();
               wishlist.toggleWishlist(product);
             }}
-            className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center border transition-colors ${
+            className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center border transition-all duration-300 ${
               saved
-                ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
+                ? 'border-[#139D60]/20 bg-white shadow-[0_4px_12px_rgba(19,157,96,0.12)]'
                 : 'border-white/75 bg-white/85 text-[#0F3A3A] hover:bg-white'
             }`}
             aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
           >
-            <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
+            <span className={`material-symbols-outlined text-[20px] transition-all duration-300 ${saved ? 'text-[#139D60] fill-1 scale-110' : 'text-[#0F3A3A]'}`}>
+              {saved ? 'favorite' : 'favorite_border'}
+            </span>
           </button>
 
           {product.isOnSale && (

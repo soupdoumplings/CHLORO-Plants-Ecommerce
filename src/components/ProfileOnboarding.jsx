@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import {
   buildBillingPayload,
@@ -197,7 +198,15 @@ const ProfileOnboarding = () => {
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-[720px] border border-[#D9D6CA] bg-white shadow-2xl shadow-black/20"
           >
-            <div className="grid gap-0 md:grid-cols-[220px_1fr]">
+            <div className="relative grid gap-0 md:grid-cols-[220px_1fr]">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="absolute right-5 top-5 z-30 text-[#1A1A1A]/30 transition-colors hover:text-[#1A1A1A] md:right-7 md:top-7"
+                aria-label="Skip setup"
+              >
+                <X size={20} />
+              </button>
               <aside className="bg-[#0F3A3A] p-7 text-[#FBF9F4]">
                 <p className="mb-5 font-label text-[9px] font-bold uppercase tracking-[0.24em] text-[#C6E9E9]">
                   Account Setup
@@ -335,14 +344,31 @@ const ProfileOnboarding = () => {
                 )}
 
                 <div className="mt-8 flex items-center justify-between gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setStepIndex((current) => Math.max(0, current - 1))}
-                    disabled={stepIndex === 0 || saving}
-                    className="border border-[#B0B0A8]/35 px-5 py-3 font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#5E6058] transition-colors hover:bg-[#F5F4ED] disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    Back
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setStepIndex((current) => Math.max(0, current - 1))}
+                      disabled={stepIndex === 0 || saving}
+                      className="border border-[#B0B0A8]/35 px-5 py-3 font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#5E6058] transition-colors hover:bg-[#F5F4ED] disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Back
+                    </button>
+                    {stepIndex > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (stepIndex < steps.length - 1) {
+                            setStepIndex(stepIndex + 1);
+                          } else {
+                            setOpen(false);
+                          }
+                        }}
+                        className="px-3 py-3 font-label text-[9px] font-bold uppercase tracking-[0.18em] text-[#5E6058]/55 transition-colors hover:text-[#0F3A3A]"
+                      >
+                        Skip
+                      </button>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={handleNext}

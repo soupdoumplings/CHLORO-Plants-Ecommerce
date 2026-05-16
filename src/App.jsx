@@ -82,6 +82,17 @@ import CustomCursor from './components/CustomCursor';
 import ChatbotWidget from './components/ChatbotWidget';
 import SiteConsent from './components/SiteConsent';
 
+// BUG FIX: Hides the chatbot on authentication and admin routes to prevent UI overlap 
+// and maintain a clean environment for sensitive tasks.
+const ChatbotWrapper = () => {
+  const location = useLocation();
+  const hiddenRoutes = ['/login', '/register', '/signup', '/admin', '/archive'];
+  const isHidden = hiddenRoutes.some(route => location.pathname.startsWith(route));
+
+  if (isHidden) return null;
+  return <ChatbotWidget />;
+};
+
 function App() {
   return (
     <Router>
@@ -94,7 +105,7 @@ function App() {
                   <CustomCursor />
                   <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
                     <AnimatedRoutes />
-                    <ChatbotWidget />
+                    <ChatbotWrapper />
                     <PreferenceOnboarding />
                     <ProfileOnboarding />
                     <SiteConsent />

@@ -316,7 +316,7 @@ const AuthPage = () => {
                   )}
 
                   {((!isLogin && !isForgotPassword) || (isLogin && !isForgotPassword && loginMethod === 'email') || (isForgotPassword && resetStep === 3)) && (
-                    <div className="relative">
+                    <div>
                       <div className="mb-2.5 flex items-center justify-between gap-4">
                         <label className="block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">
                           {isForgotPassword ? 'New Password' : 'Password'}
@@ -336,18 +336,20 @@ const AuthPage = () => {
                           </button>
                         )}
                       </div>
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="********"
-                        className={`${fieldClass} pr-8`}
-                        autoComplete={isLogin && !isForgotPassword ? 'current-password' : 'new-password'}
-                      />
-                      <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]" aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="********"
+                          className={`${fieldClass} pr-8`}
+                          autoComplete={isLogin && !isForgotPassword ? 'current-password' : 'new-password'}
+                        />
+                        <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]" aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
                       {(!isLogin || isForgotPassword) && (
                         <div className="mt-2 flex gap-4">
                           <span className={`text-[8px] uppercase tracking-widest ${passwordCriteria.length ? 'text-green-600' : 'text-[#2F4F4F]/30'}`}>8+ Chars</span>
@@ -358,20 +360,22 @@ const AuthPage = () => {
                   )}
 
                   {((!isLogin && !isForgotPassword) || (isForgotPassword && resetStep === 3)) && (
-                    <div className="relative">
+                    <div>
                       <label className="mb-2.5 block font-label text-[9px] font-semibold uppercase tracking-[0.2em] text-[#456565]">Confirm Password</label>
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="********"
-                        className={`${fieldClass} pr-8`}
-                        autoComplete="new-password"
-                      />
-                      <button type="button" onClick={() => setShowConfirmPassword((prev) => !prev)} className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]" aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}>
-                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="********"
+                          className={`${fieldClass} pr-8`}
+                          autoComplete="new-password"
+                        />
+                        <button type="button" onClick={() => setShowConfirmPassword((prev) => !prev)} className="absolute bottom-3 right-0 text-[#2F4F4F]/40 transition-colors hover:text-[#2F4F4F]" aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}>
+                          {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

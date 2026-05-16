@@ -10,7 +10,7 @@ export function ProductHero({ product }) {
   const saved = wishlist.isWishlisted(product.id);
 
   return (
-    <Motion.section 
+    <Motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -32,7 +32,7 @@ export function ProductHero({ product }) {
         <div className="flex-1 w-full flex items-center justify-center relative my-6 md:my-0">
           <div className="relative w-[90%] sm:w-[80%] lg:w-[75%] max-w-lg aspect-[4/5]">
             {/* Tagline Box */}
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -47,7 +47,7 @@ export function ProductHero({ product }) {
               </h2>
             </Motion.div>
 
-            <Motion.div 
+            <Motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -63,7 +63,7 @@ export function ProductHero({ product }) {
         </div>
 
         {/* Rating & Social Links */}
-        <Motion.div 
+        <Motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -77,7 +77,7 @@ export function ProductHero({ product }) {
       <div className="flex-1 p-6 md:p-12 lg:p-16 flex flex-col justify-center items-center lg:items-start z-20">
         <div className="max-w-md w-full">
           {/* Product Name */}
-          <Motion.h3 
+          <Motion.h3
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -87,7 +87,7 @@ export function ProductHero({ product }) {
           </Motion.h3>
 
           {/* Description */}
-          <Motion.p 
+          <Motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -111,7 +111,7 @@ export function ProductHero({ product }) {
           </div>
 
           {/* Price & CTA */}
-          <Motion.div 
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
@@ -131,7 +131,7 @@ export function ProductHero({ product }) {
               </div>
             </div>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Motion.button 
+              <Motion.button
                 whileHover={{ y: -2, boxShadow: '0 14px 30px rgba(45,122,78,0.18)' }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => addToBag(product)}
@@ -142,15 +142,16 @@ export function ProductHero({ product }) {
               <button
                 type="button"
                 onClick={() => wishlist.toggleWishlist(product)}
-                className={`flex h-[48px] w-full items-center justify-center rounded-full border transition-colors duration-200 sm:w-[54px] ${
-                  saved
-                    ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white'
+                className={`flex h-[48px] w-full items-center justify-center rounded-full border transition-all duration-300 sm:w-[54px] ${saved
+                    ? 'border-[#139D60]/20 bg-white shadow-[0_4px_12px_rgba(19,157,96,0.12)]'
                     : 'border-[#0F3A3A]/25 bg-white text-[#0F3A3A] hover:border-[#0F3A3A]'
-                }`}
+                  }`}
                 aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
                 title={saved ? 'Saved to wishlist' : 'Save to wishlist'}
               >
-                <span className="material-symbols-outlined text-[20px]">{saved ? 'favorite' : 'favorite_border'}</span>
+                <span className={`material-symbols-outlined text-[20px] transition-all duration-300 ${saved ? 'text-[#139D60] fill-1 scale-110' : 'text-[#0F3A3A]'}`}>
+                  {saved ? 'favorite' : 'favorite_border'}
+                </span>
               </button>
             </div>
           </Motion.div>

@@ -626,8 +626,8 @@ const AiDiagnosisPage = () => {
                   setNewsletterEmail(event.target.value);
                   setNewsletterStatus('');
                 }}
-                placeholder="EMAIL ADDRESS"
-                className="min-w-0 flex-1 border-b border-[#11110E]/30 bg-transparent py-3 font-label text-[10px] uppercase tracking-[0.16em] text-[#11110E] outline-none placeholder:text-[#11110E]/40 sm:border-b-0"
+                placeholder="Email address"
+                className="min-w-0 flex-1 border-b border-[#11110E]/30 bg-transparent py-3 font-label text-[10px] tracking-[0.16em] text-[#11110E] outline-none placeholder:text-[#11110E]/40 sm:border-b-0"
               />
               <button type="submit" className="border border-[#11110E] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FFFEFA] sm:border-0 sm:px-0">
                 Submit

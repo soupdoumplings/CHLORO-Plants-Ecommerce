@@ -115,12 +115,18 @@ const ProductTile = ({ product, index }) => {
           <button
             type="button"
             onClick={handleWishlist}
-            className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center border transition-colors ${
-              saved ? 'border-[#0F3A3A] bg-[#0F3A3A] text-white' : 'border-white/75 bg-white/90 text-[#0F3A3A] hover:bg-white'
-            }`}
+            className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center border transition-all duration-300 ${
+              saved 
+                ? 'border-[#139D60]/20 bg-white shadow-[0_4px_12px_rgba(19,157,96,0.12)]' 
+                : 'border-white/75 bg-white/90 backdrop-blur-sm'
+            } hover:bg-white`}
             title={saved ? 'Saved' : 'Save product'}
           >
-            <Heart className={`h-4 w-4 ${saved ? 'fill-current' : ''}`} />
+            <Heart 
+              className={`h-4 w-4 transition-all duration-300 ${
+                saved ? 'fill-[#139D60] text-[#139D60] scale-110' : 'text-[#0F3A3A]'
+              }`} 
+            />
           </button>
         </div>
 
@@ -305,12 +311,22 @@ const ProductCataloguePage = () => {
                 transition={{ duration: 0.7, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-9 flex flex-wrap gap-3"
               >
-                <a href="#gift-shop" className="bg-[#11110E] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-[#FBF9F4] transition-colors hover:bg-[#0F3A3A]">
-                  Shop Gifts
-                </a>
                 <button
                   type="button"
-                  onClick={() => handleFilter(productTypeLabels.care)}
+                  onClick={() => {
+                    handleFilter(productTypeLabels.gifts);
+                    document.getElementById('gift-shop')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-[#11110E] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-[#FBF9F4] transition-colors hover:bg-[#0F3A3A]"
+                >
+                  Shop Gifts
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleFilter(productTypeLabels.care);
+                    document.getElementById('gift-shop')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   className="border border-[#11110E] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FBF9F4]"
                 >
                   Care Tools
