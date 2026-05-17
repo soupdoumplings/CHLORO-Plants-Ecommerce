@@ -27,6 +27,8 @@ const REVIEWS = [
   },
 ];
 
+const rotations = ['lg:-rotate-2', 'lg:rotate-1', 'lg:-rotate-1'];
+
 const CustomerReviews = () => {
   return (
     <section className="bg-[#FBF9F4] page-gutter pb-32">
@@ -63,7 +65,8 @@ const CustomerReviews = () => {
           </Motion.p>
         </div>
 
-        <div className="grid gap-7 lg:grid-cols-3">
+        <div className="relative mx-auto grid max-w-[1120px] gap-8 lg:grid-cols-3 lg:items-start lg:gap-10">
+          <div className="pointer-events-none absolute left-[16%] right-[16%] top-3 hidden border-t border-[#785A1A]/18 lg:block" />
           {REVIEWS.map((review, index) => (
             <Motion.article
               key={review.handle}
@@ -71,20 +74,14 @@ const CustomerReviews = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.75, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8 }}
-              className="group border border-[#31332c]/10 bg-white shadow-xl shadow-black/[0.035] transition-colors duration-500 hover:border-[#785A1A]/30"
+              whileHover={{ y: -8, rotate: 0 }}
+              className={`group relative mx-auto w-full max-w-[330px] bg-[#FFFEFA] p-5 pb-6 shadow-[0_22px_55px_rgba(49,51,44,0.12)] ring-1 ring-[#31332c]/8 transition-colors duration-500 hover:ring-[#785A1A]/25 ${rotations[index % rotations.length]}`}
             >
-              <div className="flex items-center justify-between border-b border-[#31332c]/10 px-5 py-4">
-                <div>
-                  <h3 className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#31332c]">
-                    {review.name}
-                  </h3>
-                  <p className="mt-1 font-body text-[12px] text-[#797C73]">{review.handle}</p>
-                </div>
-                <span className="material-symbols-outlined text-[18px] text-[#785A1A]">local_florist</span>
-              </div>
+              <span className="absolute left-1/2 top-0 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#785A1A]/35 bg-[#785A1A] shadow-[0_2px_8px_rgba(49,51,44,0.22)]" />
+              <span className="absolute left-1/2 top-0 hidden h-8 border-l border-[#785A1A]/20 lg:block" />
+              <div className="absolute left-1/2 top-4 z-10 h-6 w-24 -translate-x-1/2 -translate-y-1/2 rotate-2 bg-[#E8E3D4]/80 shadow-sm" />
 
-              <div className="aspect-[4/5] overflow-hidden bg-[#EDEBE4]">
+              <div className="aspect-[4/4.7] overflow-hidden border-[10px] border-[#FFFEFA] bg-[#EDEBE4] shadow-inner">
                 <img
                   src={review.image}
                   alt={`${review.plant} purchased from CHLORO`}
@@ -92,20 +89,29 @@ const CustomerReviews = () => {
                 />
               </div>
 
-              <div className="space-y-5 p-6">
-                <div className="flex items-center justify-between gap-4">
+              <div className="space-y-3 pt-4">
+                <div className="flex items-center justify-between gap-4 border-b border-[#31332c]/10 pb-3">
+                  <div>
+                    <h3 className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#31332c]">
+                      {review.name}
+                    </h3>
+                    <p className="mt-1 font-body text-[12px] text-[#797C73]">{review.handle}</p>
+                  </div>
                   <div className="flex gap-1 text-[#785A1A]" aria-label="5 out of 5 stars">
                     {[0, 1, 2, 3, 4].map((star) => (
                       <Star key={star} size={14} fill="currentColor" strokeWidth={1.8} />
                     ))}
                   </div>
-                  <p className="font-label text-[8px] font-bold uppercase tracking-[0.18em] text-[#797C73]">
-                    Verified Purchase
-                  </p>
                 </div>
 
-                <p className="font-headline text-[25px] leading-tight text-[#31332c]">{review.plant}</p>
-                <p className="font-body text-[14px] leading-7 text-[#5E6058]">"{review.comment}"</p>
+                <div>
+                  <p className="font-headline text-[23px] leading-tight text-[#31332c]">{review.plant}</p>
+                  <p className="mt-2 font-body text-[13px] leading-6 text-[#5E6058]">"{review.comment}"</p>
+                </div>
+
+                <p className="font-label text-[8px] font-bold uppercase tracking-[0.18em] text-[#797C73]">
+                  Verified Purchase
+                </p>
               </div>
             </Motion.article>
           ))}
