@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 
 const shopLinks = [
   { label: 'Shop Collection', to: '/discovery' },
@@ -10,13 +11,11 @@ const shopLinks = [
   { label: 'AI Diagnosis', to: '/ai-diagnosis' },
 ];
 
-const accountLinks = [
-  { label: 'My Bag', to: '/cart' },
-  { label: 'Checkout', to: '/checkout' },
-  { label: 'Dashboard', to: '/dashboard' },
-  { label: 'My Orders', to: '/orders' },
-  { label: 'Wishlist', to: '/wishlist' },
-  { label: 'Sign In', to: '/login' },
+const socialLinks = [
+  { label: 'WhatsApp', href: 'https://wa.me/9779800000000', icon: FaWhatsapp },
+  { label: 'Instagram', href: 'https://www.instagram.com/chloro.studio', icon: FaInstagram },
+  { label: 'Facebook', href: 'https://www.facebook.com/chloro.studio', icon: FaFacebookF },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@chloro.studio', icon: FaTiktok },
 ];
 
 const supportLinks = [
@@ -84,13 +83,29 @@ const Footer = () => {
 
             <div>
               <h3 className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-4">
-                Account
+                Socials
               </h3>
               <nav className="space-y-3">
-                {accountLinks.map((item) => (
-                  <FooterNavLink key={item.to} to={item.to}>{item.label}</FooterNavLink>
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="group flex items-center gap-3 text-[#FBF9F4]/65 transition-colors hover:text-[#FBF9F4]"
+                    title={item.label}
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center border border-[#FBF9F4]/16 text-[#C6E9E9] transition-colors group-hover:border-[#C6E9E9]/70 group-hover:bg-[#C6E9E9] group-hover:text-[#0F3A3A]">
+                      <item.icon className="h-3 w-3" />
+                    </span>
+                    <span className="font-headline text-[17px] md:text-[18px] leading-tight">{item.label}</span>
+                  </a>
                 ))}
               </nav>
+              <p className="mt-5 max-w-[190px] border-t border-[#FBF9F4]/10 pt-4 font-body text-[11px] leading-relaxed text-[#FBF9F4]/50">
+                Message us for orders, plant-care help, and studio availability.
+              </p>
             </div>
 
             <div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { useAuth } from '../../lib/AuthContext';
 import profileImg from '../../assets/profile-photo.png';
@@ -56,14 +56,20 @@ const SavedCheckoutInfo = ({ profile, className = '' }) => (
   </div>
 );
 
+const validTabIds = accountTabs.map((tab) => tab.id);
+
 const ProfileDetails = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const fileInputRef = useRef(null);
   const [avatar, setAvatar] = useState(user?.user_metadata?.avatar_url || profileImg);
   const [profile, setProfile] = useState(emptyCustomerProfile);
   const [billing, setBilling] = useState(emptyBillingDetails);
-  const [activeTab, setActiveTab] = useState('details');
+  const [activeTab, setActiveTab] = useState(() => {
+    const requestedTab = searchParams.get('tab');
+    return validTabIds.includes(requestedTab) ? requestedTab : 'details';
+  });
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -117,6 +123,21 @@ const ProfileDetails = () => {
   useEffect(() => {
     if (user?.user_metadata?.avatar_url) setAvatar(user.user_metadata.avatar_url);
   }, [user]);
+
+  useEffect(() => {
+    const requestedTab = searchParams.get('tab');
+    if (validTabIds.includes(requestedTab) && requestedTab !== activeTab) {
+      setActiveTab(requestedTab);
+    }
+  }, [activeTab, searchParams]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    const next = new URLSearchParams(searchParams);
+    if (tabId === 'details') next.delete('tab');
+    else next.set('tab', tabId);
+    setSearchParams(next, { replace: true });
+  };
 
   const updateProfile = (field, value) => {
     setProfile((current) => ({ ...current, [field]: value }));
@@ -237,7 +258,7 @@ const ProfileDetails = () => {
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`group px-4 py-3 text-left transition-colors lg:px-5 lg:py-4 ${
                 activeTab === tab.id
                   ? 'bg-[#31332C] text-[#FBF9F4]'

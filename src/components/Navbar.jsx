@@ -169,18 +169,6 @@ const Navbar = () => {
 
         {/* Utilities */}
         <div className="flex items-center gap-6">
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className={`md:hidden ${text} hover:text-[#C6E9E9] transition-colors`}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
-          >
-            <span className="material-symbols-outlined text-[28px]">
-              {mobileMenuOpen ? 'close' : 'menu'}
-            </span>
-          </button>
-
           {!isAdmin && (
             <Motion.button
               onClick={() => setSearchOpen(true)}
@@ -195,15 +183,15 @@ const Navbar = () => {
             </Motion.button>
           )}
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center outline-none`}
+                      className={`${text} hover:${accentText} transition-colors relative flex h-9 w-9 items-center justify-center outline-none`}
                       title="Notifications"
                     >
-                      notifications
+                      <span className="material-symbols-outlined text-[24px]">notifications</span>
                       <AnimatePresence>
                         {unreadCount > 0 && (
                           <Motion.span
@@ -294,43 +282,57 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {!isAdmin && (
-                  <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
-                    shopping_bag
-                    <AnimatePresence>
-                      {cartCount > 0 && (
-                        <Motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          transition={{ type: 'spring', stiffness: 500 }}
-                          className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
-                        >
-                          {cartCount}
-                        </Motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                )}
-
-            {!user ? (
-              <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
-                LOGIN
+            {!isAdmin && (
+              <Link to="/cart" className={`${text} hover:text-[#628141] transition-colors relative flex h-9 w-9 items-center justify-center`} title="Cart">
+                <span className="material-symbols-outlined text-[24px]">shopping_bag</span>
+                <AnimatePresence>
+                  {cartCount > 0 && (
+                    <Motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
+                      className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                    >
+                      {cartCount}
+                    </Motion.span>
+                  )}
+                </AnimatePresence>
               </Link>
-            ) : (
-              <>
-                <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
-                  person
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
-                  title="Logout"
-                >
-                  logout
-                </button>
-              </>
             )}
+
+            <div className="hidden items-center gap-4 md:flex">
+              {!user ? (
+                <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
+                  LOGIN
+                </Link>
+              ) : (
+                <>
+                  <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
+                    person
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
+                    title="Logout"
+                  >
+                    logout
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              className={`md:hidden ${text} hover:text-[#C6E9E9] transition-colors flex h-9 w-9 items-center justify-center`}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+            >
+              <span className="material-symbols-outlined text-[26px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
         </div>
       </Motion.nav>
@@ -364,20 +366,23 @@ const Navbar = () => {
               </div>
 
               {!isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="mt-3 flex w-full items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 text-[#FBF9F4]/82 transition-colors hover:bg-[#FBF9F4]/8"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[18px]">search</span>
-                    <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">Search Catalogue</span>
-                  </span>
-                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                </button>
+                <div className="mt-3 grid gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 text-[#FBF9F4]/82 transition-colors hover:bg-[#FBF9F4]/8"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[18px]">search</span>
+                      <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">Search Catalogue</span>
+                    </span>
+                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                  </button>
+
+                </div>
               )}
 
               <div className="mt-4 flex flex-wrap gap-3 border-t border-[#FBF9F4]/12 pt-4">
