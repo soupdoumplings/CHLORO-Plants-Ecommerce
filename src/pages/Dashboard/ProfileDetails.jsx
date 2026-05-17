@@ -32,6 +32,30 @@ const accountTabs = [
   { id: 'orders', label: 'Orders & Wishlist', eyebrow: 'Purchases' },
 ];
 
+const SavedCheckoutInfo = ({ profile, className = '' }) => (
+  <div className={`bg-[#EDEBE4] p-7 lg:p-8 ${className}`}>
+    <h3 className="mb-4 font-headline text-[22px] leading-snug text-[#1A1A1A]">Saved Checkout</h3>
+    <p className="mb-6 font-body text-[14px] leading-relaxed text-[#6B6B6B]">
+      These details are reused during checkout so returning customers do not retype billing information.
+    </p>
+    <div className="border-t border-[#B0B0A8]/25 pt-4">
+      <p className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#6B6B6B]">Default address</p>
+      <p className="mt-2 font-body text-sm leading-6 text-[#31332C]">
+        {formatAddress({
+          address_line: profile.address_line,
+          city: profile.city,
+          country: profile.country,
+          postal_code: profile.postal_code,
+        }) || 'Not saved yet'}
+      </p>
+    </div>
+    <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
+      My Orders
+      <span className="material-symbols-outlined text-[16px]">east</span>
+    </Link>
+  </div>
+);
+
 const ProfileDetails = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -181,60 +205,51 @@ const ProfileDetails = () => {
       className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-20"
     >
       <div className="flex flex-col gap-8 lg:col-span-4 xl:col-span-3">
-        <div className="group relative aspect-[4/5] w-full overflow-hidden bg-[#EDEBE4]">
-          <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-          <img src={avatar} alt="Member profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center bg-white/85 shadow-sm backdrop-blur-sm transition-colors hover:bg-white"
-            aria-label="Upload profile photo"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#4A4A4A]">photo_camera</span>
-          </button>
-        </div>
-
-        <div className="bg-[#EDEBE4] p-7 lg:p-8">
-          <h3 className="mb-4 font-headline text-[22px] leading-snug text-[#1A1A1A]">Saved Checkout</h3>
-          <p className="mb-6 font-body text-[14px] leading-relaxed text-[#6B6B6B]">
-            These details are reused during checkout so returning customers do not retype billing information.
-          </p>
-          <div className="border-t border-[#B0B0A8]/25 pt-4">
-            <p className="font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#6B6B6B]">Default address</p>
-            <p className="mt-2 font-body text-sm leading-6 text-[#31332C]">
-              {formatAddress({
-                address_line: profile.address_line,
-                city: profile.city,
-                country: profile.country,
-                postal_code: profile.postal_code,
-              }) || 'Not saved yet'}
+        <div className="flex items-center gap-6 lg:block">
+          <div className="group relative shrink-0 aspect-square w-28 overflow-hidden bg-[#EDEBE4] sm:w-36 lg:w-full">
+            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+            <img src={avatar} alt="Member profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center bg-white/85 shadow-sm backdrop-blur-sm transition-colors hover:bg-white lg:bottom-4 lg:right-4 lg:h-10 lg:w-10"
+              aria-label="Upload profile photo"
+            >
+              <span className="material-symbols-outlined text-[16px] text-[#4A4A4A] lg:text-[18px]">photo_camera</span>
+            </button>
+          </div>
+          
+          <div className="flex flex-col lg:hidden">
+            <h2 className="font-headline text-[24px] leading-tight text-[#1A1A1A]">
+              {profile.full_name || 'Member'}
+            </h2>
+            <p className="mt-1 font-body text-[14px] text-[#6B6B6B]">
+              {user?.email}
             </p>
           </div>
-          <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
-            My Orders
-            <span className="material-symbols-outlined text-[16px]">east</span>
-          </Link>
         </div>
+
+        <SavedCheckoutInfo profile={profile} className="hidden lg:block" />
       </div>
 
       <div className="lg:col-span-8 xl:col-span-9">
-        <div className="mb-6 grid grid-cols-1 gap-2 border border-[#B0B0A8]/15 bg-white p-2 shadow-sm sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-1 border border-[#B0B0A8]/15 bg-white p-1 shadow-sm sm:grid-cols-3 lg:gap-2 lg:p-2">
           {accountTabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`group px-5 py-4 text-left transition-colors ${
+              className={`group px-4 py-3 text-left transition-colors lg:px-5 lg:py-4 ${
                 activeTab === tab.id
                   ? 'bg-[#31332C] text-[#FBF9F4]'
                   : 'text-[#31332C] hover:bg-[#F5F4ED]'
               }`}
             >
-              <span className={`block font-label text-[9px] font-bold uppercase tracking-[0.2em] ${
+              <span className={`block font-label text-[8px] font-bold uppercase tracking-[0.2em] lg:text-[9px] ${
                 activeTab === tab.id ? 'text-[#D8B56D]' : 'text-[#785A1A]'
               }`}>
                 {tab.eyebrow}
               </span>
-              <span className="mt-1 block font-headline text-[24px] leading-tight">{tab.label}</span>
+              <span className="mt-1 block font-headline text-[20px] leading-tight lg:text-[24px]">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -343,6 +358,8 @@ const ProfileDetails = () => {
             <RecentOrders />
           </Motion.div>
         )}
+
+        <SavedCheckoutInfo profile={profile} className="mt-12 block lg:hidden" />
       </div>
     </Motion.section>
   );
