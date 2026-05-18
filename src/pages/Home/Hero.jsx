@@ -6,21 +6,18 @@ import Magnetic from '../../components/Magnetic';
 
 const Hero = () => {
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  });
-  const videoOpacity = useTransform(scrollYProgress, [0, 0.55, 1], [1, 0.78, 0.18]);
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.58, 0.92], [1, 0.96, 0.24]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, -52]);
-  const veilOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [0.38, 0.48, 0.66]);
+  const { scrollY } = useScroll();
+  const videoOpacity = useTransform(scrollY, [0, 420, 760], [1, 0.78, 0.18]);
+  const videoScale = useTransform(scrollY, [0, 760], [1, 1.08]);
+  const contentOpacity = useTransform(scrollY, [0, 440, 700], [1, 0.96, 0.24]);
+  const contentY = useTransform(scrollY, [0, 760], [0, -52]);
+  const veilOpacity = useTransform(scrollY, [0, 520, 760], [0.38, 0.48, 0.66]);
 
   return (
     <header
       ref={heroRef}
       data-cursor-theme="light"
-      className="relative w-full h-screen flex flex-col justify-center page-gutter pt-20 overflow-hidden"
+      className="relative flex min-h-[100svh] w-full flex-col justify-center overflow-hidden page-gutter pt-20"
     >
       <Motion.div
         className="absolute inset-0 z-0"
@@ -52,7 +49,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 0.9, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="font-label text-[11px] tracking-[0.28em] uppercase mb-5 text-[#C6E9E9] font-bold"
+          className="mb-5 font-label text-[9px] font-bold uppercase tracking-[0.22em] text-[#C6E9E9] sm:text-[11px] sm:tracking-[0.28em]"
         >
           The High-Altitude Collection
         </Motion.p>
@@ -60,7 +57,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="font-headline text-[clamp(4.7rem,11vw,10rem)] tracking-tight leading-[0.82] text-white mb-6 drop-shadow-[0_18px_60px_rgba(0,0,0,0.28)]"
+          className="mb-6 font-headline text-[clamp(3.4rem,17vw,10rem)] tracking-tight leading-[0.88] text-white drop-shadow-[0_18px_60px_rgba(0,0,0,0.28)] sm:leading-[0.82]"
         >
           Himalayan <br />
           <span className="italic font-extralight opacity-95">Elegance.</span>
@@ -69,7 +66,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
-          className="font-body text-[16px] md:text-[18px] leading-relaxed text-white/78 max-w-[560px] mb-2"
+          className="mb-2 max-w-[560px] font-body text-[15px] leading-relaxed text-white/78 md:text-[18px]"
         >
           Shop indoor plants, seasonal care tools, and quiet botanical support for refined homes.
         </Motion.p>
@@ -78,7 +75,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col md:flex-row gap-8 items-start md:items-center"
+          className="flex flex-col items-start gap-5 sm:gap-8 md:flex-row md:items-center"
         >
           <Magnetic magnetism={15}>
             <Motion.div
@@ -88,7 +85,7 @@ const Hero = () => {
             >
               <Link
                 to="/discovery"
-                className="block px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#fbf9f4] transition-all"
+                className="block px-6 py-4 text-center text-[10px] font-bold uppercase tracking-[0.18em] transition-all hover:bg-[#fbf9f4] sm:px-8 sm:text-[11px] sm:tracking-[0.2em]"
               >
                 Shop Collection
               </Link>

@@ -38,7 +38,7 @@ export const PlantPreferencesProvider = ({ children }) => {
         .from('users')
         .select('plant_preferences')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 

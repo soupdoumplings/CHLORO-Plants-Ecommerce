@@ -103,11 +103,11 @@ const Navbar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between page-gutter-tight transition-all duration-500 cursor-auto`}
+        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-4 sm:px-6 lg:px-[5vw] transition-all duration-500 cursor-auto`}
       >
-        <div className="flex items-center gap-12">
+        <div className="flex min-w-0 items-center gap-6 lg:gap-12">
           {/* Branding */}
-          <Link to={isAdmin ? "/archive" : "/"} className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
+          <Link to={isAdmin ? "/archive" : "/"} className={`shrink-0 font-headline text-[27px] sm:text-2xl ${text} hover:opacity-70 transition-opacity`}>
             CHLORO
           </Link>
 
@@ -168,7 +168,7 @@ const Navbar = () => {
         )}
 
         {/* Utilities */}
-        <div className="flex items-center gap-6">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:gap-6">
           {!isAdmin && (
             <Motion.button
               onClick={() => setSearchOpen(true)}
@@ -183,7 +183,7 @@ const Navbar = () => {
             </Motion.button>
           )}
 
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button
@@ -214,7 +214,7 @@ const Navbar = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-12 right-0 w-80 bg-[#0F3A3A] border border-[#FBF9F4]/20 shadow-2xl overflow-hidden flex flex-col z-50 cursor-auto"
+                          className="fixed left-3 right-3 top-[92px] max-h-[calc(100vh-112px)] bg-[#0F3A3A] border border-[#FBF9F4]/20 shadow-2xl overflow-hidden flex flex-col z-50 cursor-auto sm:left-auto sm:right-4 sm:w-[min(360px,calc(100vw-32px))] md:absolute md:left-auto md:right-0 md:top-12 md:max-h-none md:w-80"
                         >
                           <div className="flex items-center justify-between p-4 border-b border-[#FBF9F4]/20 bg-[#0A2E2E]">
                             <h3 className="font-headline text-[#FBF9F4] text-sm uppercase tracking-wider">Notifications</h3>
@@ -228,7 +228,7 @@ const Navbar = () => {
                             )}
                           </div>
 
-                          <div className="max-h-[360px] overflow-y-auto no-scrollbar">
+                          <div className="max-h-[min(360px,calc(100vh-210px))] overflow-y-auto no-scrollbar">
                             {notifications.length === 0 ? (
                               <div className="p-6 text-center text-[#FBF9F4]/50 font-label text-xs uppercase tracking-widest">
                                 No notifications yet

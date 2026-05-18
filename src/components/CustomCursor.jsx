@@ -8,6 +8,8 @@ const CustomCursor = () => {
   const isHiddenRef = useRef(isHidden);
   const isHoveredRef = useRef(isHovered);
   const isOverDarkSurfaceRef = useRef(isOverDarkSurface);
+  const frameRef = useRef(null);
+  const latestPointRef = useRef({ x: -100, y: -100 });
 
   const cursorSize = isHovered ? 46 : 24;
 
@@ -35,16 +37,22 @@ const CustomCursor = () => {
 
   useEffect(() => {
     // Highly optimized passive event handler
-    const handleMouseMove = (e) => {
-      // By using translateX/Y -50% in the styles, we don't need to calculate offsets here
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+    const supportsCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!supportsCustomCursor) return undefined;
+
+    const updateCursorState = () => {
+      frameRef.current = null;
+      const { x, y } = latestPointRef.current;
+
+      mouseX.set(x);
+      mouseY.set(y);
 
       if (isHiddenRef.current) {
+        isHiddenRef.current = false;
         setIsHidden(false);
       }
 
-      const hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
+      const hoveredElement = document.elementFromPoint(x, y);
       const nextDarkSurface = Boolean(hoveredElement?.closest('nav, footer, header, [data-cursor-theme="light"]'));
       const nextHovered = Boolean(hoveredElement?.closest('button, a, input, textarea, select, label, .cursor-pointer, [role="button"]'));
 
@@ -59,8 +67,21 @@ const CustomCursor = () => {
       }
     };
 
-    const handleMouseLeave = () => setIsHidden(true);
-    const handleMouseEnterWindow = () => setIsHidden(false);
+    const handleMouseMove = (e) => {
+      latestPointRef.current = { x: e.clientX, y: e.clientY };
+      if (!frameRef.current) {
+        frameRef.current = window.requestAnimationFrame(updateCursorState);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      isHiddenRef.current = true;
+      setIsHidden(true);
+    };
+    const handleMouseEnterWindow = () => {
+      isHiddenRef.current = false;
+      setIsHidden(false);
+    };
 
     // Use passive listeners to prevent scrolling/input thread blocking
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -71,6 +92,7 @@ const CustomCursor = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       document.body.removeEventListener('mouseleave', handleMouseLeave);
       document.body.removeEventListener('mouseenter', handleMouseEnterWindow);
+      if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
     };
   }, [mouseX, mouseY]); // Empty dependencies mean event listeners are attached exactly once
 

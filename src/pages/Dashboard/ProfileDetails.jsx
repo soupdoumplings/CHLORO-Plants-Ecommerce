@@ -199,10 +199,10 @@ const ProfileDetails = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-20"
+      className="grid grid-cols-1 items-start gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-20"
     >
       <div className="flex flex-col gap-8 lg:col-span-4 xl:col-span-3">
-        <div className="group relative aspect-[4/5] w-full overflow-hidden bg-[#EDEBE4]">
+        <div className="group relative mx-auto aspect-[4/5] max-h-[520px] w-full max-w-[420px] overflow-hidden bg-[#EDEBE4] sm:max-h-none lg:max-w-none">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
           <img src={avatar} alt="Member profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
           <button

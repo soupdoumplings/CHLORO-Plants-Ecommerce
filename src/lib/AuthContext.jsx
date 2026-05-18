@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const { data, error } = await supabase.from('users').select('role').eq('id', currentUser.id).single();
+        const { data, error } = await supabase.from('users').select('role').eq('id', currentUser.id).maybeSingle();
         if (!error && data) {
           setIsAdmin(data.role === 'ADMIN');
         } else {
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     // Ensure the user has a row in public.users (fixes foreign key errors for cart, orders, etc.)
     const ensureUserProfile = async (currentUser) => {
       if (!currentUser) return;
-      const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).single();
+      const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).maybeSingle();
       if (!data) {
         const name = currentUser.user_metadata?.full_name
           || currentUser.user_metadata?.name
@@ -51,9 +51,9 @@ export const AuthProvider = ({ children }) => {
         const phoneRow = currentUser.phone || currentUser.user_metadata?.phone
           ? { ...baseRow, phone: currentUser.phone || currentUser.user_metadata?.phone }
           : baseRow;
-        const { error: insertError } = await supabase.from('users').insert([phoneRow]);
+        const { error: insertError } = await supabase.from('users').upsert(phoneRow, { onConflict: 'id' });
         if (insertError && phoneRow.phone) {
-          await supabase.from('users').insert([baseRow]);
+          await supabase.from('users').upsert(baseRow, { onConflict: 'id' });
         }
       }
     };
@@ -166,10 +166,10 @@ export const AuthProvider = ({ children }) => {
         role: 'USER'
       };
       const userRow = normalizedPhone ? { ...baseUserRow, phone: normalizedPhone } : baseUserRow;
-      let { error: dbError } = await supabase.from('users').insert([userRow]);
+      let { error: dbError } = await supabase.from('users').upsert(userRow, { onConflict: 'id' });
       // Backward-compatible fallback if the users table doesn't have a phone column yet.
       if (dbError && normalizedPhone) {
-        const fallback = await supabase.from('users').insert([baseUserRow]);
+        const fallback = await supabase.from('users').upsert(baseUserRow, { onConflict: 'id' });
         dbError = fallback.error;
       }
       // If db fails, console log but don't strictly crash the sign up
