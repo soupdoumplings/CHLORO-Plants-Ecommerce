@@ -23,8 +23,8 @@ export const initialCartItems = [
 
 export const crossSellProduct = {
   id: 'prod_cross',
-  name: 'Botanical Growth Serum',
-  description: 'The essential companion for your Heritage Planter. A cold-pressed organic nutrient blend designed for indoor specimens.',
-  price: 28.00,
-  image: scissors, // using placeholder image
+  name: 'Precision Pruning Scissors',
+  description: 'Forged for botanical maintenance. These Japanese-inspired shears ensure clean cuts for healthy plant growth and clean propagation.',
+  price: 450.00,
+  image: scissors,
 };

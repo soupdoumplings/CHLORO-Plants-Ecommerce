@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
 import { fallbackCatalogImage } from './localImages';
+import { getEffectivePrice } from './pricing';
 
 const CartContext = createContext();
 
@@ -13,6 +14,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
+  const userId = session?.user?.id;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,7 +23,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const fetchCart = useCallback(async () => {
-    if (!session?.user) {
+    if (!userId) {
       setCartItems([]);
       setLoading(false);
       return;
@@ -34,7 +36,7 @@ export const CartProvider = ({ children }) => {
           *,
           products (*)
         `)
-        .eq('user_id', session.user.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -42,10 +44,11 @@ export const CartProvider = ({ children }) => {
         id: item.id,
         productId: item.product_id,
         name: item.products.name,
-        price: Number(item.products.price),
+        price: getEffectivePrice(item.products),
+        originalPrice: Number(item.products.price || 0),
         quantity: item.quantity,
         image: item.products.images?.[0] || fallbackCatalogImage,
-        variant: 'STUDIO SPECIMEN' // Default variant for simplicity
+        variant: 'STUDIO PICK' // Default variant for simplicity
       }));
 
       setCartItems(formattedItems);
@@ -54,14 +57,14 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
   const addToBag = async (product, quantity = 1) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true, error: 'Please log in to add items to your bag.' };
     }
@@ -75,7 +78,11 @@ export const CartProvider = ({ children }) => {
     try {
       // Parse price: handle both raw numbers and formatted strings like "NPR 50.00"
       let priceValue = 0;
-      if (typeof product.price === 'number') {
+      if (product.salePrice) {
+        priceValue = Number(product.salePrice);
+      } else if (product.effectivePrice) {
+        priceValue = Number(product.effectivePrice);
+      } else if (typeof product.price === 'number') {
         priceValue = product.price;
       } else if (product.rawPrice) {
         priceValue = Number(product.rawPrice);
@@ -100,7 +107,7 @@ export const CartProvider = ({ children }) => {
         const { error } = await supabase
           .from('cart_items')
           .insert([{
-            user_id: session.user.id,
+            user_id: userId,
             product_id: product.id,
             quantity: quantity,
             price_snapshot: priceValue
@@ -111,7 +118,7 @@ export const CartProvider = ({ children }) => {
 
       // Create a notification for the added item
       await supabase.from('notifications').insert([{
-        user_id: session.user.id,
+        user_id: userId,
         type: 'SYSTEM',
         message: `You added ${quantity}x ${product.name || 'item'} to your bag.`,
         link: '/cart'
@@ -128,7 +135,7 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (id, newQty) => {
     if (newQty < 1) return removeFromBag(id);
 
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return;
     }
@@ -147,7 +154,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromBag = async (id) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return;
     }
@@ -166,7 +173,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearBag = async () => {
-    if (!session?.user) {
+    if (!userId) {
       setCartItems([]);
       return;
     }
@@ -174,7 +181,7 @@ export const CartProvider = ({ children }) => {
       const { error } = await supabase
         .from('cart_items')
         .delete()
-        .eq('user_id', session.user.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
       setCartItems([]);

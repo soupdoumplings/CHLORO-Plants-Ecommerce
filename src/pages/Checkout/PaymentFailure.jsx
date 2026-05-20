@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import EditorialHero from '../../components/EditorialHero';
+import { productAssetImages } from '../../lib/localImages';
 
 const PaymentFailure = () => {
   return (
@@ -15,7 +17,21 @@ const PaymentFailure = () => {
     >
       <Navbar />
 
-      <main className="flex-grow flex items-center justify-center px-6 py-20 mt-[82px] lg:mt-[100px]">
+      <main className="flex-grow mt-[82px] lg:mt-[100px]">
+        <EditorialHero
+          eyebrow="Payment Recovery"
+          title="Payment"
+          italic="Interrupted"
+          copy="Your cart is still saved. Review the likely causes, then retry checkout or return to your bag without losing the selection."
+          image={productAssetImages.vessel}
+          imageAlt="Ceramic vessel"
+          meta={[
+            { label: 'Cart', value: 'Preserved' },
+            { label: 'Next Step', value: 'Retry' },
+          ]}
+        />
+
+      <section className="flex items-center justify-center px-6 py-20">
         <Motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -112,6 +128,7 @@ const PaymentFailure = () => {
             </Link>
           </Motion.div>
         </Motion.div>
+      </section>
       </main>
 
       <Footer />

@@ -8,6 +8,7 @@ const NotificationContext = createContext({});
 
 export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
+  const userId = user?.id;
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [currentToast, setCurrentToast] = useState(null);
@@ -21,7 +22,7 @@ export const NotificationProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       queueMicrotask(() => {
         setNotifications([]);
         setUnreadCount(0);
@@ -34,7 +35,7 @@ export const NotificationProvider = ({ children }) => {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(50); // Keep reasonable limit
 
@@ -52,7 +53,7 @@ export const NotificationProvider = ({ children }) => {
         event: 'INSERT',
         schema: 'public',
         table: 'notifications',
-        filter: `user_id=eq.${user.id}`
+        filter: `user_id=eq.${userId}`
       }, (payload) => {
         const newNotification = payload.new;
         setNotifications(prev => [newNotification, ...prev]);
@@ -63,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
         event: 'UPDATE',
         schema: 'public',
         table: 'notifications',
-        filter: `user_id=eq.${user.id}`
+        filter: `user_id=eq.${userId}`
       }, (payload) => {
         const updatedNotification = payload.new;
 
@@ -79,9 +80,11 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, showToast]);
+  }, [userId, showToast]);
 
   const markAsRead = async (id) => {
+    if (!userId) return;
+
     // Optimistic UI update
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
@@ -90,10 +93,12 @@ export const NotificationProvider = ({ children }) => {
       .from('notifications')
       .update({ is_read: true })
       .eq('id', id)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
   };
 
   const markAllAsRead = async () => {
+    if (!userId) return;
+
     // Optimistic UI update
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     setUnreadCount(0);
@@ -101,7 +106,7 @@ export const NotificationProvider = ({ children }) => {
     await supabase
       .from('notifications')
       .update({ is_read: true })
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('is_read', false);
   };
 

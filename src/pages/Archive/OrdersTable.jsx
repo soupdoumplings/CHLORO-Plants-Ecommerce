@@ -29,7 +29,7 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-const OrdersTable = ({ orders, loading, onRefresh }) => {
+const OrdersTable = ({ orders, loading, error, onRefresh }) => {
   const [updatingId, setUpdatingId] = useState('');
   const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -130,6 +130,22 @@ const OrdersTable = ({ orders, loading, onRefresh }) => {
         {loading ? (
           <div className="p-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
             Loading Orders...
+          </div>
+        ) : error ? (
+          <div className="p-12 text-center">
+            <p className="font-label text-[11px] uppercase tracking-widest text-[#9F403D]">
+              Could not load customer orders.
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl font-body text-sm leading-6 text-[#5E6058]">
+              {error}
+            </p>
+            <button
+              type="button"
+              onClick={onRefresh}
+              className="mt-6 border border-[#31332C] px-5 py-3 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:bg-[#31332C] hover:text-white"
+            >
+              Retry
+            </button>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="p-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">

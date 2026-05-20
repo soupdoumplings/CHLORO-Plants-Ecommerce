@@ -19,7 +19,7 @@ const DiscoveryNavbar = () => {
           to="/"
           className="font-headline text-[22px] text-[#31332C] tracking-tight hover:opacity-70 transition-opacity"
         >
-          Petals & Pots
+          CHLORO
         </Link>
 
         <div className="hidden md:flex items-center gap-7">

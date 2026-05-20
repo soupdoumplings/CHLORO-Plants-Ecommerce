@@ -48,6 +48,17 @@ const getPosition = () => (
   })
 );
 
+const getPermissionState = async () => {
+  if (!navigator.permissions?.query) return 'prompt';
+
+  try {
+    const permission = await navigator.permissions.query({ name: 'geolocation' });
+    return permission.state;
+  } catch {
+    return 'prompt';
+  }
+};
+
 const reverseGeocodeWithNominatim = async ({ latitude, longitude }) => {
   const params = new URLSearchParams({
     format: 'jsonv2',
@@ -153,6 +164,11 @@ export const GeoLocationProvider = ({ children }) => {
     setLoading(true);
 
     try {
+      const permissionState = await getPermissionState();
+      if (permissionState === 'denied') {
+        throw new Error('Location permission is blocked. Enable it from browser site settings, or enter the address manually.');
+      }
+
       const position = await getPosition();
       const coordinates = {
         latitude: position.coords.latitude,

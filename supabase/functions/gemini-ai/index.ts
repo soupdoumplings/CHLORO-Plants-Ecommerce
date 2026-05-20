@@ -6,7 +6,8 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_AP
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const PRODUCT_CONTEXT_LIMIT = 12;
+const PRODUCT_CONTEXT_LIMIT = 20;
+const PRODUCT_FETCH_LIMIT = 40;
 
 const supabase = SUPABASE_URL && SERVICE_ROLE_KEY
   ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
@@ -39,6 +40,19 @@ const diagnosisSchema = {
     },
     causes: { type: 'array', maxItems: 3, items: { type: 'string' } },
     immediateActions: { type: 'array', maxItems: 4, items: { type: 'string' } },
+    recoveryProtocol: {
+      type: 'array',
+      minItems: 3,
+      maxItems: 4,
+      items: {
+        type: 'object',
+        properties: {
+          timing: { type: 'string' },
+          step: { type: 'string' },
+        },
+        required: ['timing', 'step'],
+      },
+    },
     carePlan: {
       type: 'array',
       maxItems: 4,
@@ -79,7 +93,7 @@ const diagnosisSchema = {
     'likelyProblems',
     'causes',
     'immediateActions',
-    'carePlan',
+    'recoveryProtocol',
     'nepalNotes',
     'prevention',
     'productRecommendations',
@@ -173,13 +187,88 @@ const extractNumberField = (text, field, fallback = 0) => {
 
 const asArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : []);
 
+const includesAny = (text, terms) => terms.some((term) => text.includes(term));
+
+const getDiagnosisIssueType = (text) => {
+  const lower = cleanText(text, 2000).toLowerCase();
+
+  if (includesAny(lower, ['pest', 'insect', 'mite', 'webbing', 'sticky', 'scale', 'thrip', 'aphid', 'chewed', 'holes', 'feeding'])) return 'pest';
+  if (includesAny(lower, ['fungal', 'fungus', 'spot', 'spots', 'lesion', 'blight', 'mildew', 'mold', 'rot spreading'])) return 'fungal';
+  if (includesAny(lower, ['overwater', 'waterlogged', 'root rot', 'soggy', 'mushy', 'yellow lower', 'drainage'])) return 'overwatering';
+  if (includesAny(lower, ['underwater', 'dry', 'crispy', 'curling', 'wilted', 'shrivel', 'brown tip', 'brown edge'])) return 'dryness';
+  if (includesAny(lower, ['sunburn', 'scorch', 'bleached', 'direct sun', 'burnt', 'pale patch'])) return 'light-stress';
+  if (includesAny(lower, ['nutrient', 'chlorosis', 'pale leaves', 'deficiency', 'yellowing'])) return 'nutrition';
+
+  return 'general';
+};
+
+const buildDynamicRecoveryProtocol = (source) => {
+  const text = typeof source === 'string'
+    ? source
+    : [
+      source?.summary,
+      source?.plantLikely,
+      source?.severity,
+      ...asArray(source?.causes),
+      ...asArray(source?.immediateActions),
+      ...asArray(source?.nepalNotes),
+      ...asArray(source?.prevention),
+      ...asArray(source?.likelyProblems).flatMap((item) => [item.name, item.evidence]),
+    ].join(' ');
+
+  switch (getDiagnosisIssueType(text)) {
+    case 'pest':
+      return [
+        { timing: 'Today', step: 'Isolate the plant and inspect leaf undersides, stems, and new growth for pests.' },
+        { timing: 'After inspection', step: 'Wipe visible residue with a damp cloth; test neem spray on one small leaf area.' },
+        { timing: 'In 48 hours', step: 'Recheck for fresh bite marks, webbing, or sticky residue before repeating treatment.' },
+      ];
+    case 'fungal':
+      return [
+        { timing: 'Today', step: 'Remove the worst spotted leaves with clean scissors and keep foliage dry.' },
+        { timing: 'Next watering', step: 'Water soil only; avoid misting while spots are spreading.' },
+        { timing: 'This week', step: 'Increase airflow and move the plant away from humid corners or crowded plants.' },
+      ];
+    case 'overwatering':
+      return [
+        { timing: 'Today', step: 'Pause watering and check that drainage holes are open and soil is not soggy.' },
+        { timing: 'Next watering', step: 'Water only after the topsoil dries and excess water can drain fully.' },
+        { timing: 'This week', step: 'Move to bright indirect light and monitor yellowing or soft stems.' },
+      ];
+    case 'dryness':
+      return [
+        { timing: 'Today', step: 'Trim crisp edges only if fully dry, then check whether the root ball is pulling away.' },
+        { timing: 'Next watering', step: 'Water slowly at soil level until evenly moist, then drain completely.' },
+        { timing: 'This week', step: 'Stabilize humidity and keep the plant away from hot windows or dry drafts.' },
+      ];
+    case 'light-stress':
+      return [
+        { timing: 'Today', step: 'Move the plant out of direct sun and leave scorched tissue attached unless fully dry.' },
+        { timing: 'Next watering', step: 'Keep watering normal; do not compensate for sun damage with extra water.' },
+        { timing: 'This week', step: 'Use bright indirect light and watch new leaves for healthier color.' },
+      ];
+    case 'nutrition':
+      return [
+        { timing: 'Today', step: 'Check soil moisture and pests first; do not fertilize a stressed or soggy plant.' },
+        { timing: 'Next watering', step: 'Flush gently if salts are visible, then return to a steady watering rhythm.' },
+        { timing: 'This month', step: 'Feed lightly only after new growth resumes and light is stable.' },
+      ];
+    default:
+      return [
+        { timing: 'Today', step: 'Isolate the plant and document the most damaged leaves before changing care.' },
+        { timing: 'Next check', step: 'Use soil moisture, leaf undersides, and stem firmness to choose the next action.' },
+        { timing: 'This week', step: 'Keep light, airflow, and watering consistent while watching for spread.' },
+      ];
+  }
+};
+
 const buildChatFallback = (rawText) => {
   const reply = extractStringField(rawText, 'reply', cleanText(rawText.replace(/[{}[\]",]/g, ' '), 420));
 
   return {
     reply: reply || 'I can help with plant care, gifts, and checkout. Please ask once more with one specific question.',
     productRecommendations: [],
-    suggestedActions: ['Open AI diagnosis', 'Find easy-care plants', 'Choose a gift'],
+    suggestedActions: ['Browse gift-ready products', 'Find easy-care plants', 'Checkout help'],
     recoveredFromMalformedJson: true,
   };
 };
@@ -191,6 +280,7 @@ const buildDiagnosisFallback = (rawText) => {
     'The image shows visible plant stress, but the AI response was incomplete. Start with cautious care: isolate the plant, inspect leaves and stems closely, and adjust watering only after checking soil moisture.',
   );
   const likelyProblem = extractStringField(rawText, 'name', 'Visible leaf stress');
+  const fallbackProtocol = buildDynamicRecoveryProtocol(`${summary} ${likelyProblem} ${rawText}`);
 
   return {
     summary,
@@ -209,11 +299,8 @@ const buildDiagnosisFallback = (rawText) => {
       'Remove badly damaged leaves with clean scissors.',
       'Wipe nearby leaves and inspect the undersides for pests.',
     ],
-    carePlan: [
-      { timing: 'Today', step: 'Isolate the specimen and remove heavily damaged leaf tissue.' },
-      { timing: 'Next watering', step: 'Water only when the topsoil has dried; avoid letting the pot sit in water.' },
-      { timing: 'This week', step: 'Improve airflow and bright indirect light, especially during humid Nepal weather.' },
-    ],
+    carePlan: fallbackProtocol,
+    recoveryProtocol: fallbackProtocol,
     nepalNotes: ['In Nepal homes, monsoon humidity can make fungal spots spread faster, while dry winter rooms can brown leaf edges.'],
     prevention: ['Avoid overhead watering.', 'Clean leaves regularly.', 'Keep the pot draining freely.'],
     productRecommendations: [],
@@ -234,6 +321,42 @@ const normalizeProduct = (product) => ({
   stock: Number(product.stock || 0),
 });
 
+const productCareScore = (product) => {
+  const text = [
+    product.name,
+    product.category,
+    product.description,
+    ...(product.tags || []),
+  ].join(' ').toLowerCase();
+
+  const careTerms = [
+    'care',
+    'tool',
+    'soil',
+    'fertilizer',
+    'feed',
+    'neem',
+    'spray',
+    'mist',
+    'meter',
+    'pruning',
+    'scissor',
+    'watering',
+    'fungal',
+    'diagnosis',
+  ];
+
+  const careScore = careTerms.reduce((score, term) => score + (text.includes(term) ? 2 : 0), 0);
+  const stockScore = product.stock > 0 ? 2 : 0;
+  return careScore + stockScore;
+};
+
+const rankProductsForPrompt = (products) => (
+  [...products]
+    .sort((a, b) => productCareScore(b) - productCareScore(a))
+    .slice(0, PRODUCT_CONTEXT_LIMIT)
+);
+
 const loadProducts = async () => {
   if (!supabase) return [];
 
@@ -243,20 +366,20 @@ const loadProducts = async () => {
       .select('id,name,price,category,tags,description,info,curator_quote,images,stock,is_active')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
-      .limit(PRODUCT_CONTEXT_LIMIT);
+      .limit(PRODUCT_FETCH_LIMIT);
 
     if (!activeResult.error) {
-      return (activeResult.data || []).map(normalizeProduct);
+      return rankProductsForPrompt((activeResult.data || []).map(normalizeProduct));
     }
 
     const fallbackResult = await supabase
       .from('products')
       .select('id,name,price,category,tags,description,info,curator_quote,images,stock')
       .order('created_at', { ascending: false })
-      .limit(PRODUCT_CONTEXT_LIMIT);
+      .limit(PRODUCT_FETCH_LIMIT);
 
     if (fallbackResult.error) throw fallbackResult.error;
-    return (fallbackResult.data || []).map(normalizeProduct);
+    return rankProductsForPrompt((fallbackResult.data || []).map(normalizeProduct));
   } catch (error) {
     console.error('Product lookup failed:', error.message);
     return [];
@@ -339,34 +462,189 @@ const attachValidProducts = (recommendations, products) => {
     .slice(0, 4);
 };
 
-const normalizeDiagnosisResult = (result) => ({
-  summary: cleanText(result.summary, 700) || 'The plant shows visible stress that needs closer inspection.',
-  plantLikely: cleanText(result.plantLikely, 120) || 'Unclear from image',
-  confidence: Number.isFinite(Number(result.confidence)) ? Number(result.confidence) : 0.5,
-  severity: ['low', 'medium', 'high', 'unclear'].includes(result.severity) ? result.severity : 'unclear',
-  likelyProblems: asArray(result.likelyProblems).slice(0, 3).map((item) => ({
-    name: cleanText(item.name, 100) || 'Visible plant stress',
-    confidence: Number.isFinite(Number(item.confidence)) ? Number(item.confidence) : 0.5,
-    evidence: cleanText(item.evidence, 240) || 'Visible symptoms in the uploaded image.',
-  })),
-  causes: asArray(result.causes).slice(0, 3).map((item) => cleanText(item, 180)),
-  immediateActions: asArray(result.immediateActions).slice(0, 4).map((item) => cleanText(item, 180)),
-  carePlan: asArray(result.carePlan).slice(0, 4).map((item) => ({
-    step: cleanText(item.step, 180) || 'Monitor the plant and adjust care gradually.',
-    timing: cleanText(item.timing, 80) || 'Next',
-  })),
-  nepalNotes: asArray(result.nepalNotes).slice(0, 3).map((item) => cleanText(item, 180)),
-  prevention: asArray(result.prevention).slice(0, 4).map((item) => cleanText(item, 180)),
-  productRecommendations: asArray(result.productRecommendations).slice(0, 3),
-  askForMoreInfo: asArray(result.askForMoreInfo).slice(0, 3).map((item) => cleanText(item, 160)),
-  disclaimer: cleanText(result.disclaimer, 300) || 'This is image-based guidance, not a definitive laboratory diagnosis.',
-  recoveredFromMalformedJson: Boolean(result.recoveredFromMalformedJson),
-});
+const hasAnyTerm = (text, terms) => terms.some((term) => text.includes(term));
 
-const normalizeChatResult = (result) => ({
+const getProductSearchText = (product) => [
+  product.name,
+  product.category,
+  product.description,
+  ...(product.tags || []),
+].join(' ').toLowerCase();
+
+const buildDiagnosisSearchText = (diagnosis) => [
+  diagnosis.summary,
+  diagnosis.plantLikely,
+  diagnosis.severity,
+  ...asArray(diagnosis.causes),
+  ...asArray(diagnosis.immediateActions),
+  ...asArray(diagnosis.nepalNotes),
+  ...asArray(diagnosis.prevention),
+  ...asArray(diagnosis.likelyProblems).flatMap((item) => [item.name, item.evidence]),
+  ...asArray(diagnosis.recoveryProtocol || diagnosis.carePlan).flatMap((item) => [item.timing, item.step]),
+].join(' ').toLowerCase();
+
+const getFallbackReason = (product, diagnosisText) => {
+  const productText = getProductSearchText(product);
+
+  if (hasAnyTerm(productText, ['neem', 'spray', 'pest']) && hasAnyTerm(diagnosisText, ['pest', 'insect', 'mite', 'sticky', 'feeding', 'holes'])) {
+    return 'Matches visible pest or insect-feeding stress and supports cautious first-response leaf care.';
+  }
+
+  if (hasAnyTerm(productText, ['pruning', 'scissor', 'fungal']) && hasAnyTerm(diagnosisText, ['remove', 'trim', 'damaged', 'infected', 'fungal', 'spot', 'lesion'])) {
+    return 'Useful for cleanly removing damaged tissue before monitoring new growth.';
+  }
+
+  if (hasAnyTerm(productText, ['meter', 'moisture']) && hasAnyTerm(diagnosisText, ['water', 'topsoil', 'overwater', 'root', 'drain', 'dry'])) {
+    return 'Helps confirm soil moisture before the next watering decision.';
+  }
+
+  if (hasAnyTerm(productText, ['watering']) && hasAnyTerm(diagnosisText, ['water', 'topsoil', 'drain'])) {
+    return 'Supports controlled soil-level watering after the recovery protocol.';
+  }
+
+  if (hasAnyTerm(productText, ['mist', 'foliar', 'humidity']) && hasAnyTerm(diagnosisText, ['humidity', 'dust', 'leaf', 'airflow'])) {
+    return 'Supports gentle foliage cleaning and humidity care when leaves are not actively rotting.';
+  }
+
+  if (hasAnyTerm(productText, ['soil', 'bark', 'root']) && hasAnyTerm(diagnosisText, ['root', 'rot', 'orchid', 'drain', 'repot'])) {
+    return 'Improves root airflow and drainage when repotting is part of recovery.';
+  }
+
+  return 'A practical care tool matched to the diagnosis and recovery protocol.';
+};
+
+const scoreProductForDiagnosis = (product, diagnosisText) => {
+  const productText = getProductSearchText(product);
+  let score = productCareScore(product);
+
+  if (!productText.includes('care') && !productText.includes('tool') && !productText.includes('diagnosis')) {
+    score -= 4;
+  }
+
+  if (product.stock > 0) score += 2;
+  if (hasAnyTerm(productText, ['neem', 'spray', 'pest']) && hasAnyTerm(diagnosisText, ['pest', 'insect', 'mite', 'sticky', 'feeding', 'holes'])) score += 10;
+  if (hasAnyTerm(productText, ['pruning', 'scissor', 'fungal']) && hasAnyTerm(diagnosisText, ['remove', 'trim', 'damaged', 'infected', 'fungal', 'spot', 'lesion'])) score += 9;
+  if (hasAnyTerm(productText, ['meter', 'moisture']) && hasAnyTerm(diagnosisText, ['water', 'topsoil', 'overwater', 'root', 'drain', 'dry'])) score += 8;
+  if (hasAnyTerm(productText, ['watering']) && hasAnyTerm(diagnosisText, ['water', 'topsoil', 'drain'])) score += 6;
+  if (hasAnyTerm(productText, ['mist', 'foliar', 'humidity']) && hasAnyTerm(diagnosisText, ['humidity', 'dust', 'leaf', 'airflow'])) score += 5;
+  if (hasAnyTerm(productText, ['soil', 'bark', 'root']) && hasAnyTerm(diagnosisText, ['root', 'rot', 'orchid', 'drain', 'repot'])) score += 7;
+
+  return score;
+};
+
+const buildFallbackProductRecommendations = (diagnosis, products) => {
+  const diagnosisText = buildDiagnosisSearchText(diagnosis);
+
+  return [...products]
+    .map((product) => ({
+      product,
+      score: scoreProductForDiagnosis(product, diagnosisText),
+    }))
+    .filter(({ product, score }) => score > 0 && product.stock > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2)
+    .map(({ product }, index) => ({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      image: product.image,
+      reason: getFallbackReason(product, diagnosisText),
+      usage: cleanText(product.description, 140) || 'Use as directed for plant recovery support.',
+      priority: index === 0 ? 'essential' : 'helpful',
+      generatedBy: 'inventory-fallback',
+    }));
+};
+
+const isGenericProtocol = (protocol) => {
+  const text = asArray(protocol)
+    .map((item) => `${item.timing || ''} ${item.step || ''}`)
+    .join(' ')
+    .toLowerCase();
+
+  return includesAny(text, [
+    'isolate the plant and remove heavily damaged leaf tissue',
+    'isolate the specimen and remove heavily damaged leaf tissue',
+    'water only when the topsoil has dried',
+    'improve airflow and bright indirect light',
+  ]);
+};
+
+const normalizeProtocol = (result) => {
+  const protocolSource = asArray(result.recoveryProtocol).length
+    ? result.recoveryProtocol
+    : asArray(result.carePlan).length
+      ? result.carePlan
+      : asArray(result.immediateActions).map((step, index) => ({
+        timing: index === 0 ? 'Today' : `Step ${index + 1}`,
+        step,
+      }));
+
+  const normalized = asArray(protocolSource).slice(0, 4).map((item, index) => ({
+    timing: cleanText(item.timing || item.label, 80) || (index === 0 ? 'Today' : `Step ${index + 1}`),
+    step: cleanText(item.step || item.text, 190) || 'Monitor the plant and adjust care gradually.',
+  }));
+
+  if (isGenericProtocol(normalized)) {
+    return buildDynamicRecoveryProtocol(result);
+  }
+
+  return normalized;
+};
+
+const normalizeDiagnosisResult = (result) => {
+  const recoveryProtocol = normalizeProtocol(result);
+
+  return {
+    summary: cleanText(result.summary, 700) || 'The plant shows visible stress that needs closer inspection.',
+    plantLikely: cleanText(result.plantLikely, 120) || 'Unclear from image',
+    confidence: Number.isFinite(Number(result.confidence)) ? Number(result.confidence) : 0.5,
+    severity: ['low', 'medium', 'high', 'unclear'].includes(result.severity) ? result.severity : 'unclear',
+    likelyProblems: asArray(result.likelyProblems).slice(0, 3).map((item) => ({
+      name: cleanText(item.name, 100) || 'Visible plant stress',
+      confidence: Number.isFinite(Number(item.confidence)) ? Number(item.confidence) : 0.5,
+      evidence: cleanText(item.evidence, 240) || 'Visible symptoms in the uploaded image.',
+    })),
+    causes: asArray(result.causes).slice(0, 3).map((item) => cleanText(item, 180)),
+    immediateActions: asArray(result.immediateActions).slice(0, 4).map((item) => cleanText(item, 180)),
+    recoveryProtocol,
+    carePlan: recoveryProtocol,
+    nepalNotes: asArray(result.nepalNotes).slice(0, 3).map((item) => cleanText(item, 180)),
+    prevention: asArray(result.prevention).slice(0, 4).map((item) => cleanText(item, 180)),
+    productRecommendations: asArray(result.productRecommendations).slice(0, 3),
+    askForMoreInfo: asArray(result.askForMoreInfo).slice(0, 3).map((item) => cleanText(item, 160)),
+    disclaimer: cleanText(result.disclaimer, 300) || 'This is image-based guidance, not a definitive laboratory diagnosis.',
+    recoveredFromMalformedJson: Boolean(result.recoveredFromMalformedJson),
+  };
+};
+
+const dedupeActions = (items) => (
+  [...new Set(asArray(items).map((item) => cleanText(item, 80)).filter(Boolean))].slice(0, 3)
+);
+
+const buildContextualChatActions = (latestMessage, actions) => {
+  const lower = cleanText(latestMessage, 500).toLowerCase();
+  const hasAny = (words) => words.some((word) => lower.includes(word));
+
+  if (hasAny(['gift', 'friend', 'send', 'present', 'birthday', 'housewarming'])) {
+    return ['Browse gift-ready products', 'Find easy-care plants', 'Checkout help'];
+  }
+
+  if (hasAny(['diagnosis', 'diagnose', 'yellow', 'drooping', 'pest', 'fungal', 'sick', 'spots'])) {
+    return ['Open AI diagnosis', 'Find care tools', 'Ask about watering'];
+  }
+
+  if (hasAny(['order', 'delivery', 'track', 'payment', 'checkout'])) {
+    return ['Open my orders', 'Checkout help', 'Browse gift-ready products'];
+  }
+
+  return dedupeActions(actions);
+};
+
+const normalizeChatResult = (result, latestMessage = '') => ({
   reply: cleanText(result.reply, 700) || 'I can help with plant care, products, gifts, and checkout.',
   productRecommendations: asArray(result.productRecommendations).slice(0, 2),
-  suggestedActions: asArray(result.suggestedActions).slice(0, 3).map((item) => cleanText(item, 80)),
+  suggestedActions: buildContextualChatActions(latestMessage, result.suggestedActions),
   recoveredFromMalformedJson: Boolean(result.recoveredFromMalformedJson),
 });
 
@@ -394,8 +672,20 @@ Local context:
 
 Product recommendation rules:
 - Recommend only products from the available CHLORO product list below.
-- If the list is empty or no item fits, return an empty productRecommendations array.
+- Prefer 1 or 2 care-tool recommendations when any listed product supports the recovery protocol.
+- If the list is empty or no listed care item fits, return an empty productRecommendations array.
 - Never invent product IDs, prices, pesticides, or medicines.
+
+Recovery protocol rules:
+- Always return recoveryProtocol with 3 concise rows for the UI.
+- Use dynamic timing labels based on the visible issue. Examples: "Today", "After inspection", "In 48 hours", "Next watering", "This week", "This month".
+- Each recoveryProtocol step must be specific to the uploaded photo, user notes, and Nepal climate context.
+- Do not reuse the same generic protocol across different diagnoses.
+- For pest damage, focus on underside inspection, residue removal, and rechecking.
+- For fungal spotting, focus on dry foliage, sterile trimming, and airflow.
+- For overwatering/root stress, focus on drainage, paused watering, and soil moisture checks.
+- For scorch/dryness, focus on light relocation, slow watering, and humidity stabilization.
+
 - Keep every string concise: summary under 55 words, care steps under 20 words each.
 - Return complete minified JSON only. No markdown.
 
@@ -417,10 +707,14 @@ ${JSON.stringify(products)}
     fallback: buildDiagnosisFallback,
   });
   const normalized = normalizeDiagnosisResult(result);
+  const attachedProducts = attachValidProducts(normalized.productRecommendations, products);
+  const productRecommendations = attachedProducts.length
+    ? attachedProducts
+    : buildFallbackProductRecommendations(normalized, products);
 
   return jsonResponse({
     ...normalized,
-    productRecommendations: attachValidProducts(normalized.productRecommendations, products),
+    productRecommendations,
     model: GEMINI_MODEL,
   });
 };
@@ -433,6 +727,7 @@ const handleChat = async (body) => {
   const transcript = messages
     .map((message) => `${message.sender === 'bot' ? 'Assistant' : 'Customer'}: ${cleanText(message.text, 520)}`)
     .join('\n');
+  const latestCustomerMessage = [...messages].reverse().find((message) => message.sender !== 'bot')?.text || '';
 
   const prompt = `
 You are Sprout, CHLORO's smart botanical shopping and care assistant for Nepal.
@@ -441,9 +736,12 @@ Answer the latest customer message using concise, friendly, practical guidance.
 Rules:
 - Be specific to Nepal when useful: Kathmandu valley, monsoon humidity, dry winter rooms, balcony sun, dust, and indoor watering.
 - For possible diseases or pests, give safe first steps and suggest the /ai-diagnosis image upload page when a visual diagnosis is needed.
+- For gift questions, use the recipient city, budget, occasion, and care level when provided. Suggest gift-ready or easy-care options and the /products-gifts page; do not suggest diagnosis unless the customer mentions symptoms or an image.
+- For delivery or checkout questions, say the recipient address can be entered at checkout, but do not promise coverage, timing, or fees unless product/order data says so.
 - Recommend only products from the CHLORO product list below. If none fit or the list is empty, return no product recommendations.
 - Do not invent stock, discounts, delivery promises, pesticides, or medical claims.
 - Keep the reply under 90 words unless the user asks for detail.
+- Suggested actions must match the latest customer intent. Avoid "Open AI diagnosis" for shopping, gifts, checkout, or order-tracking requests.
 - Return complete minified JSON only. No markdown.
 
 Current page/category context: ${context || 'General shop assistant'}
@@ -460,7 +758,7 @@ ${transcript || 'Customer: Hi'}
     maxOutputTokens: 2048,
     fallback: buildChatFallback,
   });
-  const normalized = normalizeChatResult(result);
+  const normalized = normalizeChatResult(result, latestCustomerMessage);
 
   return jsonResponse({
     ...normalized,

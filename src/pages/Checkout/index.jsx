@@ -30,7 +30,7 @@ const CheckoutPage = () => {
       postalCode: '',
     },
     sameAsShipping: true,
-    emailOrderUpdates: true,
+    emailOrderUpdates: false,
     marketingEmails: false,
   });
 
@@ -76,12 +76,12 @@ const CheckoutPage = () => {
       <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[82px] lg:mt-[100px]">
         <CheckoutHeader />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 xl:gap-32 items-start relative">
+        <div className="grid grid-cols-1 items-start gap-12 pt-14 lg:grid-cols-12 lg:gap-16 lg:pt-16 xl:gap-20">
           <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 xl:col-span-8 w-full flex justify-end"
+            className="flex w-full lg:col-span-7 xl:col-span-8"
           >
              <div className="w-full">
                <CheckoutForm
@@ -97,7 +97,7 @@ const CheckoutPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 xl:col-span-4 w-full h-full lg:static relative z-10"
+            className="relative z-10 h-full w-full lg:static lg:col-span-5 xl:col-span-4"
           >
             <CheckoutSummary paymentMethod={paymentMethod} checkoutDetails={checkoutDetails} />
           </Motion.div>

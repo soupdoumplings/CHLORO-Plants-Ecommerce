@@ -31,6 +31,22 @@ const normalizeWishlistItem = (item) => {
   };
 };
 
+const createOptimisticWishlistItem = (product, userId) => {
+  const productId = product?.id || product?.productId;
+  return normalizeWishlistItem({
+    id: `optimistic-${userId}-${productId}`,
+    product_id: productId,
+    created_at: new Date().toISOString(),
+    product: {
+      ...product,
+      id: productId,
+      image: product?.image || product?.images?.[0] || fallbackImage,
+      price: product?.rawPrice || product?.effectivePrice || product?.price || 0,
+      rawPrice: product?.rawPrice || product?.effectivePrice || product?.price || 0,
+    },
+  });
+};
+
 const attachProductsToWishlist = async (wishlistItems) => {
   const productIds = [...new Set((wishlistItems || []).map((item) => item.product_id).filter(Boolean))];
   if (!productIds.length) return wishlistItems || [];
@@ -51,6 +67,7 @@ const attachProductsToWishlist = async (wishlistItems) => {
 
 export const WishlistProvider = ({ children }) => {
   const { session } = useAuth();
+  const userId = session?.user?.id;
   const navigate = useNavigate();
   const location = useLocation();
   const [items, setItems] = useState([]);
@@ -62,7 +79,7 @@ export const WishlistProvider = ({ children }) => {
   }, [location.pathname, location.search, navigate]);
 
   const fetchWishlist = useCallback(async () => {
-    if (!session?.user) {
+    if (!userId) {
       setItems([]);
       setLoading(false);
       return;
@@ -75,7 +92,7 @@ export const WishlistProvider = ({ children }) => {
       const { data, error: fetchError } = await supabase
         .from('wishlist')
         .select('id, product_id')
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .order('id', { ascending: false });
 
       if (fetchError) throw fetchError;
@@ -87,7 +104,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     fetchWishlist();
@@ -98,7 +115,7 @@ export const WishlistProvider = ({ children }) => {
   const isWishlisted = useCallback((productId) => productIds.has(String(productId)), [productIds]);
 
   const addToWishlist = useCallback(async (product) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true };
     }
@@ -106,44 +123,63 @@ export const WishlistProvider = ({ children }) => {
     const productId = product?.id || product?.productId;
     if (!productId) return { success: false, error: 'Missing product id.' };
 
+    const optimisticItem = createOptimisticWishlistItem(product, userId);
+    let addedOptimistically = false;
+
+    setItems((current) => {
+      if (current.some((item) => String(item.productId) === String(productId))) {
+        return current;
+      }
+      addedOptimistically = true;
+      return [optimisticItem, ...current];
+    });
+
     try {
       const { error: insertError } = await supabase
         .from('wishlist')
         .upsert({
-          user_id: session.user.id,
+          user_id: userId,
           product_id: productId,
         }, { onConflict: 'user_id,product_id' });
 
       if (insertError) throw insertError;
-      await fetchWishlist();
       return { success: true };
     } catch (err) {
+      if (addedOptimistically) {
+        setItems((current) => current.filter((item) => String(item.productId) !== String(productId)));
+      }
       setError(err.message || 'Could not save wishlist item.');
       return { success: false, error: err.message };
     }
-  }, [fetchWishlist, redirectToLogin, session]);
+  }, [redirectToLogin, userId]);
 
   const removeFromWishlist = useCallback(async (productId) => {
-    if (!session?.user) {
+    if (!userId) {
       redirectToLogin();
       return { success: false, requiresAuth: true };
     }
+
+    let previousItems = [];
+    setItems((current) => {
+      previousItems = current;
+      return current.filter((item) => String(item.productId) !== String(productId));
+    });
 
     try {
       const { error: deleteError } = await supabase
         .from('wishlist')
         .delete()
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .eq('product_id', productId);
 
       if (deleteError) throw deleteError;
-      setItems((current) => current.filter((item) => String(item.productId) !== String(productId)));
       return { success: true };
     } catch (err) {
+      setItems(previousItems);
       setError(err.message || 'Could not remove wishlist item.');
       return { success: false, error: err.message };
     }
-  }, [redirectToLogin, session]);
+  }, [redirectToLogin, userId]);
 
   const toggleWishlist = useCallback(async (product) => {
     const productId = product?.id || product?.productId;

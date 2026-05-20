@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage } from '../../lib/localImages';
+import { getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 const Archive = () => {
   const [products, setProducts] = useState([]);
@@ -17,7 +18,7 @@ const Archive = () => {
           .select('*')
           .eq('is_active', true)
           .order('created_at', { ascending: false })
-          .limit(3);
+          .limit(6);
 
         if (error) throw error;
         setProducts(data || []);
@@ -34,11 +35,20 @@ const Archive = () => {
   const normalizeProduct = (item) => ({
     id: item.id,
     name: item.name,
-    price: Number(item.price || 0).toLocaleString('en-NP', {
+    price: getEffectivePrice(item).toLocaleString('en-NP', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }),
-    category: item.category || item.description || 'Botanical Specimen',
+    originalPrice: hasActiveSale(item)
+      ? Number(item.price || 0).toLocaleString('en-NP', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      : null,
+    rawPrice: getEffectivePrice(item),
+    isOnSale: hasActiveSale(item),
+    saleEndsAt: item.sale_ends_at,
+    category: item.category || item.description || 'Indoor Plant',
     image: item.images?.[0] || fallbackCatalogImage,
   });
 
@@ -63,7 +73,7 @@ const Archive = () => {
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
               className="font-headline text-[46px] md:text-[66px] xl:text-[76px] leading-[0.94] tracking-tight text-[#31332c]"
             >
-              More plants ready to take home.
+              Plants, care tools, and gifts ready to take home.
             </Motion.h2>
           </div>
           <div className="lg:col-span-4 flex flex-col md:flex-row lg:flex-col xl:flex-row md:items-center lg:items-start xl:items-center justify-between gap-6">
@@ -74,7 +84,7 @@ const Archive = () => {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="font-body text-[#5e6058] leading-relaxed text-[15px] max-w-[390px]"
             >
-              Browse recent arrivals and active listings from the collection.
+              Browse recent arrivals across living plants, care essentials, vessels, and gift-ready pieces.
             </Motion.p>
             <Motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -106,7 +116,7 @@ const Archive = () => {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-24 text-[#5e6058] font-label text-[11px] uppercase tracking-widest">
-            No products found. Add plants from the admin panel.
+            No products found. Add plants, care tools, or gifts from the admin panel.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">

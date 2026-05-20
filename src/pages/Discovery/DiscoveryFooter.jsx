@@ -45,7 +45,7 @@ const DiscoveryFooter = () => {
             className="col-span-2 md:col-span-1 space-y-5"
           >
             <h3 className="font-headline text-[22px] text-[#1A1A1A] tracking-tight">
-              Petals & Pots
+              CHLORO
             </h3>
             <p className="font-body text-[13px] text-[#4A4A4A]/70 leading-relaxed max-w-[240px]">
               Curating life's botanical masterworks since 2012.
@@ -122,14 +122,14 @@ const DiscoveryFooter = () => {
                 className="flex items-center gap-2 font-label text-[11px] tracking-[0.04em] uppercase text-[#4A4A4A]/70 hover:text-[#C5A059] transition-colors duration-300"
               >
                 <span className="material-symbols-outlined text-[16px]">photo_camera</span>
-                Petals & Pots Official
+                CHLORO Official
               </a>
               <a
                 href="#"
                 className="flex items-center gap-2 font-label text-[11px] tracking-[0.04em] uppercase text-[#4A4A4A]/70 hover:text-[#C5A059] transition-colors duration-300"
               >
                 <span className="material-symbols-outlined text-[16px]">share</span>
-                @petalsandpots
+                @chloro.plants
               </a>
             </div>
           </Motion.div>
@@ -144,7 +144,7 @@ const DiscoveryFooter = () => {
           className="pt-8 border-t border-[#B0B0A8]/10 flex flex-col sm:flex-row justify-between items-center gap-4"
         >
           <p className="font-label text-[9px] tracking-[0.12em] uppercase text-[#4A4A4A]/40 font-medium">
-            © 2024 Petals & Pots. All rights reserved.
+            2026 CHLORO. All rights reserved.
           </p>
           <div className="flex gap-8">
             <a

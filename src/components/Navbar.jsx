@@ -38,16 +38,25 @@ const Navbar = () => {
   const notificationsRef = useRef(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Close search on route change
   useEffect(() => {
-    const closeSearch = window.setTimeout(() => setSearchOpen(false), 0);
-    return () => window.clearTimeout(closeSearch);
+    const closeRouteUi = window.setTimeout(() => {
+      setSearchOpen(false);
+      setMobileMenuOpen(false);
+    }, 0);
+    return () => window.clearTimeout(closeRouteUi);
   }, [location.pathname]);
 
   // Escape key closes search
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setSearchOpen(false); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -78,6 +87,15 @@ const Navbar = () => {
   const border = "border-[#FBF9F4]/20";
   const accentText = "text-[#c6e9e9]";
   const hoverAccent = "hover:text-[#F58700]";
+  const mobileLinks = isAdmin
+    ? [{ label: 'Admin', to: '/archive', icon: 'admin_panel_settings' }]
+    : [
+      { label: 'Home', to: '/', icon: 'home' },
+      { label: 'Shop', to: '/discovery', icon: 'local_florist' },
+      { label: 'Gifts', to: '/products-gifts', icon: 'redeem' },
+      { label: 'AI Diagnosis', to: '/ai-diagnosis', icon: 'psychiatry' },
+      ...(user ? [{ label: 'Journal', to: '/journal', icon: 'article' }] : []),
+    ];
 
   return (
     <>
@@ -85,11 +103,11 @@ const Navbar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between page-gutter-tight transition-all duration-500 cursor-auto`}
+        className={`fixed top-0 left-0 right-0 h-[82px] ${bg} border-b ${border} z-50 flex items-center justify-between px-4 sm:px-6 lg:px-[5vw] transition-all duration-500 cursor-auto`}
       >
-        <div className="flex items-center gap-12">
+        <div className="flex min-w-0 items-center gap-6 lg:gap-12">
           {/* Branding */}
-          <Link to={isAdmin ? "/archive" : "/"} className={`font-headline text-2xl ${text} hover:opacity-70 transition-opacity`}>
+          <Link to={isAdmin ? "/archive" : "/"} className={`shrink-0 font-headline text-[27px] sm:text-2xl ${text} hover:opacity-70 transition-opacity`}>
             CHLORO
           </Link>
 
@@ -150,7 +168,7 @@ const Navbar = () => {
         )}
 
         {/* Utilities */}
-        <div className="flex items-center gap-6">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:gap-6">
           {!isAdmin && (
             <Motion.button
               onClick={() => setSearchOpen(true)}
@@ -165,15 +183,15 @@ const Navbar = () => {
             </Motion.button>
           )}
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className={`material-symbols-outlined ${text} hover:${accentText} transition-colors relative flex items-center justify-center outline-none`}
+                      className={`${text} hover:${accentText} transition-colors relative flex h-9 w-9 items-center justify-center outline-none`}
                       title="Notifications"
                     >
-                      notifications
+                      <span className="material-symbols-outlined text-[24px]">notifications</span>
                       <AnimatePresence>
                         {unreadCount > 0 && (
                           <Motion.span
@@ -196,7 +214,7 @@ const Navbar = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-12 right-0 w-80 bg-[#0F3A3A] border border-[#FBF9F4]/20 shadow-2xl overflow-hidden flex flex-col z-50 cursor-auto"
+                          className="fixed left-3 right-3 top-[92px] max-h-[calc(100vh-112px)] bg-[#0F3A3A] border border-[#FBF9F4]/20 shadow-2xl overflow-hidden flex flex-col z-50 cursor-auto sm:left-auto sm:right-4 sm:w-[min(360px,calc(100vw-32px))] md:absolute md:left-auto md:right-0 md:top-12 md:max-h-none md:w-80"
                         >
                           <div className="flex items-center justify-between p-4 border-b border-[#FBF9F4]/20 bg-[#0A2E2E]">
                             <h3 className="font-headline text-[#FBF9F4] text-sm uppercase tracking-wider">Notifications</h3>
@@ -210,7 +228,7 @@ const Navbar = () => {
                             )}
                           </div>
 
-                          <div className="max-h-[360px] overflow-y-auto no-scrollbar">
+                          <div className="max-h-[min(360px,calc(100vh-210px))] overflow-y-auto no-scrollbar">
                             {notifications.length === 0 ? (
                               <div className="p-6 text-center text-[#FBF9F4]/50 font-label text-xs uppercase tracking-widest">
                                 No notifications yet
@@ -264,46 +282,139 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {!isAdmin && (
-                  <Link to="/cart" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors relative flex items-center justify-center`} title="Cart">
-                    shopping_bag
-                    <AnimatePresence>
-                      {cartCount > 0 && (
-                        <Motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          transition={{ type: 'spring', stiffness: 500 }}
-                          className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
-                        >
-                          {cartCount}
-                        </Motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                )}
-
-            {!user ? (
-              <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
-                LOGIN
+            {!isAdmin && (
+              <Link to="/cart" className={`${text} hover:text-[#628141] transition-colors relative flex h-9 w-9 items-center justify-center`} title="Cart">
+                <span className="material-symbols-outlined text-[24px]">shopping_bag</span>
+                <AnimatePresence>
+                  {cartCount > 0 && (
+                    <Motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
+                      className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                    >
+                      {cartCount}
+                    </Motion.span>
+                  )}
+                </AnimatePresence>
               </Link>
-            ) : (
-              <>
-                <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
-                  person
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
-                  title="Logout"
-                >
-                  logout
-                </button>
-              </>
             )}
+
+            <div className="hidden items-center gap-4 md:flex">
+              {!user ? (
+                <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
+                  LOGIN
+                </Link>
+              ) : (
+                <>
+                  <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
+                    person
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
+                    title="Logout"
+                  >
+                    logout
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              className={`md:hidden ${text} hover:text-[#C6E9E9] transition-colors flex h-9 w-9 items-center justify-center`}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+            >
+              <span className="material-symbols-outlined text-[26px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
         </div>
       </Motion.nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <Motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed left-0 right-0 top-[82px] z-40 border-b border-[#FBF9F4]/15 bg-[#0F3A3A] shadow-2xl shadow-black/20 md:hidden"
+          >
+            <div className="page-gutter-tight py-5">
+              <div className="grid gap-2">
+                {mobileLinks.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 transition-colors ${
+                      location.pathname === item.to ? 'bg-[#FBF9F4] text-[#0F3A3A]' : 'text-[#FBF9F4]/82 hover:bg-[#FBF9F4]/8'
+                    }`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">{item.label}</span>
+                    </span>
+                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                  </Link>
+                ))}
+              </div>
+
+              {!isAdmin && (
+                <div className="mt-3 grid gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center justify-between border border-[#FBF9F4]/12 px-4 py-4 text-[#FBF9F4]/82 transition-colors hover:bg-[#FBF9F4]/8"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[18px]">search</span>
+                      <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em]">Search Catalogue</span>
+                    </span>
+                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                  </button>
+
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-3 border-t border-[#FBF9F4]/12 pt-4">
+                {!user ? (
+                  <Link
+                    to="/login"
+                    className="bg-[#FBF9F4] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A]"
+                  >
+                    Login
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="bg-[#FBF9F4] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A]"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="border border-[#FBF9F4]/40 px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#FBF9F4]"
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search Overlay — rendered outside nav so it covers full screen */}
       <AnimatePresence>

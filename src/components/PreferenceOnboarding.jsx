@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { usePlantPreferences } from '../lib/PlantPreferencesContext';
 import { DEFAULT_PLANT_PREFERENCES, preferenceOptions } from '../lib/plantPreferences';
@@ -27,7 +28,7 @@ const steps = [
     key: 'space',
     eyebrow: 'Space',
     title: 'Where will your plant mostly live?',
-    copy: 'Scale matters: shelf plants and floor specimens solve different problems.',
+    copy: 'Scale matters: shelf plants and floor plants solve different problems.',
   },
 ];
 
@@ -95,8 +96,16 @@ const PreferenceOnboarding = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-[760px] bg-[#FBF9F4] border border-[#FBF9F4]/40 shadow-2xl"
+            className="w-full max-w-[760px] bg-[#FBF9F4] border border-[#FBF9F4]/40 shadow-2xl relative"
           >
+            <button
+              type="button"
+              onClick={() => setDismissed(true)}
+              className="absolute right-5 top-5 z-30 text-[#1A1A1A]/30 transition-colors hover:text-[#1A1A1A]"
+              aria-label="Skip preferences"
+            >
+              <X size={20} />
+            </button>
             <div className="grid grid-cols-1 md:grid-cols-[220px_1fr]">
               <aside className="bg-[#0F3A3A] p-7 text-[#FBF9F4] flex flex-col justify-between gap-10">
                 <div>
@@ -104,7 +113,7 @@ const PreferenceOnboarding = () => {
                     Plant Fit
                   </p>
                   <h2 className="font-headline text-[32px] leading-none">
-                    Personalise your archive.
+                    Personalise your plant picks.
                   </h2>
                 </div>
                 <div className="space-y-3">
@@ -179,14 +188,31 @@ const PreferenceOnboarding = () => {
                 )}
 
                 <div className="flex items-center justify-between gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
-                    disabled={stepIndex === 0}
-                    className="font-label text-[10px] uppercase tracking-[0.16em] text-[#5E6058] disabled:opacity-30"
-                  >
-                    Back
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
+                      disabled={stepIndex === 0}
+                      className="font-label text-[10px] uppercase tracking-[0.16em] text-[#5E6058] transition-colors hover:text-[#1A1A1A] disabled:opacity-30 disabled:hover:text-[#5E6058]"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // FIX: Advances to the next question instead of closing the whole modal.
+                        // This allows users to skip specific preferences while continuing the flow.
+                        if (stepIndex < steps.length - 1) {
+                          setStepIndex(stepIndex + 1);
+                        } else {
+                          handleSave();
+                        }
+                      }}
+                      className="font-label text-[10px] uppercase tracking-[0.16em] text-[#5E6058]/50 hover:text-[#1A1A1A] transition-colors"
+                    >
+                      Skip
+                    </button>
+                  </div>
                   {stepIndex < steps.length - 1 ? (
                     <button
                       type="button"

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabase';
 
 const AuthContext = createContext({});
@@ -8,7 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null); // null means role is currently being fetched
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [loading, setLoading] = useState(true);
+  const hydratedUserIdRef = useRef(null);
+  const currentSessionUserIdRef = useRef(null);
+  const currentSessionAccessTokenRef = useRef(null);
 
   useEffect(() => {
     const fetchRole = async (currentUser) => {
@@ -17,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const { data, error } = await supabase.from('users').select('role').eq('id', currentUser.id).single();
+        const { data, error } = await supabase.from('users').select('role').eq('id', currentUser.id).maybeSingle();
         if (!error && data) {
           setIsAdmin(data.role === 'ADMIN');
         } else {
@@ -31,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     // Ensure the user has a row in public.users (fixes foreign key errors for cart, orders, etc.)
     const ensureUserProfile = async (currentUser) => {
       if (!currentUser) return;
-      const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).single();
+      const { data } = await supabase.from('users').select('id').eq('id', currentUser.id).maybeSingle();
       if (!data) {
         const name = currentUser.user_metadata?.full_name
           || currentUser.user_metadata?.name
@@ -47,9 +51,9 @@ export const AuthProvider = ({ children }) => {
         const phoneRow = currentUser.phone || currentUser.user_metadata?.phone
           ? { ...baseRow, phone: currentUser.phone || currentUser.user_metadata?.phone }
           : baseRow;
-        const { error: insertError } = await supabase.from('users').insert([phoneRow]);
+        const { error: insertError } = await supabase.from('users').upsert(phoneRow, { onConflict: 'id' });
         if (insertError && phoneRow.phone) {
-          await supabase.from('users').insert([baseRow]);
+          await supabase.from('users').upsert(baseRow, { onConflict: 'id' });
         }
       }
     };
@@ -66,13 +70,17 @@ export const AuthProvider = ({ children }) => {
 
     // Get initial session quickly; hydrate role/profile in background
     supabase.auth.getSession().then(({ data: { session } }) => {
+      currentSessionUserIdRef.current = session?.user?.id ?? null;
+      currentSessionAccessTokenRef.current = session?.access_token ?? null;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false); // instantly unblock global loading
 
       if (session?.user) {
+        hydratedUserIdRef.current = session.user.id;
         hydrateUserMeta(session.user);
       } else {
+        hydratedUserIdRef.current = null;
         setIsAdmin(false);
       }
     }).catch((err) => {
@@ -84,16 +92,47 @@ export const AuthProvider = ({ children }) => {
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        const nextUser = session?.user ?? null;
+        const nextUserId = nextUser?.id ?? null;
+        const nextAccessToken = session?.access_token ?? null;
+        const isDuplicateFocusEvent = Boolean(
+          nextUserId
+          && nextUserId === currentSessionUserIdRef.current
+          && nextAccessToken === currentSessionAccessTokenRef.current
+          && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        );
+
+        if (isDuplicateFocusEvent) {
+          setLoading(false);
+          return;
+        }
+
+        currentSessionUserIdRef.current = nextUserId;
+        currentSessionAccessTokenRef.current = nextAccessToken;
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(nextUser);
         setLoading(false); // ensure global loading is false
 
-        if (session?.user) {
-          if (event === 'SIGNED_IN') {
+        if (nextUser) {
+          if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true);
+          const isNewUser = hydratedUserIdRef.current !== nextUser.id;
+          const shouldHydrate = (
+            isNewUser
+            || event === 'USER_UPDATED'
+            || event === 'PASSWORD_RECOVERY'
+          );
+
+          if (event === 'SIGNED_IN' && isNewUser) {
             setIsAdmin(null); // Re-fetch role on new login
           }
-          hydrateUserMeta(session.user);
+
+          if (shouldHydrate) {
+            hydratedUserIdRef.current = nextUser.id;
+            hydrateUserMeta(nextUser);
+          }
         } else {
+          hydratedUserIdRef.current = null;
+          setIsPasswordRecovery(false);
           setIsAdmin(false);
         }
       }
@@ -127,10 +166,10 @@ export const AuthProvider = ({ children }) => {
         role: 'USER'
       };
       const userRow = normalizedPhone ? { ...baseUserRow, phone: normalizedPhone } : baseUserRow;
-      let { error: dbError } = await supabase.from('users').insert([userRow]);
+      let { error: dbError } = await supabase.from('users').upsert(userRow, { onConflict: 'id' });
       // Backward-compatible fallback if the users table doesn't have a phone column yet.
       if (dbError && normalizedPhone) {
-        const fallback = await supabase.from('users').insert([baseUserRow]);
+        const fallback = await supabase.from('users').upsert(baseUserRow, { onConflict: 'id' });
         dbError = fallback.error;
       }
       // If db fails, console log but don't strictly crash the sign up
@@ -163,36 +202,47 @@ export const AuthProvider = ({ children }) => {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      const message = String(error.message || '').toLowerCase();
+      if (message.includes('sms') || message.includes('phone') || message.includes('provider')) {
+        throw new Error('Phone OTP needs an SMS provider in Supabase. For the free-tier demo, use password login and save the phone number in profile or checkout.');
+      }
+      throw error;
+    }
     return data;
   };
 
-  const signInWithEmailOtp = async (email) => {
+  const sendPasswordResetOtp = async (email) => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       throw new Error('Enter a valid email address.');
     }
 
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: normalizedEmail,
-      options: {
-        shouldCreateUser: false,
-      },
-    });
-
+    const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
     if (error) throw error;
     return data;
   };
 
-  const verifyEmailOtp = async (email, token) => {
+  const verifyEmailOtp = async (email, token, type = 'email') => {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     const { data, error } = await supabase.auth.verifyOtp({
       email: normalizedEmail,
       token: String(token || '').trim(),
-      type: 'email',
+      type,
     });
 
     if (error) throw error;
+    if (type === 'recovery') setIsPasswordRecovery(true);
+    return data;
+  };
+
+  const updatePassword = async (newPassword) => {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) throw error;
+    setIsPasswordRecovery(false);
     return data;
   };
 
@@ -225,7 +275,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, signInWithEmailOtp, verifyEmailOtp }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, isPasswordRecovery, loading, signUp, signIn, signOut, signInWithProvider, signInWithPhone, verifyPhoneOtp, verifyEmailOtp, sendPasswordResetOtp, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

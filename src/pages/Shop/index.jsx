@@ -56,7 +56,7 @@ const ShopPage = () => {
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#785A1A] font-bold inline-block"
               >
-                Botanical Archive
+                Plant Shop
               </Motion.span>
               <Motion.h1
                 initial={{ opacity: 0, y: 40 }}
@@ -64,7 +64,7 @@ const ShopPage = () => {
                 transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="font-headline text-8xl md:text-9xl tracking-tighter text-[#31332C] leading-none"
               >
-                The <span className="italic font-light">Specimens.</span>
+                Plants <span className="italic font-light">& Gifts.</span>
               </Motion.h1>
               <Motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ const ShopPage = () => {
                 transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="font-body text-[#5E6058] text-lg max-w-md leading-relaxed"
               >
-                 A curated selection of the finest flora from the Himalayan foothills and beyond. Each specimen is selected for its architectural presence and botanical soul.
+                 Shop indoor plants, pots, and care pieces selected for Nepal homes, balconies, and everyday routines.
               </Motion.p>
            </div>
 

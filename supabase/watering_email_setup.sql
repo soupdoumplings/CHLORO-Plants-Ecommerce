@@ -30,10 +30,9 @@ CREATE POLICY "Users can update own notifications" ON public.notifications
     FOR UPDATE USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
--- Service role (edge functions) can insert notifications for any user
+-- Edge functions use SUPABASE_SERVICE_ROLE_KEY, which bypasses RLS.
+-- Do not add a broad authenticated insert policy here.
 DROP POLICY IF EXISTS "Service can insert notifications" ON public.notifications;
-CREATE POLICY "Service can insert notifications" ON public.notifications
-    FOR INSERT WITH CHECK (true);
 
 -- Enable realtime for the notifications table (powers the toast/bell in the app)
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;

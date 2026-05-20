@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../supabase';
-import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl } from '../../lib/paymentUtils';
+import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, getBaseUrl, isKhaltiConfigured } from '../../lib/paymentUtils';
 import { saveCheckoutBillingDetails } from '../../lib/customerProfile';
+import { sendOrderEmailNotification } from '../../lib/orderNotifications';
 
 const paymentLabels = {
   card: { text: 'Pay Securely', color: '#1A1A1A' },
@@ -66,18 +67,6 @@ const createOrderWithConsentFallback = async (payload) => {
   return insertOrder(compatiblePayload);
 };
 
-const sendOrderEmailNotification = async ({ orderId, enabled }) => {
-  if (!enabled) return;
-
-  const { error } = await supabase.functions.invoke('order-email-notifications', {
-    body: { orderId },
-  });
-
-  if (error) {
-    console.warn('Order email notification was not sent:', error.message);
-  }
-};
-
 const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
   const navigate = useNavigate();
   const { cartItems, clearBag } = useCart();
@@ -103,7 +92,12 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     }
 
     if (paymentMethod === 'card') {
-      setError('Card payments are not fully integrated yet. Please use eSewa, Khalti, or COD.');
+      setError('Card payments are coming soon. Please use eSewa or COD.');
+      return;
+    }
+
+    if (paymentMethod === 'khalti' && !isKhaltiConfigured()) {
+      setError('Khalti is not configured for this local build yet. Add a sandbox key or use eSewa/COD.');
       return;
     }
 
@@ -174,11 +168,6 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
 
-      await sendOrderEmailNotification({
-        orderId: order.id,
-        enabled: visibleCheckoutDetails.emailOrderUpdates,
-      });
-
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
           totalAmount: total,
@@ -187,16 +176,16 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
-          failureUrl: `${baseUrl}/payment/failure`,
+          successUrl: `${baseUrl}/payment/success?method=esewa&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
+          failureUrl: `${baseUrl}/payment/failure?order_id=${order.id}`,
         });
       } else if (paymentMethod === 'khalti') {
         try {
           const result = await initiateKhaltiPayment({
             amount: total * 100, // Convert to paisa
             purchaseOrderId: transactionId,
-            purchaseOrderName: `Petals & Pots Order ${transactionId}`,
-            returnUrl: `${baseUrl}/payment/success?order_id=${order.id}`,
+            purchaseOrderName: `CHLORO Order ${transactionId}`,
+            returnUrl: `${baseUrl}/payment/success?method=khalti&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
             websiteUrl: baseUrl,
           });
 
@@ -211,6 +200,10 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           setProcessing(false);
         }
       } else if (paymentMethod === 'cod') {
+        await sendOrderEmailNotification({
+          orderId: order.id,
+          enabled: visibleCheckoutDetails.emailOrderUpdates,
+        });
         await clearBag();
         navigate(`/payment/success?method=cod&order_id=${order.id}&ref=${transactionId}&amount=${total}`);
       }
@@ -231,7 +224,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="bg-white p-8 lg:p-14 border border-[#B0B0A8]/20 shadow-sm w-full lg:sticky lg:top-[120px]"
     >
-      <h3 className="font-label text-[10px] tracking-[0.2em] uppercase text-[#4A4A4A] font-bold mb-10">
+      <h3 className="mb-10 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-[#4A4A4A]">
         Your Order
       </h3>
 
@@ -246,14 +239,14 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
               </div>
               <div className="flex flex-col flex-1 pt-1 justify-between h-full min-h-[92px]">
                 <div>
-                  <h4 className="font-headline text-[17px] text-[#1A1A1A] leading-snug w-[120px]">
+                  <h4 className="w-[150px] font-headline text-[21px] leading-snug text-[#1A1A1A]">
                     {item.name}
                   </h4>
-                  <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] mt-2 max-w-[100px] leading-relaxed">
+                  <p className="mt-2 max-w-[130px] font-label text-[9px] uppercase tracking-[0.15em] text-[#6B6B6B] leading-relaxed">
                     {item.variant} x {item.quantity}
                   </p>
                 </div>
-                <p className="font-headline text-[15px] text-[#1A1A1A] tracking-tight mt-auto">
+                <p className="mt-auto font-headline text-[17px] tracking-tight text-[#1A1A1A]">
                   रू {(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
@@ -263,17 +256,17 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       </div>
 
       <div className="space-y-5 mb-10 border-b border-[#B0B0A8]/20 pb-10">
-        <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+        <div className="flex items-center justify-between font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">
           <span>Subtotal</span>
           <span className="text-[#1A1A1A]">रू {subtotal.toFixed(2)}</span>
         </div>
 
-        <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold leading-tight">
-          <span>Shipping <span className="text-[#6B6B6B]/70 capitalize tracking-normal text-[10px] font-medium ml-1">(Editorial Rate)</span></span>
+        <div className="flex items-center justify-between font-label text-[10px] font-semibold uppercase leading-tight tracking-[0.15em] text-[#4A4A4A]">
+          <span>Shipping <span className="ml-1 text-[11px] font-medium capitalize tracking-normal text-[#6B6B6B]/70">(Editorial Rate)</span></span>
           <span className="text-[#1A1A1A]">रू {shipping.toFixed(2)}</span>
         </div>
 
-        <div className="flex justify-between items-center font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-semibold">
+        <div className="flex items-center justify-between font-label text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4A4A4A]">
           <span>Taxes</span>
           <span className="text-[#1A1A1A]">रू 0.00</span>
         </div>
@@ -295,7 +288,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           className="bg-[#FAF2F2] border-l-2 border-[#D94F4F] py-3.5 px-4 flex items-center gap-3 mb-6"
         >
           <span className="material-symbols-outlined text-[#D94F4F] text-[15px] opacity-80">error</span>
-          <p className="font-label text-[9px] tracking-[0.05em] text-[#9F403D] font-medium leading-snug pt-[1px]">
+          <p className="pt-[1px] font-label text-[10px] font-medium leading-snug tracking-[0.05em] text-[#9F403D]">
             {error}
           </p>
         </Motion.div>
@@ -304,13 +297,13 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       <button
         onClick={handlePayment}
         disabled={processing || cartItems.length === 0}
-        className="w-full py-5 px-6 font-label text-[11px] tracking-[0.2em] uppercase font-semibold transition-all duration-300 shadow-sm mb-6 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+        className="mb-6 w-full px-6 py-5 font-label text-[12px] font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
         style={{ backgroundColor: processing ? '#B0B0A8' : currentPayment.color }}
       >
         {processing ? 'PROCESSING...' : currentPayment.text}
       </button>
 
-      <p className="font-label text-[7px] tracking-[0.15em] uppercase text-[#6B6B6B] text-center w-full">
+      <p className="w-full text-center font-label text-[8px] uppercase tracking-[0.15em] text-[#6B6B6B]">
         {paymentMethod === 'esewa' && 'SECURE TRANSACTION VIA ESEWA'}
         {paymentMethod === 'khalti' && 'SECURE TRANSACTION VIA KHALTI'}
         {paymentMethod === 'cod' && 'PAY ON DELIVERY - NO ADVANCE REQUIRED'}

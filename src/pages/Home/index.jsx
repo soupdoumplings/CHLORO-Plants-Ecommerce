@@ -8,7 +8,9 @@ import ArchivePreview from './ArchivePreview';
 import VisualBreak from './VisualBreak';
 import CategoryShelf from './CategoryShelf';
 import WhyChooseUs from './WhyChooseUs';
+import CustomerReviews from './CustomerReviews';
 import PlantRecommendations from '../../components/PlantRecommendations';
+import SaleBanner from '../../components/SaleBanner';
 
 const HomePage = () => {
   return (
@@ -23,12 +25,14 @@ const HomePage = () => {
 
       <main className="w-full flex-grow">
         <Hero />
+        <SaleBanner />
         <PlantRecommendations surface="home" />
         <ArchivePreview />
         <CategoryShelf />
         <Philosophy />
         <VisualBreak />
         <WhyChooseUs />
+        <CustomerReviews />
       </main>
 
       <Footer />
