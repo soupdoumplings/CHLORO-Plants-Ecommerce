@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 
 const shopLinks = [
   { label: 'Shop Collection', to: '/discovery' },
@@ -10,13 +11,11 @@ const shopLinks = [
   { label: 'AI Diagnosis', to: '/ai-diagnosis' },
 ];
 
-const accountLinks = [
-  { label: 'My Bag', to: '/cart' },
-  { label: 'Checkout', to: '/checkout' },
-  { label: 'Dashboard', to: '/dashboard' },
-  { label: 'My Orders', to: '/orders' },
-  { label: 'Wishlist', to: '/wishlist' },
-  { label: 'Sign In', to: '/login' },
+const socialLinks = [
+  { label: 'WhatsApp', href: 'https://wa.me/9779800000000', icon: FaWhatsapp },
+  { label: 'Instagram', href: 'https://www.instagram.com/chloro.studio', icon: FaInstagram },
+  { label: 'Facebook', href: 'https://www.facebook.com/chloro.studio', icon: FaFacebookF },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@chloro.studio', icon: FaTiktok },
 ];
 
 const supportLinks = [
@@ -40,10 +39,10 @@ const Footer = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-[#0F3A3A] text-[#FBF9F4] page-gutter pt-8 md:pt-10 pb-6 border-t border-[#FBF9F4]/10 cursor-auto"
+      className="w-full bg-[#0F3A3A] text-[#FBF9F4] page-gutter pt-6 md:pt-8 pb-4 border-t border-[#FBF9F4]/10 cursor-auto"
     >
-      <div className="page-shell flex flex-col gap-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+      <div className="page-shell flex flex-col gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           <div className="lg:col-span-5">
             <p className="font-label text-[8px] uppercase tracking-[0.26em] text-[#C6E9E9]/75 font-bold mb-3">
               Botanical Ecommerce Studio
@@ -52,7 +51,7 @@ const Footer = () => {
               CHLORO
             </h2>
             <p className="font-body text-[13px] md:text-[14px] leading-relaxed text-[#FBF9F4]/72 max-w-[400px] mt-4">
-              Shop living specimens, tools, vessels, and care support from our Kathmandu botanical studio.
+              Shop indoor plants, care tools, vessels, and plant support from our Kathmandu botanical studio.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 mt-5">
               <Link
@@ -61,12 +60,6 @@ const Footer = () => {
               >
                 Shop Collection
               </Link>
-              <a
-                href="mailto:hello@chloro.studio"
-                className="border border-[#FBF9F4]/35 text-[#FBF9F4] px-5 py-2.5 font-label text-[8px] uppercase tracking-[0.18em] font-bold text-center hover:bg-[#FBF9F4] hover:text-[#0F3A3A] transition-colors"
-              >
-                Contact Us
-              </a>
             </div>
           </div>
 
@@ -84,13 +77,29 @@ const Footer = () => {
 
             <div>
               <h3 className="font-label text-[9px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-4">
-                Account
+                Socials
               </h3>
               <nav className="space-y-3">
-                {accountLinks.map((item) => (
-                  <FooterNavLink key={item.to} to={item.to}>{item.label}</FooterNavLink>
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="group flex items-center gap-3 text-[#FBF9F4]/65 transition-colors hover:text-[#FBF9F4]"
+                    title={item.label}
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center border border-[#FBF9F4]/16 text-[#C6E9E9] transition-colors group-hover:border-[#C6E9E9]/70 group-hover:bg-[#C6E9E9] group-hover:text-[#0F3A3A]">
+                      <item.icon className="h-3 w-3" />
+                    </span>
+                    <span className="font-headline text-[17px] md:text-[18px] leading-tight">{item.label}</span>
+                  </a>
                 ))}
               </nav>
+              <p className="mt-5 max-w-[190px] border-t border-[#FBF9F4]/10 pt-4 font-body text-[11px] leading-relaxed text-[#FBF9F4]/50">
+                Message us for orders, plant-care help, and studio availability.
+              </p>
             </div>
 
             <div>
@@ -107,8 +116,8 @@ const Footer = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#FBF9F4]/12 border border-[#FBF9F4]/12">
-          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">mail</span>
+          <div className="bg-[#0F3A3A] p-3 md:p-4 min-h-[70px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2 block">mail</span>
             <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Contact Us
             </p>
@@ -120,8 +129,8 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">storefront</span>
+          <div className="bg-[#0F3A3A] p-3 md:p-4 min-h-[70px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2 block">storefront</span>
             <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Please Visit Us
             </p>
@@ -133,8 +142,8 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="bg-[#0F3A3A] p-4 md:p-5 min-h-[90px]">
-            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2.5 block">schedule</span>
+          <div className="bg-[#0F3A3A] p-3 md:p-4 min-h-[70px]">
+            <span className="material-symbols-outlined text-[#C6E9E9] text-[18px] mb-2 block">schedule</span>
             <p className="font-label text-[8px] uppercase tracking-[0.22em] text-[#FBF9F4]/45 font-bold mb-1">
               Shopping Hours
             </p>

@@ -49,41 +49,22 @@ const PlantRecommendations = ({ surface = 'home' }) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [addedProductId, setAddedProductId] = useState(null);
   const [orderSignals, setOrderSignals] = useState({ orderedProductIds: [], orderedCategories: [] });
+  const isCompact = surface === 'dashboard';
+  const shouldPersonalize = isCompact || (surface === 'home' && hasPreferences);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const maybeRequestLocation = async () => {
-      if (surface !== 'home' || location || !isSupported || getLocationPromptSeen()) {
-        setLocationReady(true);
-        return;
-      }
-
-      const result = await requestLocation();
-      setLocationPromptSeen();
-      if (isMounted) setLocationReady(true);
-
-      if (!result.success) {
-        console.warn('Using fallback region for seasonal recommendations:', result.error);
-      }
-    };
-
-    maybeRequestLocation();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isSupported, location, requestLocation, surface]);
+    setLocationReady(true);
+  }, [location, surface]);
 
   const activePreferences = useMemo(() => (
-    preferences || DEFAULT_PLANT_PREFERENCES
-  ), [preferences]);
+    shouldPersonalize ? (preferences || DEFAULT_PLANT_PREFERENCES) : DEFAULT_PLANT_PREFERENCES
+  ), [preferences, shouldPersonalize]);
 
   useEffect(() => {
     let active = true;
 
     const fetchOrderSignals = async () => {
-      if (!user) {
+      if (!shouldPersonalize || !user) {
         setOrderSignals({ orderedProductIds: [], orderedCategories: [] });
         return;
       }
@@ -111,13 +92,14 @@ const PlantRecommendations = ({ surface = 'home' }) => {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [shouldPersonalize, user]);
 
   const commerceSignals = useMemo(() => ({
-    wishlistProductIds: wishlist.items.map((item) => item.productId),
-    wishlistCategories: wishlist.items.map((item) => item.product?.category).filter(Boolean),
-    ...orderSignals,
-  }), [orderSignals, wishlist.items]);
+    wishlistProductIds: shouldPersonalize ? wishlist.items.map((item) => item.productId) : [],
+    wishlistCategories: shouldPersonalize ? wishlist.items.map((item) => item.product?.category).filter(Boolean) : [],
+    orderedProductIds: shouldPersonalize ? orderSignals.orderedProductIds : [],
+    orderedCategories: shouldPersonalize ? orderSignals.orderedCategories : [],
+  }), [orderSignals, shouldPersonalize, wishlist.items]);
 
   const getRecommendations = useCallback(async () => {
     return fetchSeasonalRecommendations({
@@ -130,7 +112,7 @@ const PlantRecommendations = ({ surface = 'home' }) => {
   }, [activePreferences, commerceSignals, location, surface]);
 
   useEffect(() => {
-    if (preferencesLoading || !locationReady) return undefined;
+    if ((shouldPersonalize && preferencesLoading) || !locationReady) return undefined;
 
     let isCancelled = false;
 
@@ -167,7 +149,7 @@ const PlantRecommendations = ({ surface = 'home' }) => {
     return () => {
       isCancelled = true;
     };
-  }, [getRecommendations, location, locationReady, preferencesLoading]);
+  }, [getRecommendations, location, locationReady, preferencesLoading, shouldPersonalize]);
 
   const handleUseLocation = async () => {
     setRecommendationState((current) => ({ ...current, loading: true, error: '' }));
@@ -198,13 +180,18 @@ const PlantRecommendations = ({ surface = 'home' }) => {
   };
 
   const recommendations = recommendationState.plants;
-  const isCompact = surface === 'dashboard';
-  const loading = preferencesLoading || !locationReady || recommendationState.loading || locating;
+  const loading = (shouldPersonalize && preferencesLoading) || !locationReady || recommendationState.loading || locating;
   const usingFallbackRegion = !location;
   const regionLabel = recommendationState.region || getRecommendationRegion(location);
-  const seasonalLine = usingFallbackRegion
-    ? `${recommendationState.season.season} selections, anchored to ${FALLBACK_REGION}.`
-    : `${recommendationState.season.season} selections for ${regionLabel}.`;
+  const sectionLabel = shouldPersonalize ? 'Recommended For You' : 'Seasonal Picks';
+  const sectionTitle = shouldPersonalize ? 'Picked from your plant preferences.' : 'Popular picks for this season.';
+  const seasonalLine = shouldPersonalize
+    ? isCompact
+      ? 'Personalized with your plant preferences, wishlist signals, and order history.'
+      : 'Your homepage now uses your saved plant preferences, wishlist signals, and seasonal fit.'
+    : usingFallbackRegion
+      ? `${recommendationState.season.season} picks selected for ${FALLBACK_REGION}.`
+      : `${recommendationState.season.season} picks selected for ${regionLabel}.`;
   const carouselPages = Math.max(1, recommendations.length);
 
   useEffect(() => {
@@ -261,10 +248,10 @@ const PlantRecommendations = ({ surface = 'home' }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end mb-12">
           <div className="lg:col-span-8 max-w-[860px]">
             <p className="font-label text-[10px] uppercase tracking-[0.26em] text-[#785A1A] font-bold mb-6">
-              Seasonal Recommendations
+              {sectionLabel}
             </p>
             <h2 className={`font-headline text-[#1A1A1A] leading-[0.92] tracking-tight ${isCompact ? 'text-[30px]' : 'text-[52px] md:text-[72px] xl:text-[84px]'}`}>
-              Chosen for the weather outside.
+              {sectionTitle}
             </h2>
           </div>
           <div className="lg:col-span-4 flex flex-col gap-6">
@@ -283,12 +270,19 @@ const PlantRecommendations = ({ surface = 'home' }) => {
                   {locating ? 'Locating...' : 'Use location'}
                 </button>
               )}
-              {hasPreferences && (
+              {!hasPreferences ? (
                 <Link
-                  to="/dashboard"
+                  to="/dashboard?tab=preferences"
+                  className="border border-[#B0B0A8]/40 bg-white/70 px-5 py-4 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A] transition-colors hover:border-[#0F3A3A] hover:bg-[#0F3A3A] hover:text-white"
+                >
+                  Want better matches? Set plant preferences
+                </Link>
+              ) : (
+                <Link
+                  to="/dashboard?tab=preferences"
                   className="font-label text-[10px] uppercase tracking-[0.18em] text-[#0F3A3A] font-bold border-b border-[#0F3A3A] pb-1 w-max self-center"
                 >
-                  Refine
+                  Adjust preferences
                 </Link>
               )}
             </div>
