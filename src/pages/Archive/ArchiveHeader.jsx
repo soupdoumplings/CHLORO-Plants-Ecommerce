@@ -7,6 +7,7 @@ const ArchiveHeader = () => {
   return (
     <div className="mb-12 lg:mb-16">
       <EditorialHero
+        compact={true}
         eyebrow="Botanical Asset Management"
         title="Admin"
         italic="Dashboard"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { productAssetImages, publicPlantImages } from '../../lib/localImages';
+import { publicPlantImages } from '../../lib/localImages';
 
 const CATEGORIES = [
   {
@@ -17,35 +17,23 @@ const CATEGORIES = [
   },
   {
     id: 3,
-    title: 'Care Tools',
-    image: productAssetImages.wateringCan,
-    link: '/products-gifts?filter=Care%20Tools'
-  },
-  {
-    id: 4,
-    title: 'Gift Sets',
-    image: productAssetImages.terrarium,
-    link: '/products-gifts?filter=Gifts'
-  },
-  {
-    id: 5,
     title: 'Pet-Friendly',
     image: publicPlantImages.cat,
     link: '/discovery?filter=Pet-Friendly'
   },
   {
-    id: 6,
-    title: 'Pots & Vessels',
+    id: 4,
+    title: 'Gifts',
     image: publicPlantImages.lavender,
-    link: '/products-gifts?filter=Gifts'
+    link: '/discovery?filter=Gifts'
   }
 ];
 
 const CategoryShelf = () => {
   return (
-    <section className="w-full bg-[#FBF9F4] py-20 page-gutter md:py-24">
+    <section className="w-full py-32 page-gutter bg-[#FBF9F4]">
       <div className="page-shell">
-        <div className="mb-12 space-y-4 text-left md:mb-14">
+        <div className="space-y-4 mb-20 text-left">
           <Motion.span
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -62,11 +50,11 @@ const CategoryShelf = () => {
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="font-headline text-7xl md:text-8xl tracking-tighter text-[#31332C] leading-none"
           >
-            Find your perfect fit
+            Find your perfect plant
           </Motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {CATEGORIES.map((cat, i) => (
             <Motion.div
               key={cat.id}
@@ -75,7 +63,7 @@ const CategoryShelf = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="group relative aspect-[16/11] max-h-[420px] cursor-pointer overflow-hidden md:aspect-[5/4] xl:aspect-[4/3]"
+              className="group cursor-pointer relative aspect-[14/19] overflow-hidden"
               onClick={() => window.location.href = cat.link}
             >
               <img

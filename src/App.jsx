@@ -81,6 +81,7 @@ const AnimatedRoutes = () => {
 import CustomCursor from './components/CustomCursor';
 import ChatbotWidget from './components/ChatbotWidget';
 import SiteConsent from './components/SiteConsent';
+import ScrollToTop from './components/ScrollToTop';
 
 // BUG FIX: Hides the chatbot on authentication and admin routes to prevent UI overlap 
 // and maintain a clean environment for sensitive tasks.
@@ -96,6 +97,7 @@ const ChatbotWrapper = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <PlantPreferencesProvider>
           <NotificationProvider>

@@ -83,12 +83,14 @@ const AuthPage = () => {
         } else {
           await verifyPhoneOtp(phone, otpToken);
           setSuccessMsg('Phone verified. Opening your account...');
+          navigate('/');
         }
         return;
       }
 
       if (isLogin) {
         await signIn(email, password);
+        navigate('/');
         return;
       }
 

@@ -85,7 +85,7 @@ const Hero = () => {
             >
               <Link
                 to="/discovery"
-                className="block px-6 py-4 text-center text-[10px] font-bold uppercase tracking-[0.18em] transition-all hover:bg-[#fbf9f4] sm:px-8 sm:text-[11px] sm:tracking-[0.2em]"
+                className="block px-4 py-2.5 text-center text-[9px] font-bold uppercase tracking-[0.15em] transition-all hover:bg-[#fbf9f4] sm:px-6 sm:py-3 sm:text-[10px] sm:tracking-[0.18em]"
               >
                 Shop Collection
               </Link>

@@ -109,7 +109,7 @@ const Toolkit = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mb-14 max-w-3xl text-center md:mb-16"
         >
           <p className="mb-5 font-label text-[11px] font-bold uppercase tracking-[0.3em] text-[#31332c]">
@@ -154,10 +154,10 @@ const Toolkit = () => {
             {tools.map((tool, index) => (
               <Motion.article
                 key={tool.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: (index % 4) * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, delay: (index % 4) * 0.12, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 className="group min-h-[350px] border border-[#31332c]/8 bg-white/70 text-center transition-colors duration-300 hover:bg-[#efeee6]"
               >

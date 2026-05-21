@@ -18,7 +18,7 @@ const Archive = () => {
           .select('*')
           .eq('is_active', true)
           .order('created_at', { ascending: false })
-          .limit(6);
+          .limit(3);
 
         if (error) throw error;
         setProducts(data || []);

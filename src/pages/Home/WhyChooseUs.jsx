@@ -31,13 +31,13 @@ const WhyChooseUs = () => {
 
         {/* Left Side: Editorial Image */}
         <Motion.div
-          initial={{ opacity: 0, x: -40 }}
+          initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="group relative lg:sticky lg:top-32"
         >
-          <div className="aspect-[4/3] max-h-[520px] overflow-hidden shadow-2xl shadow-black/10 lg:aspect-[5/4]">
+          <div className="aspect-[4/5] overflow-hidden shadow-2xl shadow-black/10">
             <img
               src="/ful.jpg"
               alt="Botanical Care"
@@ -58,15 +58,15 @@ const WhyChooseUs = () => {
             The Chloro Standard
           </Motion.span>
 
-          <Motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+          <Motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="font-headline text-6xl md:text-7xl tracking-tight text-[#31332c] mb-20"
           >
             Why choose us??
-          </Motion.h2>
+          </Motion.div>
 
           {/* Integrated Story Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">

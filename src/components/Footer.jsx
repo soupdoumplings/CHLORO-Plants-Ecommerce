@@ -135,7 +135,7 @@ const Footer = () => {
               Please Visit Us
             </p>
             <p className="font-headline text-[16px] leading-tight">
-              Lazimpat, Kathmandu
+              Naxal, Kathmandu
             </p>
             <p className="font-body text-[11px] leading-relaxed text-[#FBF9F4]/58 mt-1.5">
               Studio visits are available by appointment.

@@ -139,7 +139,7 @@ const ArchivePage = () => {
       className="min-h-screen bg-[#FBF9F4] flex flex-col items-center overflow-x-hidden w-full relative"
     >
       <Navbar />
-      <main className="w-full page-shell flex-grow mt-[82px] page-gutter pt-16">
+      <main className="w-full page-shell flex-grow mt-[82px] page-gutter">
         <ArchiveHeader />
 
         <section className="mb-12 grid w-full grid-cols-1 border-l border-t border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5 lg:grid-cols-3">

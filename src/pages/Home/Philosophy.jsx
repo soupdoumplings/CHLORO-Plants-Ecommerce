@@ -7,8 +7,8 @@ const Editorial = () => {
     <section className="w-full overflow-hidden border-y border-[#31332c]/5 bg-[#f5f4ed] px-4 py-16 sm:px-6 sm:py-20 md:px-[5vw] md:py-24">
       <div className="mx-auto grid w-full max-w-[1720px] grid-cols-1 items-center gap-12 sm:gap-16 md:grid-cols-12 md:gap-20">
         <Motion.div
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 mx-auto w-full max-w-[min(100%,520px)] min-w-0 text-center md:col-span-5 md:mx-0 md:max-w-none md:text-left"
@@ -60,8 +60,8 @@ const Editorial = () => {
         </Motion.div>
 
         <Motion.div
-          initial={{ opacity: 0, y: 28, scale: 0.97 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0, x: 60, scale: 0.97 }}
+          whileInView={{ opacity: 1, x: 0, scale: 1 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-full max-w-[min(100%,560px)] min-w-0 md:col-span-7 md:mx-0 md:max-w-none group"
@@ -70,7 +70,7 @@ const Editorial = () => {
             <img
               src="/lof.jpg"
               alt="Wildflower Heritage"
-              className="h-full w-full object-contain object-center transition-transform duration-[3s] md:group-hover:scale-105"
+              className="h-full w-full object-cover object-center transition-transform duration-[3s] md:group-hover:scale-105"
             />
           </div>
           <Motion.div
