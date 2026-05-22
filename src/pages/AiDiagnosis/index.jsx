@@ -11,23 +11,6 @@ import { productAssetImages } from '../../lib/localImages';
 
 const placeholderLeaf = productAssetImages.monstera;
 
-const treatmentPlaceholders = [
-  {
-    name: 'No 04 Foliar Mist',
-    category: 'Antifungal / Restorative',
-    reason: 'Treatment recommendations unlock after Gemini reviews your plant photo.',
-    image: productAssetImages.wateringCan,
-    locked: true,
-  },
-  {
-    name: 'No 12 Ionic Solution',
-    category: 'Vascular Stabilizer',
-    reason: 'Care products and tools will be matched from CHLORO inventory.',
-    image: productAssetImages.scissors,
-    locked: true,
-  },
-];
-
 const severityCopy = {
   low: 'Observation',
   medium: 'Stabilize',
@@ -203,7 +186,7 @@ const AiDiagnosisPage = () => {
         ? 'Begin Clinical Analysis'
         : 'Upload Image To Begin';
   const reportActionDisabled = !result && (!image || isPreparing || isAnalyzing);
-  const treatmentCards = result ? displayProducts.slice(0, 2) : treatmentPlaceholders;
+  const treatmentCards = displayProducts.slice(0, 2);
 
   const scrollToLab = useCallback(() => {
     labRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -559,61 +542,63 @@ const AiDiagnosisPage = () => {
           </div>
         </section>
 
-        <section className="bg-[#F7F3EA] px-6 py-20 md:px-10 md:py-28">
-          <div className="mx-auto w-full max-w-[1720px] md:w-[90vw]">
-            <div className="flex flex-col justify-between gap-6 border-b border-[#11110E]/10 pb-7 md:flex-row md:items-end">
-              <div>
-                <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Recommended Care</p>
-                <h2 className="mt-3 font-headline text-[38px] leading-none text-[#11110E] md:text-[52px]">Care Products For This Plant</h2>
+        {result && (
+          <section className="bg-[#F7F3EA] px-6 py-20 md:px-10 md:py-28">
+            <div className="mx-auto w-full max-w-[1720px] md:w-[90vw]">
+              <div className="flex flex-col justify-between gap-6 border-b border-[#11110E]/10 pb-7 md:flex-row md:items-end">
+                <div>
+                  <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Recommended Care</p>
+                  <h2 className="mt-3 font-headline text-[38px] leading-none text-[#11110E] md:text-[52px]">Care Products For This Plant</h2>
+                </div>
+                <p className="max-w-[330px] font-body text-[12px] leading-relaxed text-[#6D695F] md:text-right">
+                  Targeted care products are selected from live CHLORO inventory after analysis.
+                </p>
               </div>
-              <p className="max-w-[330px] font-body text-[12px] leading-relaxed text-[#6D695F] md:text-right">
-                Targeted care products are selected from live CHLORO inventory after analysis.
-              </p>
-            </div>
 
-            <div className="mx-auto mt-10 grid max-w-[1460px] grid-cols-1 gap-8 md:grid-cols-2">
-              {treatmentCards.map((product, index) => (
-                <ProductCard
-                  key={product.id || product.name}
-                  product={product}
-                  delay={index * 0.08}
-                  imageFrameClassName="aspect-[1/0.92] max-h-[620px]"
-                />
-              ))}
-            </div>
+              {treatmentCards.length > 0 ? (
+                <div className="mx-auto mt-10 grid max-w-[1460px] grid-cols-1 gap-8 md:grid-cols-2">
+                  {treatmentCards.map((product, index) => (
+                    <ProductCard
+                      key={product.id || product.name}
+                      product={product}
+                      delay={index * 0.08}
+                      imageFrameClassName="aspect-[1/0.92] max-h-[620px]"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-6 border border-[#11110E]/10 bg-[#FFFEFA] px-5 py-4 font-body text-[13px] leading-relaxed text-[#6D695F]">
+                  Gemini did not find a matching inventory item. Add care products in the admin inventory to make this section recommend real stock.
+                </p>
+              )}
 
-            {result && !displayProducts.length && (
-              <p className="mt-6 border border-[#11110E]/10 bg-[#FFFEFA] px-5 py-4 font-body text-[13px] leading-relaxed text-[#6D695F]">
-                Gemini did not find a matching inventory item. Add care products in the admin inventory to make this section recommend real stock.
-              </p>
-            )}
-
-            <div ref={protocolRef} className="mt-24 grid scroll-mt-[96px] gap-10 border-t border-[#11110E]/10 pt-12 lg:grid-cols-[320px_1fr]">
-              <div>
-                <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Logistics</p>
-                <h2 className="mt-3 font-headline text-[36px] leading-[0.95] text-[#11110E] md:text-[48px]">Recovery Protocol</h2>
-              </div>
-              <div className="divide-y divide-[#11110E]/10 border-t border-[#11110E]/10">
-                {protocol.slice(0, 4).map((item, index) => (
-                  <div key={`${item.label}-${item.text}`} className="grid gap-5 py-7 md:grid-cols-[64px_1fr_1.35fr]">
-                    <p className="font-label text-[22px] text-[#11110E]/28">{String(index + 1).padStart(2, '0')}</p>
-                    <div>
-                      <p className="font-label text-[8px] uppercase tracking-[0.24em] text-[#7A756A]">{item.label}</p>
-                      <p className="mt-2 font-headline text-[24px] leading-none text-[#11110E]">{item.label}</p>
+              <div ref={protocolRef} className="mt-24 grid scroll-mt-[96px] gap-10 border-t border-[#11110E]/10 pt-12 lg:grid-cols-[320px_1fr]">
+                <div>
+                  <p className="font-label text-[8px] uppercase tracking-[0.34em] text-[#7A756A]">Logistics</p>
+                  <h2 className="mt-3 font-headline text-[36px] leading-[0.95] text-[#11110E] md:text-[48px]">Recovery Protocol</h2>
+                </div>
+                <div className="divide-y divide-[#11110E]/10 border-t border-[#11110E]/10">
+                  {protocol.slice(0, 4).map((item, index) => (
+                    <div key={`${item.label}-${item.text}`} className="grid gap-5 py-7 md:grid-cols-[64px_1fr_1.35fr]">
+                      <p className="font-label text-[22px] text-[#11110E]/28">{String(index + 1).padStart(2, '0')}</p>
+                      <div>
+                        <p className="font-label text-[8px] uppercase tracking-[0.24em] text-[#7A756A]">{item.label}</p>
+                        <p className="mt-2 font-headline text-[24px] leading-none text-[#11110E]">{item.label}</p>
+                      </div>
+                      <p className="font-body text-[13px] leading-relaxed text-[#5E5A52]">{item.text}</p>
                     </div>
-                    <p className="font-body text-[13px] leading-relaxed text-[#5E5A52]">{item.text}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {result?.disclaimer && (
-              <p className="mt-12 max-w-[700px] border-t border-[#E5E1D7] pt-6 font-body text-[12px] leading-relaxed text-[#8A857A]">
-                {result.disclaimer}
-              </p>
-            )}
-          </div>
-        </section>
+              {result.disclaimer && (
+                <p className="mt-12 max-w-[700px] border-t border-[#E5E1D7] pt-6 font-body text-[12px] leading-relaxed text-[#8A857A]">
+                  {result.disclaimer}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
 
         <section className="bg-[#F7F3EA] px-6 pb-24 md:px-10">
           <div className="mx-auto w-full max-w-[1720px] border border-[#11110E]/14 bg-[#FFFEFA] px-6 py-20 text-center md:w-[90vw] md:px-10">
