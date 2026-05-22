@@ -109,12 +109,27 @@ export const markPlantWatered = async (plant) => {
     last_reminder_sent_at_ts: null,
   };
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('user_plants')
     .update(patch)
     .eq('id', plant.id)
     .select()
     .single();
+
+  if (error?.code === 'PGRST204' && String(error.message || '').includes('last_reminder_sent_at_ts')) {
+    const legacyPatch = { ...patch };
+    delete legacyPatch.last_reminder_sent_at_ts;
+
+    const legacyResult = await supabase
+      .from('user_plants')
+      .update(legacyPatch)
+      .eq('id', plant.id)
+      .select()
+      .single();
+
+    data = legacyResult.data;
+    error = legacyResult.error;
+  }
 
   if (error) throw error;
   return data;
