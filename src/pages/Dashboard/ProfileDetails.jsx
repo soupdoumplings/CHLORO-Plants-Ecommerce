@@ -49,10 +49,16 @@ const SavedCheckoutInfo = ({ profile, className = '' }) => (
         }) || 'Not saved yet'}
       </p>
     </div>
-    <Link to="/orders" className="mt-6 inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
-      My Orders
-      <span className="material-symbols-outlined text-[16px]">east</span>
-    </Link>
+    <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <Link to="/orders" className="inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A]">
+        My Orders
+        <span className="material-symbols-outlined text-[16px]">east</span>
+      </Link>
+      <Link to="/my-plants" className="inline-flex items-center gap-2 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#785A1A]">
+        Care Reminders
+        <span className="material-symbols-outlined text-[16px]">water_drop</span>
+      </Link>
+    </div>
   </div>
 );
 
@@ -290,9 +296,15 @@ const ProfileDetails = () => {
                   Edit saved account and checkout details.
                 </p>
               </div>
-              <Link to="/wishlist" className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#785A1A] underline underline-offset-4">
-                Open Wishlist
-              </Link>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <Link to="/my-plants" className="inline-flex items-center gap-1.5 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#0F3A3A] underline underline-offset-4">
+                  Care Reminders
+                  <span className="material-symbols-outlined text-[15px]">water_drop</span>
+                </Link>
+                <Link to="/wishlist" className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-[#785A1A] underline underline-offset-4">
+                  Open Wishlist
+                </Link>
+              </div>
             </div>
 
             {loading ? (
