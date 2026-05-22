@@ -34,4 +34,5 @@ export const publicPlantImages = {
   phool: '/phool.png',
   cat: '/cat.jpg',
   BlackRose: '/BlackRose.jpg',
+  gifts: '/Gifts.jpg',
 };

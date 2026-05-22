@@ -24,7 +24,7 @@ const CATEGORIES = [
   {
     id: 4,
     title: 'Gifts',
-    image: publicPlantImages.lavender,
+    image: publicPlantImages.gifts,
     link: '/discovery?filter=Gifts'
   }
 ];
@@ -63,7 +63,7 @@ const CategoryShelf = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="group relative aspect-[14/10] max-h-[480px] cursor-pointer overflow-hidden md:aspect-[4/3] xl:aspect-[14/9]"
+              className="group cursor-pointer relative aspect-[14/19] overflow-hidden"
               onClick={() => window.location.href = cat.link}
             >
               <img
