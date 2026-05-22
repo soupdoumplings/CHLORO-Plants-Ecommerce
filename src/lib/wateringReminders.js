@@ -101,40 +101,48 @@ export const markPlantWatered = async (plant) => {
   const frequencyDays = plant.water_frequency_hours
     ? Number(plant.water_frequency_hours) / 24
     : parseWaterFrequencyDays(plant.water_frequency_days);
-  const patch = {
+  const modernPatch = {
     last_watered_at: getTodayDate(),
     next_watering_at: getNextWateringAt(frequencyDays),
     next_watering_date: getNextWateringDate(frequencyDays),
     last_reminder_sent_at: null,
     last_reminder_sent_at_ts: null,
   };
-
-  let { data, error } = await supabase
-    .from('user_plants')
-    .update(patch)
-    .eq('id', plant.id)
-    .select()
-    .single();
-
-  if (error?.code === 'PGRST204') {
-    const legacyPatch = {
-      last_watered_at: patch.last_watered_at,
-      next_watering_date: patch.next_watering_date,
-      last_reminder_sent_at: patch.last_reminder_sent_at,
-    };
-    const legacyResult = await supabase
+  const legacyPatch = {
+    last_watered_at: modernPatch.last_watered_at,
+    next_watering_date: modernPatch.next_watering_date,
+    last_reminder_sent_at: modernPatch.last_reminder_sent_at,
+  };
+  const dateOnlyPatch = {
+    last_watered_at: modernPatch.last_watered_at,
+    next_watering_date: modernPatch.next_watering_date,
+  };
+  const wateredOnlyPatch = {
+    last_watered_at: modernPatch.last_watered_at,
+  };
+  const updatePlant = (patch) => supabase
       .from('user_plants')
-      .update(legacyPatch)
+      .update(patch)
       .eq('id', plant.id)
       .select()
       .single();
 
-    data = legacyResult.data;
-    error = legacyResult.error;
+  let lastError = null;
+  for (const attempt of [modernPatch, legacyPatch, dateOnlyPatch, wateredOnlyPatch]) {
+    const { data, error } = await updatePlant(attempt);
+
+    if (!error) {
+      return {
+        ...plant,
+        ...data,
+        ...attempt,
+      };
+    }
+
+    lastError = error;
   }
 
-  if (error) throw error;
-  return data;
+  throw lastError;
 };
 
 export const setEmailNotifications = async (plantId, enabled) => {

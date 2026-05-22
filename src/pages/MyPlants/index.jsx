@@ -60,13 +60,23 @@ const MyPlantsPage = () => {
   }, [user]);
 
   const handleWatered = async (plant) => {
-    const updated = await markPlantWatered(plant);
-    setPlants((current) => current.map((item) => item.id === updated.id ? updated : item));
+    setError('');
+    try {
+      const updated = await markPlantWatered(plant);
+      setPlants((current) => current.map((item) => item.id === updated.id ? updated : item));
+    } catch (err) {
+      setError(err.message || 'Could not update this watering schedule.');
+    }
   };
 
   const handleEmailToggle = async (plant, enabled) => {
-    const updated = await setEmailNotifications(plant.id, enabled);
-    setPlants((current) => current.map((item) => item.id === updated.id ? updated : item));
+    setError('');
+    try {
+      const updated = await setEmailNotifications(plant.id, enabled);
+      setPlants((current) => current.map((item) => item.id === updated.id ? updated : item));
+    } catch (err) {
+      setError(err.message || 'Could not update email reminders.');
+    }
   };
 
   const formatFrequency = (plant) => {
