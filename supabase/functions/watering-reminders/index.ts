@@ -161,16 +161,24 @@ const sendEmail = async ({ email, plantName, markUrl }) => {
 
 const processDueReminders = async () => {
   const today = new Date().toISOString().slice(0, 10);
+  const now = new Date().toISOString();
 
   const { data: duePlants, error } = await supabase
     .from('user_plants')
-    .select('id, user_id, plant_name, water_frequency_days, next_watering_date, email_notifications, last_reminder_sent_at, public_water_token, users(email)')
-    .lte('next_watering_date', today)
-    .or(`last_reminder_sent_at.is.null,last_reminder_sent_at.neq.${today}`);
+    .select('id, user_id, plant_name, water_frequency_days, water_frequency_hours, next_watering_date, next_watering_at, email_notifications, last_reminder_sent_at, last_reminder_sent_at_ts, public_water_token, users(email)')
+    .or(`next_watering_at.lte.${now},and(next_watering_at.is.null,next_watering_date.lte.${today})`);
 
   if (error) throw error;
 
+  let processed = 0;
+
   for (const plant of duePlants || []) {
+    const lastSent = plant.last_reminder_sent_at_ts ? new Date(plant.last_reminder_sent_at_ts).getTime() : 0;
+    const nextDue = plant.next_watering_at ? new Date(plant.next_watering_at).getTime() : 0;
+    const legacySentToday = !plant.next_watering_at && plant.last_reminder_sent_at === today;
+
+    if ((nextDue && lastSent >= nextDue) || legacySentToday) continue;
+
     await supabase.from('notifications').insert({
       user_id: plant.user_id,
       type: 'WATERING',
@@ -188,11 +196,16 @@ const processDueReminders = async () => {
 
     await supabase
       .from('user_plants')
-      .update({ last_reminder_sent_at: today })
+      .update({
+        last_reminder_sent_at: today,
+        last_reminder_sent_at_ts: now,
+      })
       .eq('id', plant.id);
+
+    processed += 1;
   }
 
-  return duePlants?.length || 0;
+  return processed;
 };
 
 serve(async (req) => {

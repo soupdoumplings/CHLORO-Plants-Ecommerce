@@ -14,10 +14,10 @@ const ESEWA_CONFIG = {
 
 const KHALTI_CONFIG = {
   endpoint: import.meta.env.VITE_KHALTI_ENDPOINT || 'https://dev.khalti.com/api/v2/epayment/initiate/',
-  secretKey: import.meta.env.VITE_KHALTI_SECRET_KEY || '',
+  secretKey: import.meta.env.VITE_KHALTI_SECRET_KEY || import.meta.env.VITE_KHALTI_PUBLIC_KEY || '',
 };
 
-export const isKhaltiConfigured = () => Boolean(KHALTI_CONFIG.secretKey);
+export const isKhaltiConfigured = () => Boolean(KHALTI_CONFIG.secretKey) || import.meta.env.DEV;
 
 const generateEsewaSignature = (message, secret) => {
   const hash = CryptoJS.HmacSHA256(message, secret);
@@ -79,7 +79,17 @@ export const initiateKhaltiPayment = async ({
   websiteUrl,
   customerInfo,
 }) => {
-  if (!isKhaltiConfigured()) {
+  const hasKey = Boolean(KHALTI_CONFIG.secretKey);
+
+  if (!hasKey && import.meta.env.DEV) {
+    const demoUrl = new URL(returnUrl);
+    demoUrl.searchParams.set('status', 'completed');
+    demoUrl.searchParams.set('pidx', `demo-${purchaseOrderId}`);
+    demoUrl.searchParams.set('amount', String(Math.round(Number(amount))));
+    return { payment_url: demoUrl.toString(), demo: true };
+  }
+
+  if (!hasKey) {
     throw new Error('Khalti sandbox key is missing. Add VITE_KHALTI_SECRET_KEY or choose eSewa/COD.');
   }
 

@@ -96,9 +96,10 @@ export default defineConfig({
     },
     proxy: {
       '/api/khalti': {
-        target: 'https://dev.khalti.com',
+        target: 'https://a.khalti.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/khalti/, ''),
+        secure: true,
       },
     }
   }

@@ -26,7 +26,9 @@ const DashboardPage = () => {
 
       <main className="flex-grow w-full page-shell page-gutter pb-20 mt-[82px]">
         <ProfileHeader />
-        <ProfileDetails />
+        <div className="pt-10 sm:pt-12 lg:pt-16">
+          <ProfileDetails />
+        </div>
       </main>
 
       <Footer />

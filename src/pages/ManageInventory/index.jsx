@@ -9,6 +9,15 @@ import { productAssetImages, publicPlantImages } from '../../lib/localImages';
 
 const MODEL_BUCKET = 'plant-model';
 const MODEL_FILE_TYPES = ['glb', 'gltf'];
+const MODEL_MAX_BYTES = 50 * 1024 * 1024;
+const MODEL_MIME_TYPES = {
+  glb: 'application/octet-stream',
+  gltf: 'model/gltf+json',
+};
+const IMAGE_BUCKET = 'product-images';
+const IMAGE_FILE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 const fallbackImageForCategory = (category) => {
   const categoryLabel = String(category || '').toLowerCase();
@@ -18,15 +27,82 @@ const fallbackImageForCategory = (category) => {
 };
 
 const safeFileName = (fileName) => (
-  String(fileName || 'plant-model.glb')
+  String(fileName || 'inventory-file')
     .toLowerCase()
     .replace(/[^a-z0-9._-]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    || 'plant-model.glb'
+    || 'inventory-file'
 );
+
+const formatFileSize = (bytes) => {
+  if (!Number.isFinite(bytes)) return 'unknown size';
+  const mb = bytes / (1024 * 1024);
+  return `${mb.toFixed(mb >= 10 ? 0 : 1)} MB`;
+};
+
+const getStorageErrorMessage = (error, fallback) => {
+  if (!error) return fallback;
+  return [
+    error.message,
+    error.error,
+    error.name,
+    error.statusCode ? `status ${error.statusCode}` : '',
+    error.status ? `status ${error.status}` : '',
+    error.cause?.message,
+  ].filter(Boolean).join(' - ') || fallback;
+};
+
+const encodeStoragePath = (path) => (
+  String(path)
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/')
+);
+
+const uploadStorageObject = async ({ bucket, path, file, contentType }) => {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('Supabase URL/key is missing from the Vite environment.');
+  }
+
+  const { data: authData, error: authError } = await supabase.auth.getSession();
+  if (authError) throw authError;
+  if (!authData.session?.access_token) {
+    throw new Error('Your login session expired. Please log in again before uploading.');
+  }
+
+  const endpoint = `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(bucket)}/${encodeStoragePath(path)}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${authData.session.access_token}`,
+      'Cache-Control': '3600',
+      'Content-Type': contentType,
+      'x-upsert': 'false',
+    },
+    body: file,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    let details = text;
+
+    try {
+      const json = JSON.parse(text);
+      details = [json.message, json.error, json.statusCode || json.status]
+        .filter(Boolean)
+        .join(' - ');
+    } catch {
+      // Keep the raw response text.
+    }
+
+    throw new Error(`Storage upload failed (${response.status}): ${details || response.statusText}`);
+  }
+};
 
 const ManageInventory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [isModelUploading, setIsModelUploading] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -44,6 +120,7 @@ const ManageInventory = () => {
   const [category, setCategory] = useState('Indoor Plants');
   const [tagsInput, setTagsInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -96,27 +173,98 @@ const ManageInventory = () => {
       return;
     }
 
+    if (file.size > MODEL_MAX_BYTES) {
+      setErrorMsg(`This model is ${formatFileSize(file.size)}. Please upload a GLB/GLTF under 50 MB or compress it in Blender first.`);
+      event.target.value = '';
+      return;
+    }
+
     setIsModelUploading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
-      const modelPath = `inventory/${Date.now()}-${safeFileName(file.name)}`;
+      const modelPath = `inventory/${isEditMode ? id : 'drafts'}/${Date.now()}-${safeFileName(file.name)}`;
+      const modelMimeType = MODEL_MIME_TYPES[extension] || 'application/octet-stream';
+      const uploadFile = file.type === modelMimeType
+        ? file
+        : new File([await file.arrayBuffer()], file.name, {
+            type: modelMimeType,
+            lastModified: file.lastModified,
+          });
+      await uploadStorageObject({
+        bucket: MODEL_BUCKET,
+        path: modelPath,
+        file: uploadFile,
+        contentType: modelMimeType,
+      });
+
+      const { data } = supabase.storage.from(MODEL_BUCKET).getPublicUrl(modelPath);
+      setModelUrl(data.publicUrl);
+
+      if (isEditMode) {
+        const { error: attachError } = await supabase
+          .from('products')
+          .update({ model_url: data.publicUrl })
+          .eq('id', id);
+
+        if (attachError) {
+          setErrorMsg(`Model uploaded, but it could not be attached to this product: ${attachError.message}`);
+          return;
+        }
+
+        setSuccessMsg('3D model uploaded and attached to this product.');
+        return;
+      }
+
+      setSuccessMsg('3D model uploaded. Click Save to attach it to this new inventory item.');
+    } catch (err) {
+      console.error('3D model upload failed', err);
+      setErrorMsg(
+        `${[getStorageErrorMessage(err, 'Could not upload the 3D model file.'), err.details].filter(Boolean).join(' - ')} Check that "${MODEL_BUCKET}" exists in the same Supabase project as your .env, accepts application/octet-stream/model files, and the GLB is under 50 MB.`
+      );
+    } finally {
+      setIsModelUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleImageFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!file.type.startsWith('image/') || !IMAGE_FILE_TYPES.includes(extension)) {
+      setErrorMsg('Please upload a JPG, PNG, WebP, or GIF image file.');
+      event.target.value = '';
+      return;
+    }
+
+    setIsImageUploading(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    try {
+      const imagePath = `inventory/${Date.now()}-${safeFileName(file.name)}`;
       const { error: uploadError } = await supabase.storage
-        .from(MODEL_BUCKET)
-        .upload(modelPath, file, {
+        .from(IMAGE_BUCKET)
+        .upload(imagePath, file, {
           cacheControl: '3600',
-          contentType: file.type || (extension === 'glb' ? 'model/gltf-binary' : 'model/gltf+json'),
+          contentType: file.type,
           upsert: false,
         });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from(MODEL_BUCKET).getPublicUrl(modelPath);
-      setModelUrl(data.publicUrl);
+      const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(imagePath);
+      setImageUrl(data.publicUrl);
+      setSuccessMsg('Image uploaded. Click Save to attach it to this inventory item.');
     } catch (err) {
-      setErrorMsg(err.message || 'Could not upload the 3D model file.');
+      setErrorMsg(
+        `${getStorageErrorMessage(err, 'Could not upload the product image.')} Make sure the Supabase storage bucket "${IMAGE_BUCKET}" exists and is public.`
+      );
     } finally {
-      setIsModelUploading(false);
+      setIsImageUploading(false);
       event.target.value = '';
     }
   };
@@ -129,6 +277,7 @@ const ManageInventory = () => {
 
     setIsSubmitting(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     const productImages = imageUrl.trim()
       ? [imageUrl.trim()]
@@ -237,6 +386,11 @@ const ManageInventory = () => {
                      {errorMsg}
                      </div>
                   )}
+                  {successMsg && (
+                     <div className="bg-[#EFF7F2] text-[#0F3A3A] font-body text-[12px] p-4 rounded border border-[#0F3A3A]/10">
+                     {successMsg}
+                     </div>
+                  )}
 
                   {/* Section Label: Identity */}
                   <div className="flex items-center gap-3 pb-2 border-b border-[#B1B3A9]/15">
@@ -297,7 +451,25 @@ const ManageInventory = () => {
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Image URL</label>
                      <input type="url" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="Paste a direct image URL" className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-body text-[15px] text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
-                     <p className="font-body text-[11px] text-[#5E6058]/60">Paste a direct image URL. This will be the hero image on the catalogue page.</p>
+                     <div className="flex flex-wrap items-center gap-3">
+                       <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-2 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:border-[#785A1A] hover:text-[#785A1A]">
+                         <span className="material-symbols-outlined text-[17px]">add_photo_alternate</span>
+                         {isImageUploading ? 'Uploading...' : 'Upload Image'}
+                         <input
+                           type="file"
+                           accept="image/jpeg,image/png,image/webp,image/gif"
+                           onChange={handleImageFileUpload}
+                           disabled={isImageUploading}
+                           className="sr-only"
+                         />
+                       </label>
+                       {imageUrl && (
+                         <a href={imageUrl} target="_blank" rel="noreferrer" className="font-body text-[11px] text-[#785A1A] underline-offset-4 hover:underline">
+                           Open current image
+                         </a>
+                       )}
+                     </div>
+                     <p className="font-body text-[11px] text-[#5E6058]/60">Paste a direct image URL or upload an image. This will be the hero image on the catalogue page.</p>
                   </div>
 
                   <div className="flex flex-col gap-3 group">
@@ -316,12 +488,22 @@ const ManageInventory = () => {
                          />
                        </label>
                        {modelUrl && (
-                         <a href={modelUrl} target="_blank" rel="noreferrer" className="font-body text-[11px] text-[#785A1A] underline-offset-4 hover:underline">
-                           Open current model
-                         </a>
+                         <>
+                           <a href={modelUrl} target="_blank" rel="noreferrer" className="font-body text-[11px] text-[#785A1A] underline-offset-4 hover:underline">
+                             Open current model
+                           </a>
+                           <button
+                             type="button"
+                             onClick={() => setModelUrl('')}
+                             className="font-label text-[10px] font-bold uppercase tracking-[0.14em] text-[#9F403D] underline-offset-4 hover:underline"
+                           >
+                             Remove model
+                           </button>
+                         </>
                        )}
                      </div>
-                     <p className="font-body text-[11px] text-[#5E6058]/60">Optional. Paste a hosted URL or upload a .glb/.gltf file for the catalogue room preview and supported mobile AR viewing.</p>
+                     <p className="font-body text-[11px] text-[#5E6058]/60">Optional. Paste a hosted URL or upload a .glb/.gltf file for the catalogue room preview and supported mobile AR viewing. Existing products attach the model immediately after upload; new products attach it when saved.</p>
+                     <p className="font-body text-[11px] text-[#5E6058]/60">GLB is recommended. Maximum upload size: 50 MB.</p>
                   </div>
 
                   {/* Section Label: Care & Pricing */}
@@ -350,6 +532,8 @@ const ManageInventory = () => {
                          <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Watering Frequency</label>
                          <select value={waterFrequency} onChange={e => setWaterFrequency(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
                             <option value="Every 3 Days">Every 3 Days</option>
+                            <option value="Every 12 Hours">Every 12 Hours</option>
+                            <option value="Every Day">Every Day</option>
                             <option value="Every 7 Days">Every 7 Days</option>
                             <option value="Every 10 Days">Every 10 Days</option>
                             <option value="Every 14 Days">Every 14 Days</option>
@@ -491,10 +675,10 @@ const ManageInventory = () => {
                 whileHover={{ y: -2, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleSaveProduct}
-                disabled={isSubmitting || isModelUploading}
+                disabled={isSubmitting || isImageUploading || isModelUploading}
                 className="bg-[#5F5E5E] text-[#FAF7F6] px-10 py-4 font-label text-[12px] tracking-[1.5px] font-black uppercase flex items-center gap-3 hover:bg-[#31332C] rounded-lg transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                 {isModelUploading ? 'Uploading Model...' : isSubmitting ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save' : 'Add')}
+                 {isImageUploading ? 'Uploading Image...' : isModelUploading ? 'Uploading Model...' : isSubmitting ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save' : 'Add')}
                  <div className="w-[1px] h-4 bg-white/20"></div>
                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </Motion.button>

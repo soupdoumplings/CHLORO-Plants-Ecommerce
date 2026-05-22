@@ -1,6 +1,8 @@
 import { supabase } from '../supabase';
 
 export const WATERING_FREQUENCY_OPTIONS = [
+  { label: 'Every 12 hours', days: 0.5, hours: 12 },
+  { label: 'Every day', days: 1, hours: 24 },
   { label: 'Every 3 days', days: 3 },
   { label: 'Every 5 days', days: 5 },
   { label: 'Every 7 days', days: 7 },
@@ -12,13 +14,16 @@ export const WATERING_FREQUENCY_OPTIONS = [
 const toDateOnly = (date) => date.toISOString().slice(0, 10);
 
 export const parseWaterFrequencyDays = (frequency, fallback = 7) => {
-  if (typeof frequency === 'number' && Number.isFinite(frequency)) return Math.max(1, frequency);
+  if (typeof frequency === 'number' && Number.isFinite(frequency)) return Math.max(0.5, frequency);
 
   const normalized = String(frequency || '').toLowerCase();
   const explicitNumber = normalized.match(/\d+/)?.[0];
 
+  if (normalized.includes('12') && normalized.includes('hour')) return 0.5;
+  if (normalized.includes('hour')) return 0.5;
   if (explicitNumber) return Math.max(1, Number(explicitNumber));
   if (normalized.includes('daily')) return 1;
+  if (normalized.includes('every day')) return 1;
   if (normalized.includes('biweekly')) return 14;
   if (normalized.includes('weekly')) return 7;
   if (normalized.includes('month')) return 30;
@@ -26,17 +31,29 @@ export const parseWaterFrequencyDays = (frequency, fallback = 7) => {
   return fallback;
 };
 
+export const parseWaterFrequencyHours = (frequency, fallback = 168) => {
+  const days = parseWaterFrequencyDays(frequency, fallback / 24);
+  return Math.max(12, Math.round(days * 24));
+};
+
 export const getNextWateringDate = (frequencyDays, fromDate = new Date()) => {
   const nextDate = new Date(fromDate);
   nextDate.setHours(12, 0, 0, 0);
-  nextDate.setDate(nextDate.getDate() + parseWaterFrequencyDays(frequencyDays));
+  nextDate.setTime(nextDate.getTime() + parseWaterFrequencyHours(frequencyDays) * 60 * 60 * 1000);
   return toDateOnly(nextDate);
+};
+
+export const getNextWateringAt = (frequencyDays, fromDate = new Date()) => {
+  const nextDate = new Date(fromDate);
+  nextDate.setTime(nextDate.getTime() + parseWaterFrequencyHours(frequencyDays) * 60 * 60 * 1000);
+  return nextDate.toISOString();
 };
 
 export const getTodayDate = () => toDateOnly(new Date());
 
 export const getPlantReminderPayload = ({ userId, plant, frequencyDays, emailNotifications, orderId = null }) => {
   const days = parseWaterFrequencyDays(frequencyDays);
+  const hours = parseWaterFrequencyHours(frequencyDays);
   const productId = plant?.product_id || plant?.id || null;
   const plantName = plant?.plant_name || plant?.product_name || plant?.product_name_snapshot || plant?.name || 'Plant';
   const plantImage = plant?.plant_image || plant?.product_image_snapshot || plant?.image || plant?.images?.[0] || null;
@@ -47,9 +64,11 @@ export const getPlantReminderPayload = ({ userId, plant, frequencyDays, emailNot
     order_id: orderId,
     plant_name: plantName,
     plant_image: plantImage,
-    water_frequency_days: days,
+    water_frequency_days: Math.max(1, Math.ceil(days)),
+    water_frequency_hours: hours,
     last_watered_at: getTodayDate(),
     next_watering_date: getNextWateringDate(days),
+    next_watering_at: getNextWateringAt(days),
     email_notifications: emailNotifications,
   };
 };
@@ -79,11 +98,15 @@ export const fetchUserPlants = async (userId) => {
 };
 
 export const markPlantWatered = async (plant) => {
-  const frequencyDays = parseWaterFrequencyDays(plant.water_frequency_days);
+  const frequencyDays = plant.water_frequency_hours
+    ? Number(plant.water_frequency_hours) / 24
+    : parseWaterFrequencyDays(plant.water_frequency_days);
   const patch = {
     last_watered_at: getTodayDate(),
+    next_watering_at: getNextWateringAt(frequencyDays),
     next_watering_date: getNextWateringDate(frequencyDays),
     last_reminder_sent_at: null,
+    last_reminder_sent_at_ts: null,
   };
 
   const { data, error } = await supabase

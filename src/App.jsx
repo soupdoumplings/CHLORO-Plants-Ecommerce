@@ -17,6 +17,7 @@ const CataloguePage = lazy(() => import('./pages/Catalogue'));
 const ArchivePage = lazy(() => import('./pages/Archive'));
 const ManageInventory = lazy(() => import('./pages/ManageInventory'));
 const PromotionsPage = lazy(() => import('./pages/Admin/Promotions'));
+const AdminProfilePage = lazy(() => import('./pages/Admin/Profile'));
 const DiscoveryPage = lazy(() => import('./pages/Discovery'));
 const ProductCataloguePage = lazy(() => import('./pages/ProductCatalogue'));
 const CartPage = lazy(() => import('./pages/Cart'));
@@ -64,6 +65,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/add-plant" element={<AdminRoute><ManageInventory /></AdminRoute>} />
           <Route path="/admin/edit-plant/:id" element={<AdminRoute><ManageInventory /></AdminRoute>} />
           <Route path="/admin/promotions" element={<AdminRoute><PromotionsPage /></AdminRoute>} />
+          <Route path="/admin/profile" element={<AdminRoute><AdminProfilePage /></AdminRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />

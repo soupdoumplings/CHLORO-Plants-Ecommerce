@@ -47,6 +47,88 @@ const quickAnswers = [
 
 const editorialSearches = ['monstera', 'orchid', 'ficus', 'aloe vera'];
 
+const fallbackPlantProfiles = [
+  {
+    access_token: 'local-monstera-deliciosa',
+    entity_name: 'Monstera deliciosa',
+    matched_in_type: 'curated journal',
+    details: {
+      name: 'Monstera deliciosa',
+      common_names: ['Swiss cheese plant', 'Split-leaf philodendron'],
+      description: 'A bold indoor foliage plant with split leaves. It prefers bright indirect light, steady warmth, and watering after the upper soil begins to dry.',
+      rank: 'species',
+      taxonomy: { family: 'Araceae', genus: 'Monstera' },
+      watering: { min: 1, max: 2 },
+      propagation_methods: ['stem cutting', 'air layering'],
+      edible_parts: [],
+      synonyms: ['Monstera borsigiana'],
+    },
+  },
+  {
+    access_token: 'local-orchid-phalaenopsis',
+    entity_name: 'Phalaenopsis orchid',
+    matched_in_type: 'curated journal',
+    details: {
+      name: 'Phalaenopsis orchid',
+      common_names: ['Moth orchid'],
+      description: 'A flowering houseplant that prefers filtered light, airy potting media, and careful watering once roots turn silvery rather than bright green.',
+      rank: 'genus',
+      taxonomy: { family: 'Orchidaceae', genus: 'Phalaenopsis' },
+      watering: { min: 1, max: 2 },
+      propagation_methods: ['keiki division'],
+      edible_parts: [],
+      synonyms: [],
+    },
+  },
+  {
+    access_token: 'local-ficus-elastica',
+    entity_name: 'Ficus elastica',
+    matched_in_type: 'curated journal',
+    details: {
+      name: 'Ficus elastica',
+      common_names: ['Rubber plant'],
+      description: 'A resilient indoor tree with glossy leaves. It grows best in bright indirect light and should be watered when the top layer of soil dries.',
+      rank: 'species',
+      taxonomy: { family: 'Moraceae', genus: 'Ficus' },
+      watering: { min: 1, max: 2 },
+      propagation_methods: ['stem cutting', 'air layering'],
+      edible_parts: [],
+      synonyms: [],
+    },
+  },
+  {
+    access_token: 'local-aloe-vera',
+    entity_name: 'Aloe vera',
+    matched_in_type: 'curated journal',
+    details: {
+      name: 'Aloe vera',
+      common_names: ['Aloe'],
+      description: 'A drought-tolerant succulent that needs strong light and sparse watering. Let the soil dry fully before watering again.',
+      rank: 'species',
+      taxonomy: { family: 'Asphodelaceae', genus: 'Aloe' },
+      watering: { min: 1, max: 1 },
+      propagation_methods: ['offset division'],
+      edible_parts: ['leaf gel'],
+      synonyms: [],
+    },
+  },
+];
+
+const getFallbackMatches = (query) => {
+  const normalized = String(query || '').toLowerCase();
+  return fallbackPlantProfiles.filter((profile) => (
+    profile.entity_name.toLowerCase().includes(normalized)
+    || profile.details.name.toLowerCase().includes(normalized)
+    || commonNamesText(profile.details.common_names).toLowerCase().includes(normalized)
+  ));
+};
+
+const getFallbackDetails = (accessToken) => fallbackPlantProfiles
+  .find((profile) => profile.access_token === accessToken)
+  ?.details;
+
+const isKindwiseLimitError = (error) => error?.status === 429 || String(error?.message || '').includes('(429)');
+
 const mapMoisture = (value) => {
   if (value <= 1) return 'Dry';
   if (value <= 2) return 'Medium';
@@ -156,8 +238,15 @@ const JournalPage = () => {
         const nextToken = entities[0].access_token;
         setSelectedToken((prev) => prev || nextToken);
       } catch (error) {
-        setResults([]);
-        setSearchError(error.message || 'Search failed.');
+        const fallbackMatches = getFallbackMatches(debouncedQuery);
+        setResults(fallbackMatches);
+        setSelectedPlant(null);
+        setSelectedToken(fallbackMatches[0]?.access_token || '');
+        setSearchError(
+          isKindwiseLimitError(error)
+            ? 'Kindwise limit reached, showing saved CHLORO journal entries.'
+            : error.message || 'Search failed.'
+        );
       } finally {
         setSearchLoading(false);
       }
@@ -171,6 +260,12 @@ const JournalPage = () => {
       if (!selectedToken) return;
 
       setDetailError('');
+      const fallbackDetails = getFallbackDetails(selectedToken);
+      if (fallbackDetails) {
+        setSelectedPlant(fallbackDetails);
+        return;
+      }
+
       const cached = detailCache.current.get(selectedToken);
       if (cached) {
         setSelectedPlant(cached);
@@ -184,8 +279,11 @@ const JournalPage = () => {
         detailCache.current.set(selectedToken, detail);
         setSelectedPlant(detail);
       } catch (error) {
-        setSelectedPlant(null);
-        setDetailError(error.message || 'Could not load plant details.');
+        setDetailError(
+          isKindwiseLimitError(error)
+            ? 'Kindwise detail limit reached, keeping the saved journal profile visible.'
+            : error.message || 'Could not load plant details.'
+        );
       } finally {
         setDetailLoading(false);
       }

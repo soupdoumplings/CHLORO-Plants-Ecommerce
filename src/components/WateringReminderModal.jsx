@@ -22,7 +22,7 @@ const WateringReminderModal = ({ open, onClose, user, plants = [], defaultFreque
   }, [plants, selectedPlantId]);
 
   const frequencyOptions = useMemo(() => {
-    if (WATERING_FREQUENCY_OPTIONS.some((option) => option.days === frequencyDays)) {
+    if (WATERING_FREQUENCY_OPTIONS.some((option) => Number(option.days) === Number(frequencyDays))) {
       return WATERING_FREQUENCY_OPTIONS;
     }
     return [
@@ -96,7 +96,7 @@ const WateringReminderModal = ({ open, onClose, user, plants = [], defaultFreque
             </div>
 
             {plants.length > 1 && (
-              <label className="block mb-6">
+              <label className="block mb-7">
                 <span className="block font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-bold mb-2">
                   Purchased plant
                 </span>
@@ -114,7 +114,7 @@ const WateringReminderModal = ({ open, onClose, user, plants = [], defaultFreque
               </label>
             )}
 
-            <label className="block mb-6">
+            <label className="block mb-7">
               <span className="block font-label text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A] font-bold mb-2">
                 Watering frequency
               </span>
@@ -124,7 +124,7 @@ const WateringReminderModal = ({ open, onClose, user, plants = [], defaultFreque
                 className="w-full bg-white border border-[#B0B0A8]/40 px-4 py-3 font-body text-[14px] outline-none focus:border-[#1A1A1A]"
               >
                 {frequencyOptions.map((option) => (
-                  <option key={option.days} value={option.days}>{option.label}</option>
+                  <option key={`${option.days}-${option.label}`} value={option.days}>{option.label}</option>
                 ))}
               </select>
             </label>

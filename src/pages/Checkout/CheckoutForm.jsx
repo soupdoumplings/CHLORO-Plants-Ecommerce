@@ -36,6 +36,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
   const shippingAddress = checkoutDetails.shippingAddress;
   const billingAddress = checkoutDetails.billingAddress;
   const khaltiReady = isKhaltiConfigured();
+  const khaltiDemoMode = khaltiReady && !import.meta.env.VITE_KHALTI_SECRET_KEY && !import.meta.env.VITE_KHALTI_PUBLIC_KEY;
 
   const updateDetails = (patch) => {
     setCheckoutDetails((current) => ({ ...current, ...patch }));
@@ -387,7 +388,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               <div className="flex flex-col">
                 <span className={`font-headline italic text-[18px] transition-colors ${paymentMethod === 'khalti' ? 'text-[#3D1A68]' : 'text-[#4A4A4A] group-hover:text-[#3D1A68]'}`}>Pay with Khalti</span>
                 <span className="mt-1 font-label text-[10px] uppercase tracking-[0.15em] text-[#6B6B6B]">
-                  {khaltiReady ? 'Digital Wallet' : 'Sandbox key required'}
+                  {khaltiDemoMode ? 'Sandbox Demo Mode' : khaltiReady ? 'Digital Wallet' : 'Sandbox key required'}
                 </span>
               </div>
             </div>
@@ -476,7 +477,11 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-[#5C2D91]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#5C2D91]/30 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#3D1A68] mb-2">Pay with Khalti</h3>
-              <p className="font-body text-[14px] text-[#4A4A4A]">You will be redirected to Khalti's sandbox checkout page to complete your payment.</p>
+              <p className="font-body text-[14px] text-[#4A4A4A]">
+                {khaltiDemoMode
+                  ? 'Local demo mode will complete the Khalti flow without requiring sandbox credentials.'
+                  : "You will be redirected to Khalti's sandbox checkout page to complete your payment."}
+              </p>
             </Motion.div>
           )}
 

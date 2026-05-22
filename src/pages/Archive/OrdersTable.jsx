@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { supabase } from '../../supabase';
 
+const ORDERS_PER_PAGE = 15;
 const statusOptions = ['pending', 'processing', 'shipping', 'delivered', 'cancelled'];
 const paymentOptions = ['pending', 'completed', 'failed', 'refunded', 'cancelled'];
 
@@ -33,11 +34,35 @@ const OrdersTable = ({ orders, loading, error, onRefresh }) => {
   const [updatingId, setUpdatingId] = useState('');
   const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredOrders = useMemo(() => {
     if (statusFilter === 'all') return orders;
     return orders.filter((order) => order.status === statusFilter);
   }, [orders, statusFilter]);
+
+  const pageCount = Math.max(1, Math.ceil(filteredOrders.length / ORDERS_PER_PAGE));
+  const currentPageOrders = useMemo(() => {
+    const start = (currentPage - 1) * ORDERS_PER_PAGE;
+    return filteredOrders.slice(start, start + ORDERS_PER_PAGE);
+  }, [currentPage, filteredOrders]);
+  const pageStart = filteredOrders.length === 0 ? 0 : ((currentPage - 1) * ORDERS_PER_PAGE) + 1;
+  const pageEnd = Math.min(currentPage * ORDERS_PER_PAGE, filteredOrders.length);
+  const pageNumbers = useMemo(() => {
+    const windowSize = 5;
+    const halfWindow = Math.floor(windowSize / 2);
+    const start = Math.max(1, Math.min(currentPage - halfWindow, pageCount - windowSize + 1));
+    const end = Math.min(pageCount, start + windowSize - 1);
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, pageCount]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > pageCount) setCurrentPage(pageCount);
+  }, [currentPage, pageCount]);
 
   const handleStatusChange = async (orderId, nextStatus) => {
     setUpdatingId(orderId);
@@ -152,96 +177,146 @@ const OrdersTable = ({ orders, loading, error, onRefresh }) => {
             No orders in this queue.
           </div>
         ) : (
-          <div className="divide-y divide-[#B1B3A9]/15">
-            {filteredOrders.map((order) => (
-              <div key={order.id} className="grid gap-6 p-6 transition-colors hover:bg-[#FBF9F4] lg:grid-cols-[1.2fr_1fr_220px] lg:p-8">
-                <div>
-                  <div className="mb-4 flex flex-wrap items-center gap-3">
-                    <span className={`px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] ${statusStyles[order.status] || statusStyles.pending}`}>
-                      {order.status}
-                    </span>
-                    <span className="font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#797C73]">
-                      {formatDate(order.created_at)}
-                    </span>
-                  </div>
+          <>
+            <div className="flex flex-col gap-3 border-b border-[#B1B3A9]/15 bg-[#FBF9F4] px-6 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+              <p className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
+                Showing {pageStart}-{pageEnd} of {filteredOrders.length} orders
+              </p>
+              <p className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#785A1A]">
+                {ORDERS_PER_PAGE} per page
+              </p>
+            </div>
 
-                  <h3 className="font-headline text-2xl leading-tight text-[#31332C]">
-                    {order.customer_name}
-                  </h3>
-                  <p className="mt-2 font-body text-sm leading-6 text-[#5E6058]">
-                    {order.customer_phone} - {order.customer_email}
-                  </p>
-                  <p className="mt-3 max-w-xl font-body text-sm leading-6 text-[#31332C]">
-                    {order.shipping_address}
-                  </p>
-                </div>
+            <div className="divide-y divide-[#B1B3A9]/15">
+              {currentPageOrders.map((order) => (
+                <div key={order.id} className="grid gap-6 p-6 transition-colors hover:bg-[#FBF9F4] lg:grid-cols-[1.2fr_1fr_220px] lg:p-8">
+                  <div>
+                    <div className="mb-4 flex flex-wrap items-center gap-3">
+                      <span className={`px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] ${statusStyles[order.status] || statusStyles.pending}`}>
+                        {order.status}
+                      </span>
+                      <span className="font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#797C73]">
+                        {formatDate(order.created_at)}
+                      </span>
+                    </div>
 
-                <div>
-                  <p className="mb-3 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#785A1A]">
-                    Items
-                  </p>
-                  <div className="space-y-2">
-                    {(order.order_items || []).map((item) => (
-                      <div key={item.id} className="flex items-start justify-between gap-4 font-body text-sm text-[#31332C]">
-                        <span>{item.product_name || 'Product'} x {item.quantity}</span>
-                        <span className="shrink-0 text-[#5E6058]">{formatMoney(item.price_at_time)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-5 border-t border-[#B1B3A9]/15 pt-4">
-                    <p className="font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#5E6058]">
-                      {order.payment_method} - {order.payment_status}
+                    <h3 className="font-headline text-2xl leading-tight text-[#31332C]">
+                      {order.customer_name}
+                    </h3>
+                    <p className="mt-2 font-body text-sm leading-6 text-[#5E6058]">
+                      {order.customer_phone} - {order.customer_email}
                     </p>
-                    <p className="mt-2 font-headline text-2xl text-[#31332C]">
-                      {formatMoney(order.total_amount)}
+                    <p className="mt-3 max-w-xl font-body text-sm leading-6 text-[#31332C]">
+                      {order.shipping_address}
                     </p>
                   </div>
+
+                  <div>
+                    <p className="mb-3 font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#785A1A]">
+                      Items
+                    </p>
+                    <div className="space-y-2">
+                      {(order.order_items || []).map((item) => (
+                        <div key={item.id} className="flex items-start justify-between gap-4 font-body text-sm text-[#31332C]">
+                          <span>{item.product_name || 'Product'} x {item.quantity}</span>
+                          <span className="shrink-0 text-[#5E6058]">{formatMoney(item.price_at_time)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-5 border-t border-[#B1B3A9]/15 pt-4">
+                      <p className="font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#5E6058]">
+                        {order.payment_method} - {order.payment_status}
+                      </p>
+                      <p className="mt-2 font-headline text-2xl text-[#31332C]">
+                        {formatMoney(order.total_amount)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col justify-between gap-4">
+                    <label className="flex flex-col gap-2">
+                      <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
+                        Delivery Status
+                      </span>
+                      <select
+                        value={order.status || 'pending'}
+                        disabled={updatingId === order.id}
+                        onChange={(event) => handleStatusChange(order.id, event.target.value)}
+                        className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
+                      >
+                        {statusOptions.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="flex flex-col gap-2">
+                      <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
+                        Payment Status
+                      </span>
+                      <select
+                        value={order.payment_status || 'pending'}
+                        disabled={updatingPaymentId === order.id}
+                        onChange={(event) => handlePaymentStatusChange(order.id, event.target.value)}
+                        className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
+                      >
+                        {paymentOptions.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <p className="font-body text-xs leading-5 text-[#797C73]">
+                      Ref: {order.payment_reference || order.id.slice(0, 8)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {pageCount > 1 && (
+              <div className="flex flex-col gap-4 border-t border-[#B1B3A9]/15 bg-white px-6 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={currentPage === 1}
+                  className="border border-[#31332C]/20 px-5 py-3 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:bg-[#31332C] hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  Previous
+                </button>
+
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {pageNumbers.map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setCurrentPage(page)}
+                      className={`h-10 min-w-10 border px-3 font-label text-[9px] font-bold uppercase tracking-[0.12em] transition-colors ${
+                        currentPage === page
+                          ? 'border-[#31332C] bg-[#31332C] text-white'
+                          : 'border-[#31332C]/15 text-[#31332C] hover:bg-[#F5F4ED]'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
                 </div>
 
-                <div className="flex flex-col justify-between gap-4">
-                  <label className="flex flex-col gap-2">
-                    <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
-                      Delivery Status
-                    </span>
-                    <select
-                      value={order.status || 'pending'}
-                      disabled={updatingId === order.id}
-                      onChange={(event) => handleStatusChange(order.id, event.target.value)}
-                      className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
-                    >
-                      {statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="flex flex-col gap-2">
-                    <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">
-                      Payment Status
-                    </span>
-                    <select
-                      value={order.payment_status || 'pending'}
-                      disabled={updatingPaymentId === order.id}
-                      onChange={(event) => handlePaymentStatusChange(order.id, event.target.value)}
-                      className="border border-[#B1B3A9]/30 bg-[#FBF9F4] px-4 py-3 font-label text-[10px] font-bold uppercase tracking-[0.12em] text-[#31332C] outline-none transition-colors focus:border-[#785A1A] disabled:opacity-50"
-                    >
-                      {paymentOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <p className="font-body text-xs leading-5 text-[#797C73]">
-                    Ref: {order.payment_reference || order.id.slice(0, 8)}
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.min(pageCount, page + 1))}
+                  disabled={currentPage === pageCount}
+                  className="border border-[#31332C]/20 px-5 py-3 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:bg-[#31332C] hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  Next
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </Motion.section>

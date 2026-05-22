@@ -97,7 +97,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     }
 
     if (paymentMethod === 'khalti' && !isKhaltiConfigured()) {
-      setError('Khalti sandbox key is missing. Add VITE_KHALTI_SECRET_KEY or choose eSewa/COD.');
+      setError('Khalti is not available in this build. Add VITE_KHALTI_SECRET_KEY or choose eSewa/COD.');
       return;
     }
 

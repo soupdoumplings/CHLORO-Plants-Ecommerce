@@ -11,6 +11,7 @@ import { parseEsewaResponse } from '../../lib/paymentUtils';
 import { sendOrderEmailNotification } from '../../lib/orderNotifications';
 import { supabase } from '../../supabase';
 import { productAssetImages } from '../../lib/localImages';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const fallbackValue = 'Pending';
 
@@ -198,7 +199,7 @@ const PaymentSuccess = () => {
 
       const { data, error } = await supabase
         .from('order_items')
-        .select('product_id, product_name, products(id, name, images, water_frequency)')
+        .select('product_id, product_name, products(id, name, images, water_frequency, category, description, info, tags)')
         .eq('order_id', orderId);
 
       if (error || !data?.length) return;
@@ -208,7 +209,11 @@ const PaymentSuccess = () => {
         name: item.products?.name || item.product_name,
         images: item.products?.images || [],
         water_frequency: item.products?.water_frequency || 'Every 7 Days',
-      })).filter((plant) => plant.id || plant.name);
+        category: item.products?.category,
+        description: item.products?.description,
+        info: item.products?.info,
+        tags: item.products?.tags || [],
+      })).filter((plant) => (plant.id || plant.name) && getProductType(plant) === productTypeLabels.plants);
 
       setPurchasedPlants(plants);
       setReminderOpen(plants.length > 0);

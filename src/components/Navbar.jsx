@@ -85,8 +85,10 @@ const Navbar = () => {
   const text = "text-[#FBF9F4]";
   const textDim = "text-[#FBF9F4]/70";
   const border = "border-[#FBF9F4]/20";
-  const accentText = "text-[#c6e9e9]";
   const hoverAccent = "hover:text-[#F58700]";
+  const navIconAction = `relative flex h-8 w-8 items-center justify-center ${text} hover:text-[#628141] transition-colors outline-none`;
+  const notificationIconAction = `relative flex h-8 w-8 items-center justify-center ${text} hover:text-[#c6e9e9] transition-colors outline-none`;
+  const navIcon = "material-symbols-outlined text-[24px] leading-none";
   const mobileLinks = isAdmin
     ? [{ label: 'Admin', to: '/archive', icon: 'admin_panel_settings' }]
     : [
@@ -168,7 +170,7 @@ const Navbar = () => {
         )}
 
         {/* Utilities */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:gap-6">
+        <div className="flex shrink-0 items-center gap-[1.2rem]">
           {!isAdmin && (
             <Motion.button
               onClick={() => setSearchOpen(true)}
@@ -183,15 +185,15 @@ const Navbar = () => {
             </Motion.button>
           )}
 
-          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+          <div className="flex items-center gap-[1.2rem]">
                 {user && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className={`${text} hover:${accentText} transition-colors relative flex h-9 w-9 items-center justify-center outline-none`}
+                      className={notificationIconAction}
                       title="Notifications"
                     >
-                      <span className="material-symbols-outlined text-[24px]">notifications</span>
+                      <span className={navIcon}>notifications</span>
                       <AnimatePresence>
                         {unreadCount > 0 && (
                           <Motion.span
@@ -199,7 +201,7 @@ const Navbar = () => {
                             animate={{ scale: 1 }}
                             exit={{ scale: 0 }}
                             transition={{ type: 'spring', stiffness: 500 }}
-                            className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#F58700] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                            className={`absolute -top-2 -right-1 w-[18px] h-[18px] bg-[#F58700] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
                           >
                             {unreadCount > 9 ? '9+' : unreadCount}
                           </Motion.span>
@@ -283,8 +285,8 @@ const Navbar = () => {
                 )}
 
             {!isAdmin && (
-              <Link to="/cart" className={`${text} hover:text-[#628141] transition-colors relative flex h-9 w-9 items-center justify-center`} title="Cart">
-                <span className="material-symbols-outlined text-[24px]">shopping_bag</span>
+              <Link to="/cart" className={navIconAction} title="Cart">
+                <span className={navIcon}>shopping_bag</span>
                 <AnimatePresence>
                   {cartCount > 0 && (
                     <Motion.span
@@ -292,7 +294,7 @@ const Navbar = () => {
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                       transition={{ type: 'spring', stiffness: 500 }}
-                      className={`absolute -top-1.5 -right-2 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
+                      className={`absolute -top-2 -right-1 w-[18px] h-[18px] bg-[#C5A059] text-[#FBF9F4] rounded-full font-body text-[11px] font-extrabold flex items-center justify-center shadow-md border-[1.5px] border-[#0F3A3A]`}
                     >
                       {cartCount}
                     </Motion.span>
@@ -301,22 +303,22 @@ const Navbar = () => {
               </Link>
             )}
 
-            <div className="hidden items-center gap-4 md:flex">
+            <div className="hidden items-center gap-[1.2rem] md:flex">
               {!user ? (
                 <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
                   LOGIN
                 </Link>
               ) : (
                 <>
-                  <Link to="/dashboard" className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors ml-2`} title="Dashboard">
-                    person
+                  <Link to={isAdmin ? '/admin/profile' : '/dashboard'} className={navIconAction} title={isAdmin ? 'Admin Profile' : 'Dashboard'}>
+                    <span className={navIcon}>person</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className={`material-symbols-outlined ${text} hover:text-[#628141] transition-colors`}
+                    className={navIconAction}
                     title="Logout"
                   >
-                    logout
+                    <span className={navIcon}>logout</span>
                   </button>
                 </>
               )}

@@ -9,18 +9,23 @@ import { productAssetImages } from '../../lib/localImages';
 
 const formatDate = (date) => {
   if (!date) return 'Not scheduled';
-  return new Date(`${date}T12:00:00`).toLocaleDateString('en-NP', {
+  return new Date(date.includes('T') ? date : `${date}T12:00:00`).toLocaleString('en-NP', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 };
 
 const getWateringState = (plant) => {
   const today = new Date();
-  today.setHours(12, 0, 0, 0);
-  const last = new Date(`${plant.last_watered_at || plant.created_at?.slice(0, 10)}T12:00:00`);
-  const next = new Date(`${plant.next_watering_date}T12:00:00`);
+  const last = plant.last_watered_at
+    ? new Date(`${plant.last_watered_at}T12:00:00`)
+    : new Date(plant.created_at || Date.now());
+  const next = plant.next_watering_at
+    ? new Date(plant.next_watering_at)
+    : new Date(`${plant.next_watering_date}T12:00:00`);
   const total = Math.max(1, next - last);
   const elapsed = Math.max(0, today - last);
   const progress = Math.min(100, Math.round((elapsed / total) * 100));
@@ -62,6 +67,13 @@ const MyPlantsPage = () => {
   const handleEmailToggle = async (plant, enabled) => {
     const updated = await setEmailNotifications(plant.id, enabled);
     setPlants((current) => current.map((item) => item.id === updated.id ? updated : item));
+  };
+
+  const formatFrequency = (plant) => {
+    const hours = Number(plant.water_frequency_hours || 0);
+    if (hours === 12) return 'Every 12 hours';
+    if (hours === 24 || Number(plant.water_frequency_days) === 1) return 'Every day';
+    return `Every ${plant.water_frequency_days} days`;
   };
 
   return (
@@ -135,7 +147,7 @@ const MyPlantsPage = () => {
                       <div>
                         <h2 className="font-headline text-2xl text-[#1A1A1A] leading-tight">{plant.plant_name}</h2>
                         <p className="font-label text-[9px] tracking-[0.14em] uppercase text-[#6B6B6B] mt-2">
-                          Every {plant.water_frequency_days} days
+                          {formatFrequency(plant)}
                         </p>
                       </div>
                       <span className={`font-label text-[9px] tracking-[0.12em] uppercase px-2.5 py-1.5 ${state.overdue ? 'bg-[#D94F4F] text-white' : state.dueToday ? 'bg-[#C5A059] text-white' : 'bg-[#E8E9E0] text-[#0F3A3A]'}`}>
@@ -146,7 +158,7 @@ const MyPlantsPage = () => {
                     <div className="mt-6">
                       <div className="flex justify-between font-label text-[9px] tracking-[0.12em] uppercase text-[#6B6B6B] mb-2">
                         <span>Next Watering</span>
-                        <span>{formatDate(plant.next_watering_date)}</span>
+                        <span>{formatDate(plant.next_watering_at || plant.next_watering_date)}</span>
                       </div>
                       <div className="h-2 bg-[#E8E9E0] overflow-hidden">
                         <div

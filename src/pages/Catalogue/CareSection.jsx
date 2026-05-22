@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import WateringReminderModal from '../../components/WateringReminderModal';
 import { useAuth } from '../../lib/AuthContext';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const CareSection = ({ product }) => {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ const CareSection = ({ product }) => {
   const optimalPlace = product?.optimal_place || 'Bright Indirect Light';
   const waterFrequency = product?.water_frequency || 'Every 7 Days';
   const plantName = product?.name || 'This plant';
+  const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
 
   // Derive illumination description from optimal_place
   const getIlluminationDesc = (place) => {
@@ -114,7 +116,7 @@ const CareSection = ({ product }) => {
               </div>
             )}
 
-            {card.extra === 'hydration' && (
+            {card.extra === 'hydration' && isPlantProduct && (
               <Motion.div
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -166,7 +168,7 @@ const CareSection = ({ product }) => {
         ))}
       </div>
       <WateringReminderModal
-        open={reminderOpen}
+        open={reminderOpen && isPlantProduct}
         onClose={() => setReminderOpen(false)}
         user={user}
         plants={product ? [product] : []}
