@@ -116,10 +116,12 @@ export const markPlantWatered = async (plant) => {
     .select()
     .single();
 
-  if (error?.code === 'PGRST204' && String(error.message || '').includes('last_reminder_sent_at_ts')) {
-    const legacyPatch = { ...patch };
-    delete legacyPatch.last_reminder_sent_at_ts;
-
+  if (error?.code === 'PGRST204') {
+    const legacyPatch = {
+      last_watered_at: patch.last_watered_at,
+      next_watering_date: patch.next_watering_date,
+      last_reminder_sent_at: patch.last_reminder_sent_at,
+    };
     const legacyResult = await supabase
       .from('user_plants')
       .update(legacyPatch)
