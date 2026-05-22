@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../lib/CartContext';
 import { useWishlist } from '../lib/WishlistContext';
 
-const ProductCard = ({ product, delay = 0 }) => {
+const ProductCard = ({ product, delay = 0, imageFrameClassName = 'aspect-[3/4]' }) => {
   const { addToBag } = useCart();
   const wishlist = useWishlist();
   const saved = wishlist.isWishlisted(product.id);
@@ -18,7 +18,7 @@ const ProductCard = ({ product, delay = 0 }) => {
         transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
         className="group cursor-pointer block h-full flex flex-col"
       >
-        <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-[#e2e3d9]/30">
+        <div className={`relative mb-6 overflow-hidden bg-[#e2e3d9]/30 ${imageFrameClassName}`}>
           <Motion.img
             initial={{ scale: 1.05 }}
             whileHover={{ scale: 1 }}

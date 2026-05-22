@@ -476,7 +476,7 @@ const CheckoutForm = ({ paymentMethod, setPaymentMethod, checkoutDetails, setChe
               className="bg-[#5C2D91]/10 p-7 lg:p-10 shadow-sm mb-6 border border-[#5C2D91]/30 text-center overflow-hidden"
             >
               <h3 className="font-headline text-[18px] text-[#3D1A68] mb-2">Pay with Khalti</h3>
-              <p className="font-body text-[14px] text-[#4A4A4A]">You will be redirected to Khalti's secure checkout page to complete your payment.</p>
+              <p className="font-body text-[14px] text-[#4A4A4A]">You will be redirected to Khalti's sandbox checkout page to complete your payment.</p>
             </Motion.div>
           )}
 

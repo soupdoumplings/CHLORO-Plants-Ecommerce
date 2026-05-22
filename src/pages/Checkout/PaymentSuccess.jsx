@@ -37,7 +37,7 @@ const formatAmount = (amount) => {
 const getTransactionFromParams = (searchParams) => {
   const esewaData = searchParams.get('data');
   const khaltiPidx = searchParams.get('pidx');
-  const orderId = searchParams.get('order_id');
+  const orderId = searchParams.get('order_id') || searchParams.get('purchase_order_id');
   const method = searchParams.get('method');
   const reference = searchParams.get('ref');
   const amount = searchParams.get('amount');
@@ -67,15 +67,16 @@ const getTransactionFromParams = (searchParams) => {
   }
 
   if (khaltiPidx) {
-    const callbackAmount = searchParams.get('amount');
+    const callbackAmount = searchParams.get('total_amount') || searchParams.get('amount');
     const amountInNpr = callbackAmount ? Number(callbackAmount) / 100 : fallbackValue;
+    const status = searchParams.get('status') || 'Pending';
 
     return {
       method: methodLabels.khalti,
-      transactionCode: searchParams.get('transaction_id') || khaltiPidx,
-      orderReference: searchParams.get('purchase_order_id') || fallbackValue,
+      transactionCode: searchParams.get('transaction_id') || searchParams.get('tidx') || khaltiPidx,
+      orderReference: orderId || fallbackValue,
       amount: amountInNpr,
-      status: searchParams.get('status') || 'Complete',
+      status,
     };
   }
 
@@ -85,7 +86,7 @@ const getTransactionFromParams = (searchParams) => {
       transactionCode: reference || orderId,
       orderReference: orderId,
       amount: amount || fallbackValue,
-      status: searchParams.get('status') || 'Complete',
+      status: searchParams.get('status') || 'Pending',
     };
   }
 
@@ -167,7 +168,7 @@ const PaymentSuccess = () => {
   const [reminderOpen, setReminderOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const hasClearedCart = useRef(false);
-  const orderId = searchParams.get('order_id');
+  const orderId = searchParams.get('order_id') || searchParams.get('purchase_order_id');
 
   const paramTransaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
   const transaction = useMemo(() => (
@@ -235,9 +236,11 @@ const PaymentSuccess = () => {
       setOrderDetails(order);
 
       const method = searchParams.get('method') || order.payment_method;
+      const callbackStatus = String(searchParams.get('status') || '').toLowerCase();
       const isCod = method === 'cod';
-      const nextPaymentStatus = isCod ? 'pending' : 'completed';
-      const nextOrderStatus = isCod ? 'processing' : 'processing';
+      const isKhaltiCancelled = method === 'khalti' && callbackStatus && callbackStatus !== 'completed';
+      const nextPaymentStatus = isCod ? 'pending' : isKhaltiCancelled ? 'failed' : 'completed';
+      const nextOrderStatus = isKhaltiCancelled ? 'pending' : 'processing';
       const reference = paramTransaction.transactionCode === fallbackValue
         ? order.payment_reference || null
         : paramTransaction.transactionCode;

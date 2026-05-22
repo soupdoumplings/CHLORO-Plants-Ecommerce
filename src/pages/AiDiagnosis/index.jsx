@@ -571,9 +571,14 @@ const AiDiagnosisPage = () => {
               </p>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+            <div className="mx-auto mt-10 grid max-w-[1460px] grid-cols-1 gap-8 md:grid-cols-2">
               {treatmentCards.map((product, index) => (
-                <ProductCard key={product.id || product.name} product={product} index={index} />
+                <ProductCard
+                  key={product.id || product.name}
+                  product={product}
+                  delay={index * 0.08}
+                  imageFrameClassName="aspect-[1/0.92] max-h-[620px]"
+                />
               ))}
             </div>
 

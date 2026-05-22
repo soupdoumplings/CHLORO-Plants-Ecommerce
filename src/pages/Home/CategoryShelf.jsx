@@ -31,9 +31,9 @@ const CATEGORIES = [
 
 const CategoryShelf = () => {
   return (
-    <section className="w-full py-32 page-gutter bg-[#FBF9F4]">
+    <section className="w-full bg-[#FBF9F4] py-24 page-gutter md:py-28">
       <div className="page-shell">
-        <div className="space-y-4 mb-20 text-left">
+        <div className="mb-16 space-y-4 text-left md:mb-20">
           <Motion.span
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -63,7 +63,7 @@ const CategoryShelf = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="group cursor-pointer relative aspect-[14/19] overflow-hidden"
+              className="group relative aspect-[14/10] max-h-[480px] cursor-pointer overflow-hidden md:aspect-[4/3] xl:aspect-[14/9]"
               onClick={() => window.location.href = cat.link}
             >
               <img

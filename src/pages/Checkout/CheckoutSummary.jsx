@@ -97,7 +97,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
     }
 
     if (paymentMethod === 'khalti' && !isKhaltiConfigured()) {
-      setError('Khalti is not configured for this local build yet. Add a sandbox key or use eSewa/COD.');
+      setError('Khalti sandbox key is missing. Add VITE_KHALTI_SECRET_KEY or choose eSewa/COD.');
       return;
     }
 
@@ -180,25 +180,20 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           failureUrl: `${baseUrl}/payment/failure?order_id=${order.id}`,
         });
       } else if (paymentMethod === 'khalti') {
-        try {
-          const result = await initiateKhaltiPayment({
-            amount: total * 100, // Convert to paisa
-            purchaseOrderId: transactionId,
-            purchaseOrderName: `CHLORO Order ${transactionId}`,
-            returnUrl: `${baseUrl}/payment/success?method=khalti&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
-            websiteUrl: baseUrl,
-          });
+        const result = await initiateKhaltiPayment({
+          amount: total * 100,
+          purchaseOrderId: order.id,
+          purchaseOrderName: `CHLORO Order ${String(order.id).slice(0, 8)}`,
+          returnUrl: `${baseUrl}/payment/success?method=khalti&order_id=${order.id}&ref=${transactionId}`,
+          websiteUrl: baseUrl,
+          customerInfo: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone,
+          },
+        });
 
-          if (result.payment_url) {
-            window.location.href = result.payment_url;
-          } else {
-            throw new Error('No payment URL returned');
-          }
-        } catch (khaltiErr) {
-          console.error('Khalti error:', khaltiErr);
-          setError('Khalti payment initiation failed. Ensure proxy is running.');
-          setProcessing(false);
-        }
+        window.location.href = result.payment_url;
       } else if (paymentMethod === 'cod') {
         await sendOrderEmailNotification({
           orderId: order.id,

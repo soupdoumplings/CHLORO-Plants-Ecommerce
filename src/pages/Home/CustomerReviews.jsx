@@ -25,9 +25,30 @@ const REVIEWS = [
     plant: 'Money Plant',
     comment: 'Loved the care notes. It felt less like a random order and more like a curated gift.',
   },
+  {
+    name: 'Samir Karki',
+    handle: '@samir.leafdesk',
+    image: publicPlantImages.orchid,
+    plant: 'Orchid Stem',
+    comment: 'The bloom arrived upright and protected. It made my work desk feel much calmer.',
+  },
+  {
+    name: 'Prakriti Thapa',
+    handle: '@prakriti.home',
+    image: publicPlantImages.leaf,
+    plant: 'Trailing Pothos',
+    comment: 'Healthy roots, clean potting, and clear watering advice. Very beginner friendly.',
+  },
+  {
+    name: 'Riya Joshi',
+    handle: '@riyagifts',
+    image: publicPlantImages.phool,
+    plant: 'Gift Arrangement',
+    comment: 'Sent it as a birthday gift and the packaging looked thoughtful, not generic.',
+  },
 ];
 
-const rotations = ['lg:-rotate-2', 'lg:rotate-1', 'lg:-rotate-1'];
+const rotations = ['lg:-rotate-2', 'lg:rotate-1', 'lg:-rotate-1', 'lg:rotate-1', 'lg:-rotate-1', 'lg:rotate-2'];
 
 const CustomerReviews = () => {
   return (
@@ -65,7 +86,7 @@ const CustomerReviews = () => {
           </Motion.p>
         </div>
 
-        <div className="relative mx-auto grid max-w-[1120px] gap-8 lg:grid-cols-3 lg:items-start lg:gap-10">
+        <div className="relative mx-auto grid max-w-[1120px] gap-8 md:grid-cols-2 lg:grid-cols-3 lg:items-start lg:gap-10">
           <div className="pointer-events-none absolute left-[16%] right-[16%] top-3 hidden border-t border-[#785A1A]/18 lg:block" />
           {REVIEWS.map((review, index) => (
             <Motion.article
@@ -75,7 +96,7 @@ const CustomerReviews = () => {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.75, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -8, rotate: 0 }}
-              className={`group relative mx-auto w-full max-w-[330px] bg-[#FFFEFA] p-5 pb-6 shadow-[0_22px_55px_rgba(49,51,44,0.12)] ring-1 ring-[#31332c]/8 transition-colors duration-500 hover:ring-[#785A1A]/25 ${rotations[index % rotations.length]}`}
+              className={`group relative mx-auto w-full max-w-[330px] bg-[#FFFEFA] p-5 pb-6 shadow-[0_22px_55px_rgba(49,51,44,0.12)] ring-1 ring-[#31332c]/8 transition-colors duration-500 hover:ring-[#785A1A]/25 ${index > 2 ? 'hidden md:block' : ''} ${rotations[index % rotations.length]}`}
             >
               <span className="absolute left-1/2 top-0 z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#785A1A]/35 bg-[#785A1A] shadow-[0_2px_8px_rgba(49,51,44,0.22)]" />
               <span className="absolute left-1/2 top-0 hidden h-8 border-l border-[#785A1A]/20 lg:block" />

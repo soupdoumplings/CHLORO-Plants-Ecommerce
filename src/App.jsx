@@ -19,7 +19,6 @@ const ManageInventory = lazy(() => import('./pages/ManageInventory'));
 const PromotionsPage = lazy(() => import('./pages/Admin/Promotions'));
 const DiscoveryPage = lazy(() => import('./pages/Discovery'));
 const ProductCataloguePage = lazy(() => import('./pages/ProductCatalogue'));
-const ProductDetailPage = lazy(() => import('./pages/Product'));
 const CartPage = lazy(() => import('./pages/Cart'));
 const CheckoutPage = lazy(() => import('./pages/Checkout'));
 const DashboardPage = lazy(() => import('./pages/Dashboard'));
@@ -55,7 +54,6 @@ const AnimatedRoutes = () => {
           <Route path="/catalogue/:id" element={<CataloguePage />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
           <Route path="/products-gifts" element={<ProductCataloguePage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/failure" element={<PaymentFailure />} />

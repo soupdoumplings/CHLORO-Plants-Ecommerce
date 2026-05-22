@@ -43,6 +43,136 @@ const getInitialSection = () => {
   return adminSections.some((section) => section.id === hashSection) ? hashSection : 'orders';
 };
 
+const csvColumns = [
+  'record_type',
+  'id',
+  'name',
+  'category',
+  'status',
+  'payment_status',
+  'payment_method',
+  'customer_name',
+  'customer_email',
+  'customer_phone',
+  'stock',
+  'price',
+  'quantity',
+  'line_total',
+  'order_total',
+  'created_at',
+  'details',
+];
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) return '';
+  const text = Array.isArray(value) ? value.join('; ') : String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+};
+
+const buildReport = ({ products, orders, generatedAt, scope }) => {
+  const paidOrders = orders.filter((order) => order.payment_status === 'completed');
+  const totalRevenue = paidOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
+  const totalInventoryValue = products.reduce((sum, product) => (
+    sum + (Number(product.price || 0) * Number(product.stock || 0))
+  ), 0);
+
+  const summary = {
+    products: products.length,
+    active_products: products.filter((product) => product.is_active).length,
+    low_stock_products: products.filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) < 10).length,
+    out_of_stock_products: products.filter((product) => Number(product.stock || 0) <= 0).length,
+    orders: orders.length,
+    paid_orders: paidOrders.length,
+    paid_revenue: totalRevenue,
+    inventory_value: totalInventoryValue,
+  };
+
+  const report = {
+    generated_at: generatedAt,
+    scope,
+    summary,
+  };
+
+  if (scope === 'all' || scope === 'inventory') report.products = products;
+  if (scope === 'all' || scope === 'orders') report.orders = orders;
+
+  return report;
+};
+
+const reportToCsv = (report) => {
+  const summaryRows = Object.entries(report.summary).map(([key, value]) => ({
+    record_type: 'summary',
+    id: key,
+    name: key.replace(/_/g, ' '),
+    details: value,
+  }));
+
+  const productRows = (report.products || []).map((product) => ({
+    record_type: 'product',
+    id: product.id,
+    name: product.name,
+    category: product.category || product.description,
+    status: product.is_active ? 'active' : 'inactive',
+    stock: product.stock,
+    price: product.price,
+    created_at: product.created_at,
+    details: [
+      product.model_url ? `model: ${product.model_url}` : '',
+      Array.isArray(product.tags) && product.tags.length ? `tags: ${product.tags.join('; ')}` : '',
+    ].filter(Boolean).join(' | '),
+  }));
+
+  const orderRows = (report.orders || []).flatMap((order) => {
+    const orderRow = {
+      record_type: 'order',
+      id: order.id,
+      status: order.status,
+      payment_status: order.payment_status,
+      payment_method: order.payment_method,
+      customer_name: order.customer_name,
+      customer_email: order.customer_email,
+      customer_phone: order.customer_phone,
+      order_total: order.total_amount,
+      created_at: order.created_at,
+      details: order.shipping_address,
+    };
+
+    const itemRows = (order.order_items || []).map((item) => ({
+      record_type: 'order_item',
+      id: item.id || order.id,
+      name: item.product_name || 'Product',
+      quantity: item.quantity,
+      price: item.price_at_time,
+      line_total: Number(item.price_at_time || 0) * Number(item.quantity || 0),
+      order_total: order.total_amount,
+      created_at: order.created_at,
+      details: `order: ${order.id}`,
+    }));
+
+    return [orderRow, ...itemRows];
+  });
+
+  const rows = report.scope === 'statistics'
+    ? summaryRows
+    : [...summaryRows, ...productRows, ...orderRows];
+  return [
+    csvColumns.join(','),
+    ...rows.map((row) => csvColumns.map((column) => escapeCsvValue(row[column])).join(',')),
+  ].join('\n');
+};
+
+const downloadReportFile = ({ content, filename, type }) => {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
 const ArchivePage = () => {
   const [activeSection, setActiveSection] = useState(getInitialSection);
   const [products, setProducts] = useState([]);
@@ -130,6 +260,28 @@ const ArchivePage = () => {
     }
   };
 
+  const handleDownloadReport = ({ format, scope }) => {
+    const generatedAt = new Date().toISOString();
+    const report = buildReport({ products, orders, generatedAt, scope });
+    const dateStamp = generatedAt.slice(0, 10);
+    const scopeLabel = scope || 'all';
+
+    if (format === 'csv') {
+      downloadReportFile({
+        content: reportToCsv(report),
+        filename: `chloro-${scopeLabel}-report-${dateStamp}.csv`,
+        type: 'text/csv;charset=utf-8',
+      });
+      return;
+    }
+
+    downloadReportFile({
+      content: JSON.stringify(report, null, 2),
+      filename: `chloro-${scopeLabel}-report-${dateStamp}.json`,
+      type: 'application/json;charset=utf-8',
+    });
+  };
+
   return (
     <Motion.div
       initial={{ opacity: 0 }}
@@ -140,7 +292,10 @@ const ArchivePage = () => {
     >
       <Navbar />
       <main className="w-full page-shell flex-grow mt-[82px] page-gutter">
-        <ArchiveHeader />
+        <ArchiveHeader
+          onDownloadReport={handleDownloadReport}
+          reportDisabled={loading || ordersLoading}
+        />
 
         <section className="mb-12 grid w-full grid-cols-1 border-l border-t border-[#B1B3A9]/20 bg-white shadow-xl shadow-black/5 lg:grid-cols-3">
           {adminSections.map((section) => {

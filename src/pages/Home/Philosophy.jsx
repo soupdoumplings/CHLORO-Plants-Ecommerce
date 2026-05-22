@@ -78,7 +78,7 @@ const Editorial = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute -bottom-10 -left-8 hidden max-w-sm border border-[#31332c]/5 bg-white p-10 shadow-2xl shadow-black/5 lg:block"
+            className="absolute -bottom-14 -left-8 hidden max-w-sm border border-[#31332c]/5 bg-white p-12 shadow-2xl shadow-black/5 lg:block"
           >
             <p className="font-headline italic text-2xl mb-6 text-[#785a1a] leading-relaxed tracking-tight">"We believe every home should be a sanctuary of wild Himalayan soul."</p>
             <p className="font-label text-[10px] uppercase tracking-[0.3em] text-[#797c73] font-bold">— The Founder</p>
