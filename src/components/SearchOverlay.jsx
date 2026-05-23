@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { fallbackCatalogImage } from '../lib/localImages';
+import { getProductImage } from '../lib/localImages';
 
 const SearchOverlay = ({ onClose }) => {
   const [query, setQuery] = useState('');
@@ -25,7 +25,7 @@ const SearchOverlay = ({ onClose }) => {
       if (!error && data) {
         setAllProducts(data.map(p => ({
           ...p,
-          image: p.images?.[0] || fallbackCatalogImage,
+          image: getProductImage(p),
           displayPrice: `रू ${Number(p.price).toFixed(2)}`,
         })));
       }

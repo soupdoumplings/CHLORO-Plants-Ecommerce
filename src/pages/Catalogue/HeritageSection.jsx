@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { fallbackHeroImage } from '../../lib/localImages';
+import { normalizeAppImageUrl, fallbackHeroImage } from '../../lib/localImages';
 import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const HeritageSection = ({ product }) => {
@@ -13,11 +13,12 @@ const HeritageSection = ({ product }) => {
   const provenance = product?.provenance || '';
 
   // Use second image if available, otherwise first image, otherwise fallback
-  const heritageImage = product?.images && product.images.length > 1
-    ? product.images[1]
-    : product?.images && product.images.length > 0
-      ? product.images[0]
-      : fallbackHeroImage;
+  const heritageImage = normalizeAppImageUrl(
+    product?.images && product.images.length > 1
+      ? product.images[1]
+      : product?.images?.[0],
+    fallbackHeroImage
+  );
 
   // Generate heritage narrative from product data
   const getHeritageNarrative = () => {

@@ -1,14 +1,12 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { fallbackHeroImage } from '../../lib/localImages';
+import { getProductImage, fallbackHeroImage } from '../../lib/localImages';
 import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const AnatomySection = ({ product }) => {
   const name = product?.name || 'This Product';
   const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
-  const heroImage = product?.images && product.images.length > 0
-    ? product.images[0]
-    : fallbackHeroImage;
+  const heroImage = getProductImage(product, fallbackHeroImage);
 
   // Generate anatomy details from plant data
   const getAnatomyDetails = () => {

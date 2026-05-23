@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
-import { fallbackHeroImage } from '../../lib/localImages';
+import { getProductImage, fallbackHeroImage } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
@@ -18,9 +18,7 @@ const FicusHero = ({ product }) => {
   const onSale = hasActiveSale(product);
   const price = product?.price ? formatRupees(getEffectivePrice(product)) : 'Price on request';
   const originalPrice = onSale ? formatRupees(product.price) : null;
-  const heroImage = product?.images && product.images.length > 0
-    ? product.images[0]
-    : fallbackHeroImage;
+  const heroImage = getProductImage(product, fallbackHeroImage);
   const curatorQuote = product?.curator_quote || (isPlantProduct
     ? '"A beautiful plant for homes that can offer steady light, patient watering, and a little care rhythm."'
     : '"A useful catalogue piece for considered gifting, practical routines, and plant care support."');

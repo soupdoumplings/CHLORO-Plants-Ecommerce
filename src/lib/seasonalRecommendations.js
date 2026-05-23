@@ -1,6 +1,6 @@
 import { supabase } from '../supabase';
 import { DEFAULT_PLANT_PREFERENCES, scorePlantForPreferences } from './plantPreferences';
-import { fallbackCatalogImage } from './localImages';
+import { fallbackCatalogImage, getProductImage } from './localImages';
 
 const fallbackImage = fallbackCatalogImage;
 const CACHE_PREFIX = 'chloro-seasonal-recommendations';
@@ -54,7 +54,7 @@ const getRegionalKeywords = (location, region) => {
 
 export const normalizeSeasonalProduct = (product) => ({
   ...product,
-  image: product.images?.[0] || product.image || fallbackImage,
+  image: getProductImage(product, fallbackImage),
   rawPrice: Number(product.rawPrice || product.price || 0),
   displayPrice: product.displayPrice || `रू ${Number(product.rawPrice || product.price || 0).toLocaleString('en-NP', {
     minimumFractionDigits: 2,

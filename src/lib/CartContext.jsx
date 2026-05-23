@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useState, useEffect } fr
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
-import { fallbackCatalogImage } from './localImages';
+import { getProductImage } from './localImages';
 import { getEffectivePrice } from './pricing';
 
 const CartContext = createContext();
@@ -47,7 +47,7 @@ export const CartProvider = ({ children }) => {
         price: getEffectivePrice(item.products),
         originalPrice: Number(item.products.price || 0),
         quantity: item.quantity,
-        image: item.products.images?.[0] || fallbackCatalogImage,
+        image: getProductImage(item.products),
         variant: 'STUDIO PICK' // Default variant for simplicity
       }));
 

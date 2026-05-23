@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
-import { fallbackCatalogImage } from '../../lib/localImages';
+import { getProductImage } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 import { supabase } from '../../supabase';
 
@@ -54,7 +54,7 @@ const isStarterTool = (product) => starterSignals.some((signal) => productText(p
 
 const normalizeTool = (product) => ({
   ...product,
-  image: product.images?.[0] || product.image || fallbackCatalogImage,
+  image: getProductImage(product),
   displayPrice: formatRupees(getEffectivePrice(product)),
   isOnSale: hasActiveSale(product),
   stock: Number(product.stock ?? 0),

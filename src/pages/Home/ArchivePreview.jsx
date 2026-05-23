@@ -3,7 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage } from '../../lib/localImages';
+import { getProductImage } from '../../lib/localImages';
 import { getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 
 const Archive = () => {
@@ -49,7 +49,7 @@ const Archive = () => {
     isOnSale: hasActiveSale(item),
     saleEndsAt: item.sale_ends_at,
     category: item.category || item.description || 'Indoor Plant',
-    image: item.images?.[0] || fallbackCatalogImage,
+    image: getProductImage(item),
   });
 
   return (

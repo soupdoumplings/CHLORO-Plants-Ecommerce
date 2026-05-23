@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from './AuthContext';
-import { fallbackCatalogImage } from './localImages';
+import { fallbackCatalogImage, getProductImage } from './localImages';
 
 const WishlistContext = createContext({});
 
@@ -25,7 +25,7 @@ const normalizeWishlistItem = (item) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      image: product.images?.[0] || product.image || fallbackImage,
+      image: getProductImage(product, fallbackImage),
       category: product.category || 'Indoor Plants',
     },
   };
@@ -40,7 +40,7 @@ const createOptimisticWishlistItem = (product, userId) => {
     product: {
       ...product,
       id: productId,
-      image: product?.image || product?.images?.[0] || fallbackImage,
+      image: getProductImage(product, fallbackImage),
       price: product?.rawPrice || product?.effectivePrice || product?.price || 0,
       rawPrice: product?.rawPrice || product?.effectivePrice || product?.price || 0,
     },

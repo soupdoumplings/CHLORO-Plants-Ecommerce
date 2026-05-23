@@ -5,7 +5,7 @@ import Footer from '../../components/Footer';
 import EditorialHero from '../../components/EditorialHero';
 import { useAuth } from '../../lib/AuthContext';
 import { fetchUserPlants, markPlantWatered, setEmailNotifications } from '../../lib/wateringReminders';
-import { productAssetImages } from '../../lib/localImages';
+import { normalizeAppImageUrl, productAssetImages } from '../../lib/localImages';
 
 const formatDate = (date) => {
   if (!date) return 'Not scheduled';
@@ -145,7 +145,7 @@ const MyPlantsPage = () => {
                 <div className="flex gap-5">
                   <div className="w-24 h-28 bg-[#EDEBE4] overflow-hidden shrink-0">
                     {plant.plant_image ? (
-                      <img src={plant.plant_image} alt={plant.plant_name} className="w-full h-full object-cover" />
+                      <img src={normalizeAppImageUrl(plant.plant_image)} alt={plant.plant_name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="material-symbols-outlined text-[#0F3A3A]/50">local_florist</span>

@@ -9,7 +9,7 @@ import Newsletter from './Newsletter';
 import Footer from '../../components/Footer';
 import SaleBanner from '../../components/SaleBanner';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage } from '../../lib/localImages';
+import { getProductImage } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 import { getProductType, productMatchesType, productTypeLabels } from '../../lib/productTypes';
 
@@ -59,7 +59,7 @@ const DiscoveryPage = () => {
             salePrice: hasActiveSale(p) ? Number(p.sale_price) : null,
             saleEndsAt: p.sale_ends_at,
             isOnSale: hasActiveSale(p),
-            image: p.images && p.images.length > 0 ? p.images[0] : fallbackCatalogImage,
+            image: getProductImage(p),
             category: p.category || 'Indoor Plants',
             tags: p.tags || [],
             type: getProductType(p),

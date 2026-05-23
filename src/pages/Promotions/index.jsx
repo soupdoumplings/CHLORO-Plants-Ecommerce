@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../supabase';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { getProductImage } from '../../lib/localImages';
 
 const PromotionsPage = () => {
   const [promotions, setPromotions] = useState([]);
@@ -202,7 +203,7 @@ const PromotionsPage = () => {
                     <td className="py-6 px-8">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-[#EFEEE6] rounded overflow-hidden">
-                          <img src={prom.products?.images?.[0]} alt="" className="w-full h-full object-cover" />
+                          <img src={getProductImage(prom.products)} alt="" className="w-full h-full object-cover" />
                         </div>
                         <div>
                           <p className="font-headline text-lg text-[#31332C]">{prom.products?.name}</p>

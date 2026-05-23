@@ -5,7 +5,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import EditorialHero from '../../components/EditorialHero';
 import { supabase } from '../../supabase';
-import { productAssetImages, publicPlantImages } from '../../lib/localImages';
+import { normalizeAppImageUrl, productAssetImages, publicPlantImages } from '../../lib/localImages';
 
 const MODEL_BUCKET = 'plant-model';
 const MODEL_FILE_TYPES = ['glb', 'gltf'];
@@ -206,7 +206,7 @@ const ManageInventory = () => {
             setOptimalPlace(data.optimal_place || 'Bright Indirect Light');
             setProvenance(data.provenance || '');
             setCuratorQuote(data.curator_quote || '');
-            setImageUrl(data.images && data.images.length > 0 ? data.images[0] : '');
+            setImageUrl(normalizeAppImageUrl(data.images && data.images.length > 0 ? data.images[0] : '', ''));
             setModelUrl(data.model_url || '');
             setSeason(data.season || 'All Year');
             setIsFeatured(data.is_featured || false);

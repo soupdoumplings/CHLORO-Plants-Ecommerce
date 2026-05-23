@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage } from '../../lib/localImages';
+import { getProductImage } from '../../lib/localImages';
 
 const CartCrossSell = ({ onAdd }) => {
   const [product, setProduct] = useState(null);
@@ -47,7 +47,7 @@ const CartCrossSell = ({ onAdd }) => {
       {/* Product Image Frame */}
       <div className="w-full sm:w-[220px] aspect-square shrink-0 bg-[#E6E4DC] relative overflow-hidden shadow-inner border border-[#11110E]/5">
         <img
-          src={product.images?.[0] || fallbackCatalogImage}
+          src={getProductImage(product)}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/crosssell:scale-105"
         />

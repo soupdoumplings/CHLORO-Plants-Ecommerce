@@ -7,7 +7,7 @@ import Footer from '../../components/Footer';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 import { supabase } from '../../supabase';
-import { fallbackCatalogImage, productAssetImages } from '../../lib/localImages';
+import { getProductImage, productAssetImages } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
 import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
@@ -72,7 +72,7 @@ const normalizeProduct = (product) => {
     salePrice: isOnSale ? Number(product.sale_price || 0) : null,
     isOnSale,
     displayPrice: formatRupees(rawPrice),
-    image: product.images?.[0] || product.image || fallbackCatalogImage,
+    image: getProductImage(product),
     category: product.category || 'Indoor Plants',
     tags: Array.isArray(product.tags) ? product.tags : [],
     type: getProductType(product),

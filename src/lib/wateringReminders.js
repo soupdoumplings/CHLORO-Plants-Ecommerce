@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { normalizeAppImageUrl } from './localImages';
 
 export const WATERING_FREQUENCY_OPTIONS = [
   { label: 'Every 12 hours', days: 0.5, hours: 12 },
@@ -56,7 +57,10 @@ export const getPlantReminderPayload = ({ userId, plant, frequencyDays, emailNot
   const hours = parseWaterFrequencyHours(frequencyDays);
   const productId = plant?.product_id || plant?.id || null;
   const plantName = plant?.plant_name || plant?.product_name || plant?.product_name_snapshot || plant?.name || 'Plant';
-  const plantImage = plant?.plant_image || plant?.product_image_snapshot || plant?.image || plant?.images?.[0] || null;
+  const plantImage = normalizeAppImageUrl(
+    plant?.plant_image || plant?.product_image_snapshot || plant?.image || plant?.images?.[0],
+    null
+  );
 
   return {
     user_id: userId,
