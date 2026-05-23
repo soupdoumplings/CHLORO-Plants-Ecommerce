@@ -12,10 +12,10 @@ const shopLinks = [
 ];
 
 const socialLinks = [
-  { label: 'WhatsApp', href: 'https://wa.me/9779800000000', icon: FaWhatsapp },
-  { label: 'Instagram', href: 'https://www.instagram.com/chloro.studio', icon: FaInstagram },
-  { label: 'Facebook', href: 'https://www.facebook.com/chloro.studio', icon: FaFacebookF },
-  { label: 'TikTok', href: 'https://www.tiktok.com/@chloro.studio', icon: FaTiktok },
+  { label: 'WhatsApp', href: 'https://www.whatsapp.com/', icon: FaWhatsapp },
+  { label: 'Instagram', href: 'https://www.instagram.com/', icon: FaInstagram },
+  { label: 'Facebook', href: 'https://www.facebook.com/', icon: FaFacebookF },
+  { label: 'TikTok', href: 'https://www.tiktok.com/', icon: FaTiktok },
 ];
 
 const supportLinks = [
