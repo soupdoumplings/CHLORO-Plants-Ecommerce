@@ -5,7 +5,7 @@ import { publicPlantImages } from '../../lib/localImages';
 
 const REVIEWS = [
   {
-    name: 'Aarohi Shrestha',
+    name: 'Karishma Dhungana',
     handle: '@aarohi.grows',
     image: publicPlantImages.lily,
     plant: 'Peace Lily',
