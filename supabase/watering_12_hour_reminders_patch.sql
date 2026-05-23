@@ -8,13 +8,20 @@ ALTER TABLE public.user_plants
 
 UPDATE public.user_plants
 SET
-  water_frequency_hours = COALESCE(water_frequency_hours, water_frequency_days * 24),
+  water_frequency_hours = CASE
+    WHEN next_watering_at IS NULL THEN water_frequency_days * 24
+    WHEN water_frequency_hours = 168 AND water_frequency_days <> 7 THEN water_frequency_days * 24
+    ELSE COALESCE(water_frequency_hours, water_frequency_days * 24)
+  END,
   next_watering_at = COALESCE(next_watering_at, next_watering_date::timestamptz + TIME '08:00')
 WHERE next_watering_at IS NULL
-   OR water_frequency_hours IS NULL;
+   OR water_frequency_hours IS NULL
+   OR (water_frequency_hours = 168 AND water_frequency_days <> 7);
 
 CREATE INDEX IF NOT EXISTS user_plants_next_watering_at_idx ON public.user_plants(next_watering_at);
 CREATE INDEX IF NOT EXISTS user_plants_last_reminder_sent_at_ts_idx ON public.user_plants(last_reminder_sent_at_ts);
+
+NOTIFY pgrst, 'reload schema';
 
 CREATE OR REPLACE FUNCTION public.mark_plant_watered_by_token(token UUID)
 RETURNS TABLE(plant_name TEXT, next_watering_date DATE)

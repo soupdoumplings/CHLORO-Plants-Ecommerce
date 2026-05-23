@@ -49,19 +49,43 @@ CREATE TABLE IF NOT EXISTS public.user_plants (
     plant_name            TEXT NOT NULL,
     plant_image           TEXT,
     water_frequency_days  INTEGER NOT NULL DEFAULT 7 CHECK (water_frequency_days > 0),
+    water_frequency_hours INTEGER NOT NULL DEFAULT 168 CHECK (water_frequency_hours >= 12),
     last_watered_at       DATE NOT NULL DEFAULT CURRENT_DATE,
     next_watering_date    DATE NOT NULL,
+    next_watering_at      TIMESTAMPTZ,
     email_notifications   BOOLEAN NOT NULL DEFAULT TRUE,
     last_reminder_sent_at DATE,
+    last_reminder_sent_at_ts TIMESTAMPTZ,
     public_water_token    UUID NOT NULL DEFAULT gen_random_uuid(),
     created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(user_id, product_id)
 );
 
+ALTER TABLE public.user_plants
+  ADD COLUMN IF NOT EXISTS water_frequency_hours INTEGER NOT NULL DEFAULT 168 CHECK (water_frequency_hours >= 12),
+  ADD COLUMN IF NOT EXISTS next_watering_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS last_reminder_sent_at_ts TIMESTAMPTZ;
+
+UPDATE public.user_plants
+SET
+  water_frequency_hours = CASE
+    WHEN next_watering_at IS NULL THEN water_frequency_days * 24
+    WHEN water_frequency_hours = 168 AND water_frequency_days <> 7 THEN water_frequency_days * 24
+    ELSE COALESCE(water_frequency_hours, water_frequency_days * 24)
+  END,
+  next_watering_at = COALESCE(next_watering_at, next_watering_date::timestamptz + TIME '08:00')
+WHERE next_watering_at IS NULL
+   OR water_frequency_hours IS NULL
+   OR (water_frequency_hours = 168 AND water_frequency_days <> 7);
+
 CREATE INDEX IF NOT EXISTS user_plants_user_id_idx ON public.user_plants(user_id);
 CREATE INDEX IF NOT EXISTS user_plants_next_watering_idx ON public.user_plants(next_watering_date);
+CREATE INDEX IF NOT EXISTS user_plants_next_watering_at_idx ON public.user_plants(next_watering_at);
+CREATE INDEX IF NOT EXISTS user_plants_last_reminder_sent_at_ts_idx ON public.user_plants(last_reminder_sent_at_ts);
 CREATE INDEX IF NOT EXISTS user_plants_public_water_token_idx ON public.user_plants(public_water_token);
+
+NOTIFY pgrst, 'reload schema';
 
 ALTER TABLE public.user_plants ENABLE ROW LEVEL SECURITY;
 
@@ -118,8 +142,10 @@ BEGIN
     RETURN QUERY
     UPDATE public.user_plants
        SET last_watered_at = CURRENT_DATE,
-           next_watering_date = CURRENT_DATE + water_frequency_days,
+           next_watering_at = NOW() + (water_frequency_hours || ' hours')::interval,
+           next_watering_date = (NOW() + (water_frequency_hours || ' hours')::interval)::date,
            last_reminder_sent_at = NULL,
+           last_reminder_sent_at_ts = NULL,
            updated_at = NOW()
      WHERE public_water_token = token
      RETURNING user_plants.plant_name, user_plants.next_watering_date;
@@ -127,7 +153,7 @@ END;
 $$;
 
 
--- 4. Schedule the daily cron job (Nepal 08:00 = UTC 02:15)
+-- 4. Schedule the reminder cron job (Nepal 08:00/20:00 = UTC 02:15/14:15)
 --    IMPORTANT: Replace CRON_SECRET_HERE with a secure random string
 --    that you also set as the CRON_SECRET Supabase secret.
 --    For Gmail delivery, set Edge Function secrets:
@@ -146,7 +172,7 @@ END $$;
 
 SELECT cron.schedule(
   'watering-reminders-daily',
-  '15 2 * * *',
+  '15 2,14 * * *',
   $$
   SELECT net.http_post(
     url := 'https://vefymqrvvsbsfkdfbuky.supabase.co/functions/v1/watering-reminders',

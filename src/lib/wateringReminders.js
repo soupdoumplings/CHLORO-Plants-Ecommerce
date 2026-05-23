@@ -76,14 +76,28 @@ export const getPlantReminderPayload = ({ userId, plant, frequencyDays, emailNot
 export const saveWateringSchedule = async ({ userId, plant, frequencyDays, emailNotifications = true, orderId = null }) => {
   const payload = getPlantReminderPayload({ userId, plant, frequencyDays, emailNotifications, orderId });
 
-  const { data, error } = await supabase
+  const savePayload = (schedulePayload) => supabase
     .from('user_plants')
-    .upsert(payload, { onConflict: 'user_id,product_id' })
+    .upsert(schedulePayload, { onConflict: 'user_id,product_id' })
     .select()
     .single();
 
-  if (error) throw error;
-  return data;
+  const { data, error } = await savePayload(payload);
+  if (!error) return data;
+
+  const isMissingModernWateringColumn = /next_watering_at|water_frequency_hours|last_reminder_sent_at_ts|schema cache|column/i.test(error.message || '');
+  if (!isMissingModernWateringColumn) throw error;
+
+  const {
+    next_watering_at: _nextWateringAt,
+    water_frequency_hours: _waterFrequencyHours,
+    last_reminder_sent_at_ts: _lastReminderSentAtTs,
+    ...legacyPayload
+  } = payload;
+  const { data: legacyData, error: legacyError } = await savePayload(legacyPayload);
+
+  if (legacyError) throw legacyError;
+  return legacyData;
 };
 
 export const fetchUserPlants = async (userId) => {
