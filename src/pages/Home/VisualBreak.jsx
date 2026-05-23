@@ -196,7 +196,7 @@ const Toolkit = () => {
 
         <div className="mt-10 text-center">
           <Link
-            to="/products-gifts?filter=Care%20Tools"
+            to="/discovery?filter=Care%20Tools"
             className="inline-flex items-center gap-3 border-b border-[#31332c] pb-1.5 font-label text-[10px] font-bold uppercase tracking-[0.22em] text-[#31332c] transition-opacity hover:opacity-60"
           >
             Shop all care tools

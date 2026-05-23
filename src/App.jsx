@@ -94,6 +94,21 @@ const ChatbotWrapper = () => {
   return <ChatbotWidget />;
 };
 
+const OnboardingWrapper = () => {
+  const location = useLocation();
+  const hiddenRoutes = ['/products-gifts', '/discovery', '/catalogue', '/cart'];
+  const isHidden = hiddenRoutes.some(route => location.pathname.startsWith(route));
+
+  if (isHidden) return null;
+
+  return (
+    <>
+      <PreferenceOnboarding />
+      <ProfileOnboarding />
+    </>
+  );
+};
+
 function App() {
   return (
     <Router>
@@ -108,8 +123,7 @@ function App() {
                   <div className="min-h-screen bg-[#FBF9F4] antialiased selection:bg-[#785A1A]/20 overflow-x-hidden cursor-none">
                     <AnimatedRoutes />
                     <ChatbotWrapper />
-                    <PreferenceOnboarding />
-                    <ProfileOnboarding />
+                    <OnboardingWrapper />
                     <SiteConsent />
                   </div>
                 </CartProvider>
