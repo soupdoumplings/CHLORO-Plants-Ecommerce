@@ -87,7 +87,7 @@ const AdminProfilePage = () => {
 
         const { data, error: fetchError } = await supabase
           .from('users')
-          .select('name, email, phone, role, address_line, city, country, updated_at, created_at')
+          .select('name, email, phone, role, address_line, city, country, avatar_url, updated_at, created_at')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -300,20 +300,20 @@ const AdminProfilePage = () => {
               </div>
             ) : (
               <div className="mt-7 grid gap-5">
-                <div className="grid gap-5 border border-[#D9DBCF] bg-[#FBF9F4] p-5 sm:grid-cols-[96px_1fr] sm:items-center">
-                  <div className="h-24 w-24 overflow-hidden rounded-full border border-[#D9DBCF] bg-white">
+                <div className="grid gap-4 border border-[#D9DBCF] bg-[#FBF9F4] p-4 sm:grid-cols-[72px_1fr] sm:items-center">
+                  <div className="h-[72px] w-[72px] overflow-hidden rounded-full border border-[#D9DBCF] bg-white shadow-sm">
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt={adminName} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <span className="material-symbols-outlined text-[34px] text-[#0F3A3A]/45">add_a_photo</span>
+                        <span className="material-symbols-outlined text-[26px] text-[#0F3A3A]/45">add_a_photo</span>
                       </div>
                     )}
                   </div>
-                  <div className="grid gap-3">
-                    <span className="font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">Profile Picture</span>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <label className="inline-flex cursor-pointer items-center gap-2 border border-[#31332C]/20 bg-white px-4 py-3 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:bg-[#31332C] hover:text-white">
+                  <div className="min-w-0">
+                    <span className="block font-label text-[9px] font-bold uppercase tracking-[0.16em] text-[#5E6058]">Profile Picture</span>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 border border-[#31332C]/20 bg-white px-4 py-2.5 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#31332C] transition-colors hover:bg-[#31332C] hover:text-white">
                         <span className="material-symbols-outlined text-[16px]">upload</span>
                         {uploadingAvatar ? 'Uploading...' : 'Upload Picture'}
                         <input
@@ -328,7 +328,7 @@ const AdminProfilePage = () => {
                         <button
                           type="button"
                           onClick={() => updateField('avatar_url', '')}
-                          className="border border-[#9F403D]/20 bg-white px-4 py-3 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#9F403D] transition-colors hover:bg-[#9F403D] hover:text-white"
+                          className="min-h-10 border border-[#9F403D]/20 bg-white px-4 py-2.5 font-label text-[9px] font-bold uppercase tracking-[0.14em] text-[#9F403D] transition-colors hover:bg-[#9F403D] hover:text-white"
                         >
                           Remove
                         </button>

@@ -1,11 +1,15 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { fallbackHeroImage } from '../../lib/localImages';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const HeritageSection = ({ product }) => {
-  const name = product?.name || 'This Plant';
+  const name = product?.name || 'This Product';
   const info = product?.info || '';
-  const curatorQuote = product?.curator_quote || `"${name} brings a calm, sculptural green presence to the room when matched with the right light and watering rhythm."`;
+  const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
+  const curatorQuote = product?.curator_quote || (isPlantProduct
+    ? `"${name} brings a calm, sculptural green presence to the room when matched with the right light and watering rhythm."`
+    : `"${name} is selected to support useful routines, considered gifting, and everyday plant care."`);
   const provenance = product?.provenance || '';
 
   // Use second image if available, otherwise first image, otherwise fallback
@@ -21,13 +25,19 @@ const HeritageSection = ({ product }) => {
       return info;
     }
     if (provenance) {
-      return `${name} comes from plant lines associated with ${provenance}. That background helps explain its preferred light, humidity, and care rhythm at home.`;
+      return isPlantProduct
+        ? `${name} comes from plant lines associated with ${provenance}. That background helps explain its preferred light, humidity, and care rhythm at home.`
+        : `${name} is associated with ${provenance}. That background helps explain where it fits in the catalogue and how customers can use it.`;
     }
-    return `${name} is selected for everyday homes, with care notes that help you understand where it should sit, how often to water, and what to expect as it grows.`;
+    return isPlantProduct
+      ? `${name} is selected for everyday homes, with care notes that help you understand where it should sit, how often to water, and what to expect as it grows.`
+      : `${name} is selected for everyday plant routines, gifting moments, and practical home use.`;
   };
 
   const getHeritageSecondary = () => {
-    return `Use this section as a plain-language guide before buying: match the plant to your room, light level, and routine so it has the best chance to thrive.`;
+    return isPlantProduct
+      ? 'Use this section as a plain-language guide before buying: match the plant to your room, light level, and routine so it has the best chance to thrive.'
+      : 'Use this section as a plain-language guide before buying: match the item to the task, recipient, or care routine it supports.';
   };
 
   return (
@@ -64,7 +74,7 @@ const HeritageSection = ({ product }) => {
              transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
              className="font-headline text-[80px] leading-tight text-[#31332C] tracking-tighter"
            >
-             Rooted in <br /><span className="italic font-light">Heritage</span>
+             {isPlantProduct ? 'Rooted in' : 'Made for'} <br /><span className="italic font-light">{isPlantProduct ? 'Heritage' : 'Use'}</span>
            </Motion.h2>
         </div>
 
@@ -105,7 +115,7 @@ const HeritageSection = ({ product }) => {
                 </div>
                 <div className="space-y-1">
                    <p className="font-label text-[10px] tracking-[2px] uppercase text-[#31332C] font-black">CHLORO</p>
-                   <p className="font-body text-xs text-[#5E6058] italic font-bold">Plant Care Team</p>
+                   <p className="font-body text-xs text-[#5E6058] italic font-bold">{isPlantProduct ? 'Plant Care Team' : 'Catalogue Team'}</p>
                 </div>
              </div>
           </Motion.div>

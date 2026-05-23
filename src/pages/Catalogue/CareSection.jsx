@@ -12,6 +12,77 @@ const CareSection = ({ product }) => {
   const waterFrequency = product?.water_frequency || 'Every 7 Days';
   const plantName = product?.name || 'This plant';
   const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
+  const category = product?.category || 'Product';
+  const stock = Number(product?.stock ?? 0);
+  const tags = Array.isArray(product?.tags) ? product.tags : [];
+
+  if (!isPlantProduct) {
+    const productCards = [
+      {
+        icon: 'inventory_2',
+        title: 'Product Type',
+        desc: product?.description || `${plantName} is part of the ${category.toLowerCase()} collection.`,
+        badge: category,
+        bg: 'bg-[#F5F4ED]',
+      },
+      {
+        icon: 'local_mall',
+        title: 'Best Use',
+        desc: product?.info || `Use ${plantName} as a practical add-on, gift item, or care support product from the CHLORO catalogue.`,
+        badge: tags[0] || 'Catalogue',
+        bg: 'bg-[#E8E9E0]',
+      },
+      {
+        icon: 'warehouse',
+        title: 'Availability',
+        desc: stock > 0
+          ? `${stock} unit${stock === 1 ? '' : 's'} currently available for checkout.`
+          : 'This item is currently out of stock.',
+        badge: stock > 0 ? 'In Stock' : 'Out of Stock',
+        bg: 'bg-[#E2E3D9]',
+      },
+    ];
+
+    return (
+      <section className="mb-32">
+        <Motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col md:flex-row justify-between items-baseline mb-16 border-b border-[#B1B3A9]/10 pb-8 gap-8"
+        >
+          <h2 className="font-headline text-5xl italic text-[#31332C]">Product Details</h2>
+          <p className="font-label text-[11px] tracking-[0.1rem] uppercase text-[#5E6058] mt-4 md:mt-0 font-bold opacity-80">Use, Category & Stock</p>
+        </Motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-[#B1B3A9]/10">
+          {productCards.map((card, i) => (
+            <Motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className={`p-16 ${card.bg} border-r border-[#B1B3A9]/10 text-left group`}
+            >
+              <span className="material-symbols-outlined text-[#785A1A] mb-8 text-3xl transition-transform group-hover:scale-110 inline-block">
+                {card.icon}
+              </span>
+              <h3 className="font-label text-xs tracking-[0.15rem] uppercase mb-8 font-black text-[#31332C]">{card.title}</h3>
+              <p className="font-body text-sm leading-relaxed text-[#5E6058] mb-12 opacity-90 transition-opacity group-hover:opacity-100">
+                {card.desc}
+              </p>
+              <div className="flex items-center gap-4 text-xs font-label tracking-widest uppercase text-[#456565] font-black">
+                <span className="w-2.5 h-2.5 bg-[#456565] rounded-full drop-shadow-sm"></span>
+                {card.badge}
+              </div>
+            </Motion.div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   // Derive illumination description from optimal_place
   const getIlluminationDesc = (place) => {

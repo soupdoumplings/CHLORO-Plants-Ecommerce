@@ -37,9 +37,26 @@ const filterProducts = (products, filterId) => {
   return products;
 };
 
+const searchableProductText = (item) => [
+  item.id,
+  item.name,
+  item.category,
+  item.description,
+  item.info,
+  item.provenance,
+  item.season,
+  item.is_gift ? 'gift gift-page gift item' : '',
+  item.is_active ? 'active' : 'inactive',
+  item.stock,
+  item.price,
+  ...(Array.isArray(item.tags) ? item.tags : []),
+].join(' ').toLowerCase();
+
 const InventoryTable = ({ products, loading, onRefresh }) => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
@@ -47,9 +64,26 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
     setInventoryItems(products);
   }, [products]);
 
-  const filteredInventory = useMemo(() => (
+  useEffect(() => {
+    const searchTimer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim().toLowerCase());
+    }, 120);
+
+    return () => window.clearTimeout(searchTimer);
+  }, [searchQuery]);
+
+  const categoryFilteredInventory = useMemo(() => (
     filterProducts(inventoryItems, activeFilter)
   ), [activeFilter, inventoryItems]);
+
+  const filteredInventory = useMemo(() => {
+    if (!debouncedSearchQuery) return categoryFilteredInventory;
+    const terms = debouncedSearchQuery.split(/\s+/).filter(Boolean);
+    return categoryFilteredInventory.filter((item) => {
+      const target = searchableProductText(item);
+      return terms.every((term) => target.includes(term));
+    });
+  }, [categoryFilteredInventory, debouncedSearchQuery]);
 
   const filters = useMemo(() => [
     { id: 'all', label: 'All Inventory', count: inventoryItems.length },
@@ -138,9 +172,14 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="flex justify-between items-center mb-12 border-b border-[#B1B3A9]/10 pb-10"
+        className="flex flex-col gap-8 mb-8 border-b border-[#B1B3A9]/10 pb-8 xl:flex-row xl:items-end xl:justify-between"
       >
-        <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Inventory</h2>
+        <div>
+          <h2 className="font-headline text-4xl text-[#31332C] tracking-tighter">Current Inventory</h2>
+          <p className="mt-2 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#5E6058]/70">
+            {loading ? 'Syncing records' : `${filteredInventory.length} of ${categoryFilteredInventory.length} shown`}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-2 items-center font-label text-[10px] uppercase tracking-[0.14em]">
           {filters.map((filter) => (
             <button
@@ -158,6 +197,32 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
           ))}
         </div>
       </Motion.div>
+
+      <div className="mb-8 grid gap-3 border border-[#B1B3A9]/20 bg-white p-4 shadow-sm shadow-black/5 md:grid-cols-[1fr_auto] md:items-center">
+        <label className="flex min-h-[52px] items-center gap-3 border border-[#B1B3A9]/20 bg-[#FBF9F4] px-4 transition-colors focus-within:border-[#31332C]/45">
+          <span className="material-symbols-outlined text-[20px] text-[#5E6058]/70">search</span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search name, category, tag, ID, stock, price, or status"
+            className="min-w-0 flex-1 bg-transparent font-body text-sm text-[#31332C] outline-none placeholder:text-[#5E6058]/55"
+          />
+        </label>
+        {searchQuery ? (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="min-h-[52px] px-5 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#5E6058] transition-colors hover:bg-[#F5F4ED] hover:text-[#31332C]"
+          >
+            Clear Search
+          </button>
+        ) : (
+          <p className="px-1 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#5E6058]/60 md:px-4">
+            Auto updates
+          </p>
+        )}
+      </div>
 
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left">
@@ -190,7 +255,7 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
             ) : filteredInventory.length === 0 ? (
               <tr>
                 <td colSpan="6" className="py-12 text-center font-label text-[11px] uppercase tracking-widest text-[#5E6058]">
-                  No inventory found in this category.
+                  {debouncedSearchQuery ? 'No inventory matches this search.' : 'No inventory found in this category.'}
                 </td>
               </tr>
             ) : (
@@ -218,6 +283,11 @@ const InventoryTable = ({ products, loading, onRefresh }) => {
                           <p className="mt-1 font-body text-xs text-[#5E6058]/70 truncate max-w-[240px]">
                             {item.description}
                           </p>
+                        )}
+                        {item.is_gift && (
+                          <span className="mt-2 inline-flex bg-[#E8E9E0] px-2 py-1 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-[#0F3A3A]">
+                            Gift Page
+                          </span>
                         )}
                       </div>
                     </td>

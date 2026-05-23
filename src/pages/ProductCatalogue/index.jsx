@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { ArrowRight, Droplets, Gift, Heart, Leaf, Loader2, Search, ShoppingBag, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Droplets, Gift, Heart, Loader2, Search, ShoppingBag, SlidersHorizontal } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -9,32 +9,53 @@ import { useWishlist } from '../../lib/WishlistContext';
 import { supabase } from '../../supabase';
 import { fallbackCatalogImage, productAssetImages } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
-import { getProductType, productMatchesType, productTypeLabels } from '../../lib/productTypes';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
+
+const productSearchText = (product) => [
+  product?.name,
+  product?.category,
+  product?.description,
+  product?.info,
+  product?.type,
+  ...(product?.tags || []),
+].join(' ').toLowerCase();
+
+const hasTag = (product, tag) => (
+  (product.tags || []).some((item) => String(item).toLowerCase() === tag)
+);
+
+const isGiftSuiteProduct = (product) => (
+  product.is_gift === true
+);
 
 const filterOptions = [
   {
-    id: productTypeLabels.all,
-    label: 'All',
-    icon: Leaf,
-    copy: 'Plants, care tools, vessels, and ready-to-send gifts.',
-  },
-  {
-    id: productTypeLabels.plants,
-    label: 'Plants',
-    icon: Leaf,
-    copy: 'Easy-care greens, statement leaves, and thoughtful plant gifts.',
-  },
-  {
-    id: productTypeLabels.care,
-    label: 'Care Tools',
-    icon: Droplets,
-    copy: 'Watering, pruning, misting, and recovery support for real routines.',
-  },
-  {
-    id: productTypeLabels.gifts,
-    label: 'Gifts',
+    id: 'curated',
+    label: 'Curated',
     icon: Gift,
-    copy: 'Gift-ready plants, vessels, terrariums, and small home pieces.',
+    copy: 'Admin-selected gift page products, care kits, vessels, and keepsakes.',
+    matches: isGiftSuiteProduct,
+  },
+  {
+    id: 'gift-sets',
+    label: 'Gift Sets',
+    icon: Gift,
+    copy: 'Bundles, terrariums, vessels, and polished presents that feel complete.',
+    matches: (product) => isGiftSuiteProduct(product) && hasTag(product, 'gift-set'),
+  },
+  {
+    id: 'care-kits',
+    label: 'Care Kits',
+    icon: Droplets,
+    copy: 'Useful care tools for people who already live with plants.',
+    matches: (product) => isGiftSuiteProduct(product) && hasTag(product, 'care-kit'),
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    icon: Heart,
+    copy: 'Higher-value picks for birthdays, housewarmings, and bigger gestures.',
+    matches: (product) => isGiftSuiteProduct(product) && hasTag(product, 'premium'),
   },
 ];
 
@@ -174,10 +195,10 @@ const ProductTile = ({ product, index }) => {
 
 const ProductCataloguePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const requestedFilter = searchParams.get('filter') || productTypeLabels.all;
+  const requestedFilter = searchParams.get('filter') || filterOptions[0].id;
   const [products, setProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState(
-    filterOptions.some((option) => option.id === requestedFilter) ? requestedFilter : productTypeLabels.all,
+    filterOptions.some((option) => option.id === requestedFilter) ? requestedFilter : filterOptions[0].id,
   );
   const [activeSort, setActiveSort] = useState('Latest');
   const [query, setQuery] = useState('');
@@ -215,30 +236,24 @@ const ProductCataloguePage = () => {
     fetchProducts();
   }, []);
 
+  const giftProducts = useMemo(() => products.filter(isGiftSuiteProduct), [products]);
+
   const counts = useMemo(() => (
     filterOptions.reduce((acc, option) => {
-      acc[option.id] = option.id === productTypeLabels.all
-        ? products.length
-        : products.filter((product) => productMatchesType(product, option.id)).length;
+      acc[option.id] = giftProducts.filter(option.matches).length;
       return acc;
     }, {})
-  ), [products]);
+  ), [giftProducts]);
 
   const filteredProducts = useMemo(() => {
     const search = query.trim().toLowerCase();
+    const activeOption = filterOptions.find((option) => option.id === activeFilter) || filterOptions[0];
 
-    const items = products
-      .filter((product) => productMatchesType(product, activeFilter))
+    const items = giftProducts
+      .filter(activeOption.matches)
       .filter((product) => {
         if (!search) return true;
-        return [
-          product.name,
-          product.category,
-          product.description,
-          product.info,
-          product.type,
-          ...(product.tags || []),
-        ].join(' ').toLowerCase().includes(search);
+        return productSearchText(product).includes(search);
       });
 
     if (activeSort === 'Price: Low') {
@@ -248,20 +263,20 @@ const ProductCataloguePage = () => {
     }
 
     return items;
-  }, [activeFilter, activeSort, products, query]);
+  }, [activeFilter, activeSort, giftProducts, query]);
 
   const heroProduct = useMemo(() => (
-    products.find((product) => product.type === productTypeLabels.gifts)
-    || products.find((product) => product.type === productTypeLabels.care)
-    || products[0]
-  ), [products]);
+    giftProducts.find((product) => product.type === productTypeLabels.gifts)
+    || giftProducts.find((product) => product.type === productTypeLabels.care)
+    || giftProducts[0]
+  ), [giftProducts]);
 
   const activeFilterMeta = filterOptions.find((option) => option.id === activeFilter) || filterOptions[0];
 
   const handleFilter = (filterId) => {
     setActiveFilter(filterId);
     const next = new URLSearchParams(searchParams);
-    if (filterId === productTypeLabels.all) next.delete('filter');
+    if (filterId === filterOptions[0].id) next.delete('filter');
     else next.set('filter', filterId);
     setSearchParams(next, { replace: true });
   };
@@ -314,7 +329,7 @@ const ProductCataloguePage = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleFilter(productTypeLabels.gifts);
+                    handleFilter('gift-sets');
                     document.getElementById('gift-shop')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="bg-[#11110E] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-[#FBF9F4] transition-colors hover:bg-[#0F3A3A]"
@@ -324,7 +339,7 @@ const ProductCataloguePage = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleFilter(productTypeLabels.care);
+                    handleFilter('care-kits');
                     document.getElementById('gift-shop')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="border border-[#11110E] px-7 py-4 font-label text-[10px] font-bold uppercase tracking-[0.2em] text-[#11110E] transition-colors hover:bg-[#11110E] hover:text-[#FBF9F4]"
@@ -372,7 +387,7 @@ const ProductCataloguePage = () => {
             <aside className="h-fit border border-[#11110E]/12 bg-[#FFFEFA] p-6 lg:sticky lg:top-[104px]">
               <div className="flex items-center justify-between border-b border-[#11110E]/12 pb-5">
                 <div>
-                  <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#6D695F]">Shop Filters</p>
+                  <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#6D695F]">Gift Filters</p>
                   <h2 className="mt-2 font-headline text-[38px] leading-none text-[#11110E]">Find The Right Gift</h2>
                 </div>
                 <SlidersHorizontal className="h-4 w-4 text-[#6D695F]" />
@@ -469,7 +484,7 @@ const ProductCataloguePage = () => {
                     <Gift className="mx-auto h-10 w-10 text-[#0F3A3A]" />
                     <h2 className="mt-6 font-headline text-[42px] leading-none text-[#1D241F]">No items in this section yet</h2>
                     <p className="mt-4 font-body text-sm leading-relaxed text-[#5E6058]">
-                      Add care tools, gifts, or plant listings from the admin inventory. They will appear here, in discovery, and inside AI diagnosis recommendations.
+                      Mark products as gift items from the admin add/edit product form. They will appear here after the gift page checkbox is enabled.
                     </p>
                     <Link
                       to="/admin/add-plant"

@@ -4,6 +4,7 @@ import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 import { fallbackHeroImage } from '../../lib/localImages';
 import { formatRupees, getEffectivePrice, hasActiveSale } from '../../lib/pricing';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const FicusHero = ({ product }) => {
   const { addToBag } = useCart();
@@ -12,14 +13,17 @@ const FicusHero = ({ product }) => {
   const name = product?.name || 'Unknown Product';
   const scientificName = product?.description || '';
   const info = product?.info || 'No product description available yet.';
-  const provenance = product?.provenance || 'Origin unknown';
+  const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
+  const provenance = product?.provenance || (isPlantProduct ? 'Origin unknown' : product?.category || 'Catalogue item');
   const onSale = hasActiveSale(product);
   const price = product?.price ? formatRupees(getEffectivePrice(product)) : 'Price on request';
   const originalPrice = onSale ? formatRupees(product.price) : null;
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : fallbackHeroImage;
-  const curatorQuote = product?.curator_quote || `"A beautiful plant for homes that can offer steady light, patient watering, and a little care rhythm."`;
+  const curatorQuote = product?.curator_quote || (isPlantProduct
+    ? '"A beautiful plant for homes that can offer steady light, patient watering, and a little care rhythm."'
+    : '"A useful catalogue piece for considered gifting, practical routines, and plant care support."');
 
   // Split the name into two lines if it has multiple words
   const nameParts = name.split(' ');
@@ -108,7 +112,7 @@ const FicusHero = ({ product }) => {
             className="space-y-8 w-full"
           >
             <div>
-              <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">Provenance</p>
+              <p className="font-label text-[10px] tracking-[0.1rem] uppercase opacity-50 mb-2 font-black">{isPlantProduct ? 'Provenance' : 'Category'}</p>
               <p className="font-body text-sm italic text-[#31332C]">{provenance}</p>
             </div>
 

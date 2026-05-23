@@ -3,6 +3,12 @@ import { motion as Motion } from 'framer-motion';
 
 const sortOptions = ['Latest', 'Price: Low to High', 'Price: High to Low', 'Featured First'];
 
+const categoryDisplayLabels = {
+  Plants: 'Exclusive',
+};
+
+const displayCategory = (category) => categoryDisplayLabels[category] || category;
+
 const CategoryFilter = ({
   categories = ['All Objects'],
   categoryCounts = {},
@@ -61,7 +67,7 @@ const CategoryFilter = ({
                         : 'border-[#11110E]/14 bg-[#FFFEFA] text-[#4F4B43] hover:border-[#11110E]/45'
                     }`}
                   >
-                    <span className="font-label text-[8px] font-bold uppercase tracking-[0.17em]">{cat}</span>
+                    <span className="font-label text-[8px] font-bold uppercase tracking-[0.17em]">{displayCategory(cat)}</span>
                     <span className="font-body text-[11px] opacity-65">{categoryCounts[cat] || 0}</span>
                   </Motion.button>
                 ))}

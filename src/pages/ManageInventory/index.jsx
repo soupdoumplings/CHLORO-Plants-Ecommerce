@@ -18,6 +18,62 @@ const IMAGE_BUCKET = 'product-images';
 const IMAGE_FILE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const WATER_FREQUENCY_OPTIONS = [
+  'Every 3 Days',
+  'Every 12 Hours',
+  'Every Day',
+  'Every 7 Days',
+  'Every 10 Days',
+  'Every 14 Days',
+  'When Soil is Dry',
+  'Misting Only',
+];
+const CATEGORY_OPTIONS = [
+  'Indoor Plants',
+  'Pots & Planters',
+  'Care Tools',
+  'Gardening Tools',
+  'Fresh Flowers',
+  'Outdoor Plants',
+  'Plant Care',
+];
+const PLANT_CARE_CATEGORIES = ['Indoor Plants', 'Outdoor Plants', 'Fresh Flowers'];
+const GIFT_SECTION_OPTIONS = [
+  { id: 'gift-set', label: 'Gift Sets', helper: 'Bundles, gift-ready plants, floral pieces, and vessels.' },
+  { id: 'care-kit', label: 'Care Kits', helper: 'Tools or plant-care products that work as a useful gift.' },
+  { id: 'premium', label: 'Premium', helper: 'Higher-end gift picks that should appear in Premium.' },
+];
+const GIFT_MANAGED_TAGS = ['gift', 'gift-set', 'care-kit', 'premium'];
+
+const normalizeTag = (value) => String(value || '').trim().toLowerCase();
+
+const parseTagsInput = (value) => (
+  String(value || '')
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+);
+
+const uniqueTags = (tags) => (
+  tags.filter((tag, index) => (
+    tags.findIndex((item) => normalizeTag(item) === normalizeTag(tag)) === index
+  ))
+);
+
+const giftSectionsFromTags = (tags = []) => {
+  const normalizedTags = new Set((tags || []).map(normalizeTag));
+  return GIFT_SECTION_OPTIONS
+    .map((option) => option.id)
+    .filter((id) => normalizedTags.has(id));
+};
+
+const buildProductTags = ({ tagsInput, isGift, giftSections }) => {
+  const baseTags = parseTagsInput(tagsInput).filter((tag) => !GIFT_MANAGED_TAGS.includes(normalizeTag(tag)));
+  if (!isGift) return uniqueTags(baseTags);
+  return uniqueTags([...baseTags, 'gift', ...giftSections]);
+};
+
+const isPlantCareCategory = (category) => PLANT_CARE_CATEGORIES.includes(category);
 
 const fallbackImageForCategory = (category) => {
   const categoryLabel = String(category || '').toLowerCase();
@@ -117,13 +173,17 @@ const ManageInventory = () => {
   const [modelUrl, setModelUrl] = useState('');
   const [season, setSeason] = useState('All Year');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isGift, setIsGift] = useState(false);
+  const [giftSections, setGiftSections] = useState([]);
   const [category, setCategory] = useState('Indoor Plants');
   const [tagsInput, setTagsInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isWaterFrequencyOpen, setIsWaterFrequencyOpen] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
+  const showPlantCareFields = isPlantCareCategory(category);
 
   useEffect(() => {
     if (isEditMode) {
@@ -150,6 +210,8 @@ const ManageInventory = () => {
             setModelUrl(data.model_url || '');
             setSeason(data.season || 'All Year');
             setIsFeatured(data.is_featured || false);
+            setIsGift(data.is_gift || false);
+            setGiftSections(giftSectionsFromTags(data.tags || []));
             setCategory(data.category || 'Indoor Plants');
             setTagsInput(data.tags ? data.tags.join(', ') : '');
           }
@@ -269,6 +331,30 @@ const ManageInventory = () => {
     }
   };
 
+  const handleGiftToggle = (checked) => {
+    setIsGift(checked);
+    if (!checked) {
+      setGiftSections([]);
+      return;
+    }
+
+    if (giftSections.length === 0) {
+      if (category === 'Care Tools' || category === 'Plant Care' || category === 'Gardening Tools') {
+        setGiftSections(['care-kit']);
+      } else {
+        setGiftSections(['gift-set']);
+      }
+    }
+  };
+
+  const toggleGiftSection = (sectionId) => {
+    setGiftSections((current) => (
+      current.includes(sectionId)
+        ? current.filter((item) => item !== sectionId)
+        : [...current, sectionId]
+    ));
+  };
+
   const handleSaveProduct = async () => {
     if (!name || !price) {
       setErrorMsg("Name and Market Valuation are required.");
@@ -284,7 +370,7 @@ const ManageInventory = () => {
       : [fallbackImageForCategory(category)];
 
     const productModelUrl = modelUrl.trim() || null;
-    const productTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
+    const productTags = buildProductTags({ tagsInput, isGift, giftSections });
 
     try {
       let error;
@@ -303,6 +389,7 @@ const ManageInventory = () => {
           model_url: productModelUrl,
           season,
           is_featured: isFeatured,
+          is_gift: isGift,
           category,
           tags: productTags
         }).eq('id', id);
@@ -322,6 +409,7 @@ const ManageInventory = () => {
           model_url: productModelUrl,
           season,
           is_featured: isFeatured,
+          is_gift: isGift,
           category,
           tags: productTags
         });
@@ -364,6 +452,7 @@ const ManageInventory = () => {
           )}
           meta={[
             { label: 'Category', value: category },
+            { label: 'Gift Page', value: isGift ? 'Yes' : 'No' },
             { label: 'Stock', value: String(stock || 0).padStart(2, '0') },
           ]}
         />
@@ -432,13 +521,9 @@ const ManageInventory = () => {
                   <div className="flex flex-col gap-3 group">
                      <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Primary Category</label>
                      <select value={category} onChange={e => setCategory(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-2 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
-                        <option value="Indoor Plants">Indoor Plants</option>
-                        <option value="Pots & Planters">Pots & Planters</option>
-                        <option value="Care Tools">Care Tools</option>
-                        <option value="Gardening Tools">Gardening Tools</option>
-                        <option value="Fresh Flowers">Fresh Flowers</option>
-                        <option value="Outdoor Plants">Outdoor Plants</option>
-                        <option value="Plant Care">Plant Care</option>
+                        {CATEGORY_OPTIONS.map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
                      </select>
                   </div>
 
@@ -523,25 +608,57 @@ const ManageInventory = () => {
                       </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                      <div className="flex flex-col gap-3 group">
-                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Optimal Placement</label>
-                         <input type="text" value={optimalPlace} onChange={e => setOptimalPlace(e.target.value)} placeholder="e.g. Bright Indirect Light" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
-                      </div>
-                      <div className="flex flex-col gap-3 group">
-                         <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Watering Frequency</label>
-                         <select value={waterFrequency} onChange={e => setWaterFrequency(e.target.value)} className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] font-normal focus:border-[#785A1A] cursor-pointer">
-                            <option value="Every 3 Days">Every 3 Days</option>
-                            <option value="Every 12 Hours">Every 12 Hours</option>
-                            <option value="Every Day">Every Day</option>
-                            <option value="Every 7 Days">Every 7 Days</option>
-                            <option value="Every 10 Days">Every 10 Days</option>
-                            <option value="Every 14 Days">Every 14 Days</option>
-                            <option value="When Soil is Dry">When Soil is Dry</option>
-                            <option value="Misting Only">Misting Only</option>
-                         </select>
-                      </div>
-                  </div>
+                  {showPlantCareFields && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div className="flex flex-col gap-3 group">
+                           <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Optimal Placement</label>
+                           <input type="text" value={optimalPlace} onChange={e => setOptimalPlace(e.target.value)} placeholder="e.g. Bright Indirect Light" className="bg-transparent border-b border-[#31332C]/20 py-4 outline-none font-headline text-xl text-[#31332C] placeholder:text-[#31332C]/20 focus:border-[#785A1A] transition-all w-full" />
+                        </div>
+                        <div className="flex flex-col gap-3 group">
+                           <label className="font-label text-[10px] tracking-widest uppercase text-[#5E6058] font-black group-focus-within:text-[#785A1A] transition-colors">Watering Frequency</label>
+                           <div className="relative">
+                             <button
+                               type="button"
+                               onClick={() => setIsWaterFrequencyOpen((current) => !current)}
+                               onBlur={() => window.setTimeout(() => setIsWaterFrequencyOpen(false), 120)}
+                               className="flex min-h-[57px] w-full items-center justify-between border-b border-[#31332C]/20 bg-transparent py-4 text-left font-headline text-xl font-normal text-[#31332C] outline-none transition-all hover:border-[#B1B3A9]/60 focus:border-[#785A1A]"
+                               aria-haspopup="listbox"
+                               aria-expanded={isWaterFrequencyOpen}
+                             >
+                               <span>{waterFrequency}</span>
+                               <span className="material-symbols-outlined text-[20px] text-[#785A1A]">expand_more</span>
+                             </button>
+                             {isWaterFrequencyOpen && (
+                               <div
+                                 role="listbox"
+                                 className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-64 overflow-y-auto border border-[#D9DBCF] bg-[#FBF9F4] shadow-xl shadow-black/10"
+                               >
+                                 {WATER_FREQUENCY_OPTIONS.map((option) => (
+                                   <button
+                                     key={option}
+                                     type="button"
+                                     role="option"
+                                     aria-selected={waterFrequency === option}
+                                     onMouseDown={(event) => event.preventDefault()}
+                                     onClick={() => {
+                                       setWaterFrequency(option);
+                                       setIsWaterFrequencyOpen(false);
+                                     }}
+                                     className={`flex w-full items-center justify-between px-4 py-3 text-left font-body text-[14px] transition-colors ${
+                                       waterFrequency === option
+                                         ? 'bg-[#0F3A3A] text-[#FBF9F4]'
+                                         : 'text-[#31332C] hover:bg-[#E8E9E0]'
+                                     }`}
+                                   >
+                                     {option}
+                                   </button>
+                                 ))}
+                               </div>
+                             )}
+                           </div>
+                        </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       <div className="flex flex-col gap-3 group">
@@ -582,6 +699,58 @@ const ManageInventory = () => {
                          </label>
                          <p className="font-body text-[10px] text-[#5E6058]/60 mt-1">Featured items appear at the top of the discovery grid.</p>
                       </div>
+                  </div>
+
+                  <div className="border border-[#B1B3A9]/25 bg-[#FBF9F4] p-5">
+                    <label className="flex cursor-pointer items-start gap-4">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-5 w-5 accent-[#0F3A3A]"
+                        checked={isGift}
+                        onChange={(event) => handleGiftToggle(event.target.checked)}
+                      />
+                      <span>
+                        <span className="block font-label text-[10px] font-black uppercase tracking-[0.18em] text-[#31332C]">
+                          Show on gift page
+                        </span>
+                        <span className="mt-2 block font-body text-[13px] leading-relaxed text-[#5E6058]">
+                          Enable this when the product should appear in the Gifts page sections like Curated, Gift Sets, Care Kits, or Premium.
+                        </span>
+                      </span>
+                    </label>
+                    {isGift && (
+                      <div className="mt-5 border-t border-[#B1B3A9]/20 pt-5">
+                        <p className="font-label text-[9px] font-black uppercase tracking-[0.18em] text-[#785A1A]">Gift Page Sections</p>
+                        <div className="mt-3 grid gap-3 md:grid-cols-3">
+                          {GIFT_SECTION_OPTIONS.map((option) => {
+                            const selected = giftSections.includes(option.id);
+                            return (
+                              <button
+                                key={option.id}
+                                type="button"
+                                onClick={() => toggleGiftSection(option.id)}
+                                className={`border p-4 text-left transition-colors ${
+                                  selected
+                                    ? 'border-[#0F3A3A] bg-[#0F3A3A] text-[#FBF9F4]'
+                                    : 'border-[#B1B3A9]/35 bg-white text-[#31332C] hover:border-[#0F3A3A]/40'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-[17px]">
+                                    {selected ? 'check_box' : 'check_box_outline_blank'}
+                                  </span>
+                                  <span className="font-label text-[9px] font-black uppercase tracking-[0.14em]">{option.label}</span>
+                                </span>
+                                <span className={`mt-2 block font-body text-[11px] leading-relaxed ${selected ? 'text-[#FBF9F4]/75' : 'text-[#5E6058]'}`}>
+                                  {option.helper}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="mt-3 font-body text-[11px] text-[#5E6058]/65">Curated includes every product marked for the gift page.</p>
+                      </div>
+                    )}
                   </div>
 
                </div>

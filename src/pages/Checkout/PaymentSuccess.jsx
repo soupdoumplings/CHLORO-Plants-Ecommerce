@@ -110,6 +110,23 @@ const getTransactionFromParams = (searchParams) => {
   };
 };
 
+const getEsewaPayloadFromParams = (searchParams) => {
+  const esewaData = searchParams.get('data');
+  if (!esewaData) return null;
+  return parseEsewaResponse(esewaData);
+};
+
+const getPaymentReferenceFromParams = (searchParams) => {
+  const esewaPayload = getEsewaPayloadFromParams(searchParams);
+  return searchParams.get('ref')
+    || esewaPayload?.transaction_uuid
+    || esewaPayload?.transaction_code
+    || searchParams.get('pidx')
+    || searchParams.get('transaction_id')
+    || searchParams.get('tidx')
+    || null;
+};
+
 const detailRows = (transaction) => [
   ['Order Reference', transaction.orderReference],
   ['Transaction ID', transaction.transactionCode],
@@ -169,7 +186,8 @@ const PaymentSuccess = () => {
   const [reminderOpen, setReminderOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const hasClearedCart = useRef(false);
-  const orderId = searchParams.get('order_id') || searchParams.get('purchase_order_id');
+  const [resolvedOrderId, setResolvedOrderId] = useState(searchParams.get('order_id') || searchParams.get('purchase_order_id') || '');
+  const orderId = resolvedOrderId;
 
   const paramTransaction = useMemo(() => getTransactionFromParams(searchParams), [searchParams]);
   const transaction = useMemo(() => (
@@ -192,6 +210,34 @@ const PaymentSuccess = () => {
       isMounted = false;
     };
   }, [clearBag]);
+
+  useEffect(() => {
+    const resolveOrderFromPaymentReference = async () => {
+      if (!user || orderId) return;
+
+      const paymentReference = getPaymentReferenceFromParams(searchParams);
+      if (!paymentReference) return;
+
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('payment_reference', paymentReference)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Could not resolve eSewa order reference:', error.message);
+        return;
+      }
+
+      if (order?.id) {
+        setOrderDetails(order);
+        setResolvedOrderId(order.id);
+      }
+    };
+
+    resolveOrderFromPaymentReference();
+  }, [orderId, searchParams, user]);
 
   useEffect(() => {
     const loadPurchasedPlants = async () => {

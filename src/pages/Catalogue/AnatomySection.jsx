@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { fallbackHeroImage } from '../../lib/localImages';
+import { getProductType, productTypeLabels } from '../../lib/productTypes';
 
 const AnatomySection = ({ product }) => {
-  const name = product?.name || 'This Plant';
+  const name = product?.name || 'This Product';
+  const isPlantProduct = Boolean(product) && getProductType(product) === productTypeLabels.plants;
   const heroImage = product?.images && product.images.length > 0
     ? product.images[0]
     : fallbackHeroImage;
@@ -13,19 +15,31 @@ const AnatomySection = ({ product }) => {
     const optimalPlace = product?.optimal_place || '';
     const waterFrequency = product?.water_frequency || '';
 
-    const detail1 = {
-      title: 'Leaf',
-      subtitle: 'Details',
-      description: `${name} has distinctive foliage. Use the image and notes here to understand its shape, texture, and how it may look in your space.`,
-    };
+    const detail1 = isPlantProduct
+      ? {
+          title: 'Leaf',
+          subtitle: 'Details',
+          description: `${name} has distinctive foliage. Use the image and notes here to understand its shape, texture, and how it may look in your space.`,
+        }
+      : {
+          title: 'Item',
+          subtitle: 'Details',
+          description: `${name} is shown with its current catalogue image and notes so customers can understand the finish, format, and intended use before checkout.`,
+        };
 
-    const detail2 = {
-      title: 'Growth',
-      subtitle: 'Habit',
-      description: optimalPlace
-        ? `Thriving in ${optimalPlace.toLowerCase()} conditions${waterFrequency ? ` with ${waterFrequency.toLowerCase()} hydration` : ''}, the ${name} develops its signature form over time.`
-        : `New leaves open gradually as the plant settles into the right light, water, and room conditions.`,
-    };
+    const detail2 = isPlantProduct
+      ? {
+          title: 'Growth',
+          subtitle: 'Habit',
+          description: optimalPlace
+            ? `Thriving in ${optimalPlace.toLowerCase()} conditions${waterFrequency ? ` with ${waterFrequency.toLowerCase()} hydration` : ''}, the ${name} develops its signature form over time.`
+            : `New leaves open gradually as the plant settles into the right light, water, and room conditions.`,
+        }
+      : {
+          title: 'Shop',
+          subtitle: 'Context',
+          description: `${name} belongs to ${product?.category || 'the catalogue'} and can be paired with plants, gifts, or care routines depending on the customer's need.`,
+        };
 
     return [detail1, detail2];
   };

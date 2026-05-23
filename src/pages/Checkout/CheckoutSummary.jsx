@@ -176,7 +176,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success?method=esewa&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
+          successUrl: `${baseUrl}/payment/success`,
           failureUrl: `${baseUrl}/payment/failure?order_id=${order.id}`,
         });
       } else if (paymentMethod === 'khalti') {

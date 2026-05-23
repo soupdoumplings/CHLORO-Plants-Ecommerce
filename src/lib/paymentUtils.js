@@ -24,6 +24,12 @@ const generateEsewaSignature = (message, secret) => {
   return CryptoJS.enc.Base64.stringify(hash);
 };
 
+const formatEsewaAmount = (value) => {
+  const amount = Number(value || 0);
+  if (!Number.isFinite(amount)) return '0';
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+};
+
 export const generateTransactionId = () => {
   return `PP-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 };
@@ -38,17 +44,22 @@ export const initiateEsewaPayment = ({
   successUrl,
   failureUrl,
 }) => {
-  const signatureMessage = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${ESEWA_CONFIG.productCode}`;
+  const formattedAmount = formatEsewaAmount(amount);
+  const formattedTaxAmount = formatEsewaAmount(taxAmount);
+  const formattedServiceCharge = formatEsewaAmount(serviceCharge);
+  const formattedDeliveryCharge = formatEsewaAmount(deliveryCharge);
+  const formattedTotalAmount = formatEsewaAmount(totalAmount);
+  const signatureMessage = `total_amount=${formattedTotalAmount},transaction_uuid=${transactionUuid},product_code=${ESEWA_CONFIG.productCode}`;
   const signature = generateEsewaSignature(signatureMessage, ESEWA_CONFIG.secretKey);
 
   const formData = {
-    amount: String(amount),
-    tax_amount: String(taxAmount),
-    total_amount: String(totalAmount),
+    amount: formattedAmount,
+    tax_amount: formattedTaxAmount,
+    total_amount: formattedTotalAmount,
     transaction_uuid: transactionUuid,
     product_code: ESEWA_CONFIG.productCode,
-    product_service_charge: String(serviceCharge),
-    product_delivery_charge: String(deliveryCharge),
+    product_service_charge: formattedServiceCharge,
+    product_delivery_charge: formattedDeliveryCharge,
     success_url: successUrl,
     failure_url: failureUrl,
     signed_field_names: 'total_amount,transaction_uuid,product_code',

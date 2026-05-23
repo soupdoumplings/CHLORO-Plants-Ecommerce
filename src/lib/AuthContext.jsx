@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       const message = String(error.message || '').toLowerCase();
       if (message.includes('sms') || message.includes('phone') || message.includes('provider')) {
-        throw new Error('Phone OTP needs an SMS provider in Supabase. For the free-tier demo, use password login and save the phone number in profile or checkout.');
+        throw new Error(`SMS Provider Error: ${error.message}. Please ensure your Twilio credentials are correct and configured in your remote Supabase Dashboard under Authentication -> Providers -> Phone.`);
       }
       throw error;
     }

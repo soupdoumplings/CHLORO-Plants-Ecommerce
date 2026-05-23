@@ -4,6 +4,12 @@ import { motion as Motion } from 'framer-motion';
 import { useCart } from '../../lib/CartContext';
 import { useWishlist } from '../../lib/WishlistContext';
 
+const collectionDisplayLabels = {
+  Plants: 'Exclusive',
+};
+
+const displayCollection = (value) => collectionDisplayLabels[value] || value;
+
 const money = (value) => `रू ${Number(value || 0).toLocaleString('en-NP', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -82,7 +88,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           </span>
           {product.type && (
             <span className="w-max bg-[#0F3A3A] px-3 py-1.5 font-label text-[8px] font-bold uppercase tracking-[0.14em] text-white">
-              {product.type}
+              {displayCollection(product.type)}
             </span>
           )}
           {product.isOnSale && (
@@ -143,7 +149,7 @@ const DiscoveryProductCard = ({ product, index }) => {
           </div>
           <div>
             <p className="font-label text-[8px] uppercase tracking-[0.2em] text-[#6D695F]">Best For</p>
-            <p className="mt-1 font-body text-[12px] text-[#11110E]">{product.type || tags[0] || 'Easy placement'}</p>
+            <p className="mt-1 font-body text-[12px] text-[#11110E]">{displayCollection(product.type) || tags[0] || 'Easy placement'}</p>
           </div>
         </div>
 
@@ -192,7 +198,7 @@ const ProductGrid = ({ products, loading, error, activeCategory }) => {
           <div>
             <p className="font-label text-[9px] uppercase tracking-[0.32em] text-[#6D695F]">Shop Collection</p>
             <h2 className="mt-3 font-headline text-[42px] leading-none text-[#11110E] md:text-[58px]">
-              {activeCategory || 'Products'}
+              {displayCollection(activeCategory) || 'Products'}
             </h2>
           </div>
           <p className="font-label text-[9px] uppercase tracking-[0.18em] text-[#6D695F]">
