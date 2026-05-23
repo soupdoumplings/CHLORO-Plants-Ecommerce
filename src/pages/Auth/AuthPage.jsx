@@ -112,8 +112,8 @@ const AuthPage = () => {
       const message = err.message || '';
       if (message.toLowerCase().includes('rate limit')) {
         setErrorMsg('Supabase rate limit exceeded. Try again in a few minutes.');
-      } else if (message.toLowerCase().includes('unsupported phone') || message.toLowerCase().includes('phone provider')) {
-        setErrorMsg('Phone OTP needs a Supabase SMS provider. Use email and password for this build.');
+      } else if (message.toLowerCase().includes('unsupported phone') || message.toLowerCase().includes('phone provider') || message.toLowerCase().includes('sms provider')) {
+        setErrorMsg(err.message);
       } else {
         setErrorMsg(message || 'An error occurred during authentication.');
       }
@@ -135,7 +135,7 @@ const AuthPage = () => {
 
   const changeLoginMethod = (method) => {
     if (method === 'phone' && !phoneAuthEnabled) {
-      setErrorMsg('Phone OTP needs a Supabase SMS provider. Use email and password for this build.');
+      setErrorMsg('Phone OTP is currently disabled. Please enable VITE_ENABLE_PHONE_AUTH in your settings.');
       setSuccessMsg('');
       return;
     }
@@ -259,7 +259,7 @@ const AuthPage = () => {
                 )}
                 {isLogin && !isForgotPassword && loginMethod === 'phone' && (
                   <p className="-mt-2 mb-5 font-body text-[11px] leading-relaxed text-[#797c73]">
-                    Phone codes require a Supabase SMS provider. For the free demo, use password login and keep phone saved in your profile or checkout details.
+                    Enter your phone number with your country code (e.g., +1XXXXXXXXXX) to receive a secure 6-digit verification code.
                   </p>
                 )}
 
