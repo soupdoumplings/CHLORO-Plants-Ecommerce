@@ -36,6 +36,7 @@ const Navbar = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications() || { notifications: [], unreadCount: 0 };
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef(null);
+  const isSignedIn = Boolean(user?.id);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,6 +64,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
+      setShowNotifications(false);
       await signOut();
       navigate('/');
     } catch (err) {
@@ -96,7 +98,7 @@ const Navbar = () => {
       { label: 'Shop', to: '/discovery', icon: 'local_florist' },
       { label: 'Gifts', to: '/products-gifts', icon: 'redeem' },
       { label: 'AI Diagnosis', to: '/ai-diagnosis', icon: 'psychiatry' },
-      ...(user ? [{ label: 'Journal', to: '/journal', icon: 'article' }] : []),
+      ...(isSignedIn ? [{ label: 'Journal', to: '/journal', icon: 'article' }] : []),
     ];
 
   return (
@@ -135,7 +137,7 @@ const Navbar = () => {
                 >
                   Gifts
                 </Link>
-                {user && (
+                {isSignedIn && (
                   <Link to="/journal" className={`${location.pathname === '/journal' ? text : textDim} hover:text-[#628141] transition-colors`}>The Journal</Link>
                 )}
               </>
@@ -186,7 +188,7 @@ const Navbar = () => {
           )}
 
           <div className="flex items-center gap-[1.2rem]">
-                {user && (
+                {isSignedIn && (
                   <div className="relative flex items-center justify-center" ref={notificationsRef}>
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
@@ -210,7 +212,7 @@ const Navbar = () => {
                     </button>
 
                     <AnimatePresence>
-                      {showNotifications && (
+                      {isSignedIn && showNotifications && (
                         <Motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -284,7 +286,7 @@ const Navbar = () => {
                   </div>
                 )}
 
-            {!isAdmin && (
+            {!isAdmin && isSignedIn && (
               <Link to="/cart" className={navIconAction} title="Cart">
                 <span className={navIcon}>shopping_bag</span>
                 <AnimatePresence>
@@ -304,7 +306,7 @@ const Navbar = () => {
             )}
 
             <div className="hidden items-center gap-[1.2rem] md:flex">
-              {!user ? (
+              {!isSignedIn ? (
                 <Link to="/login" className={`font-headline text-[13px] tracking-tight uppercase ${textDim} hover:text-[#628141] transition-colors ml-2`}>
                   LOGIN
                 </Link>
@@ -388,7 +390,7 @@ const Navbar = () => {
               )}
 
               <div className="mt-4 flex flex-wrap gap-3 border-t border-[#FBF9F4]/12 pt-4">
-                {!user ? (
+                {!isSignedIn ? (
                   <Link
                     to="/login"
                     className="bg-[#FBF9F4] px-5 py-3 font-label text-[10px] font-bold uppercase tracking-[0.18em] text-[#0F3A3A]"
