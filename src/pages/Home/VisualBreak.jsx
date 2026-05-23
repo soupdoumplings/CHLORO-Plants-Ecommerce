@@ -84,7 +84,9 @@ const Toolkit = () => {
           .map(normalizeTool);
 
         const starterTools = careTools.filter(isStarterTool);
-        setTools((starterTools.length ? starterTools : careTools).slice(0, 4));
+        const starterToolIds = new Set(starterTools.map((tool) => tool.id));
+        const remainingTools = careTools.filter((tool) => !starterToolIds.has(tool.id));
+        setTools([...starterTools, ...remainingTools].slice(0, 4));
       } catch (err) {
         setError(err.message || 'Care tools could not be loaded.');
         setTools([]);
