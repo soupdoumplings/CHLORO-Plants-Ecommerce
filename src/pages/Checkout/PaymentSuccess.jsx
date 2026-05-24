@@ -134,6 +134,37 @@ const detailRows = (transaction) => [
   ['Amount', formatAmount(transaction.amount)],
 ];
 
+const getPendingWateringReminder = ({ orderId, transactionId }) => {
+  const keys = [
+    orderId ? `chloro_pending_watering_${orderId}` : '',
+    transactionId && transactionId !== fallbackValue ? `chloro_pending_watering_${transactionId}` : '',
+  ].filter(Boolean);
+
+  for (const key of keys) {
+    try {
+      const parsed = JSON.parse(window.sessionStorage.getItem(key) || 'null');
+      if (parsed?.plants?.length) return parsed;
+    } catch {
+      // Ignore broken storage entries and continue to the next key.
+    }
+  }
+
+  return null;
+};
+
+const clearPendingWateringReminder = ({ orderId, transactionId }) => {
+  [
+    orderId ? `chloro_pending_watering_${orderId}` : '',
+    transactionId && transactionId !== fallbackValue ? `chloro_pending_watering_${transactionId}` : '',
+  ].filter(Boolean).forEach((key) => {
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {
+      // Non-critical cleanup.
+    }
+  });
+};
+
 const statusLabels = {
   completed: 'Complete',
   pending: 'Pending',
@@ -243,17 +274,30 @@ const PaymentSuccess = () => {
     const loadPurchasedPlants = async () => {
       if (!user || !orderId) return;
 
+      const pendingReminder = getPendingWateringReminder({
+        orderId,
+        transactionId: paramTransaction.transactionCode,
+      });
+
       const { data, error } = await supabase
         .from('order_items')
         .select('product_id, product_name, products(id, name, images, water_frequency, category, description, info, tags)')
         .eq('order_id', orderId);
 
-      if (error || !data?.length) return;
+      if (error || !data?.length) {
+        if (pendingReminder?.plants?.length) {
+          setPurchasedPlants(pendingReminder.plants);
+          setReminderOpen(true);
+        }
+        return;
+      }
 
       const plants = data.map((item) => ({
         id: item.products?.id || item.product_id,
         name: item.products?.name || item.product_name,
         images: item.products?.images || [],
+        image: item.products?.images?.[0],
+        product_image_snapshot: item.products?.images?.[0],
         water_frequency: item.products?.water_frequency || 'Every 7 Days',
         category: item.products?.category,
         description: item.products?.description,
@@ -261,12 +305,19 @@ const PaymentSuccess = () => {
         tags: item.products?.tags || [],
       })).filter((plant) => (plant.id || plant.name) && getProductType(plant) === productTypeLabels.plants);
 
-      setPurchasedPlants(plants);
-      setReminderOpen(plants.length > 0);
+      const reminderPlants = plants.length ? plants : pendingReminder?.plants || [];
+      setPurchasedPlants(reminderPlants);
+      setReminderOpen(reminderPlants.length > 0);
+      if (reminderPlants.length) {
+        clearPendingWateringReminder({
+          orderId,
+          transactionId: paramTransaction.transactionCode,
+        });
+      }
     };
 
     loadPurchasedPlants();
-  }, [orderId, user]);
+  }, [orderId, paramTransaction.transactionCode, user]);
 
   useEffect(() => {
     const reconcilePayment = async () => {

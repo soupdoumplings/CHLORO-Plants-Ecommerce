@@ -8,6 +8,31 @@ import { initiateEsewaPayment, initiateKhaltiPayment, generateTransactionId, get
 import { saveCheckoutBillingDetails } from '../../lib/customerProfile';
 import { sendOrderEmailNotification } from '../../lib/orderNotifications';
 
+const storePendingWateringReminder = ({ orderId, transactionId, cartItems }) => {
+  const plants = (cartItems || []).map((item) => ({
+    id: item.productId,
+    name: item.name,
+    image: item.image,
+    product_image_snapshot: item.image,
+    water_frequency: 'Every 7 Days',
+  })).filter((item) => item.id || item.name);
+
+  if (!plants.length) return;
+
+  try {
+    const payload = JSON.stringify({
+      orderId,
+      transactionId,
+      plants,
+      createdAt: new Date().toISOString(),
+    });
+    window.sessionStorage.setItem(`chloro_pending_watering_${orderId}`, payload);
+    window.sessionStorage.setItem(`chloro_pending_watering_${transactionId}`, payload);
+  } catch {
+    // Reminder handoff is helpful, not required for checkout success.
+  }
+};
+
 const paymentLabels = {
   card: { text: 'Pay Securely', color: '#1A1A1A' },
   esewa: { text: 'Proceed to eSewa', color: '#60BB46' },
@@ -168,6 +193,12 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
 
+      storePendingWateringReminder({
+        orderId: order.id,
+        transactionId,
+        cartItems,
+      });
+
       if (paymentMethod === 'esewa') {
         initiateEsewaPayment({
           totalAmount: total,
@@ -176,7 +207,7 @@ const CheckoutSummary = ({ paymentMethod, checkoutDetails }) => {
           serviceCharge: 0,
           deliveryCharge: shipping,
           transactionUuid: transactionId,
-          successUrl: `${baseUrl}/payment/success`,
+          successUrl: `${baseUrl}/payment/success?method=esewa&order_id=${order.id}&ref=${transactionId}&amount=${total}`,
           failureUrl: `${baseUrl}/payment/failure?order_id=${order.id}`,
         });
       } else if (paymentMethod === 'khalti') {
